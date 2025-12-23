@@ -5,6 +5,9 @@
   <title>Investors | ChemSus Technologies Pvt Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/logo.png"> <!-- favicon [web:91] -->
+
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
@@ -50,27 +53,24 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-family: "Montserrat", sans-serif;
       font-weight: 700;
       font-size: 20px;
       letter-spacing: 0.03em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      color: #ffffff;
     }
 
-    .nav-logo-badge {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      border: 2px solid #ffffff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 14px;
+    .nav-logo-img {
+      height: 34px;
+      width: auto;
     }
 
     .nav-menu {
@@ -78,6 +78,7 @@
       display: flex;
       gap: 20px;
       font-size: 15px;
+      flex-wrap: wrap;
     }
 
     .nav-menu li a {
@@ -89,6 +90,45 @@
     .nav-menu li a.active,
     .nav-menu li a:hover {
       border-color: #ffffff;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* SEARCH (with icon) */
+    .search-form {
+      position: relative;
+    }
+
+    .search-input {
+      padding: 6px 28px 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.75);
+      background: rgba(255,255,255,0.08);
+      color: #ffffff;
+      font-size: 13px;
+      min-width: 170px;
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: #d1d5db;
+      font-size: 12px;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 16px;
+      color: #ffffff;
+      pointer-events: none;
     }
 
     /* HERO with chemical pattern */
@@ -106,7 +146,6 @@
       text-align: center;
     }
 
-    /* “Molecule” dots */
     .hero::before {
       content: "";
       position: absolute;
@@ -184,7 +223,6 @@
       max-width: 760px;
     }
 
-    /* FUNDING CARD with subtle lab stripe */
     .funding-wrapper {
       display: grid;
       grid-template-columns: 1.05fr 1.6fr;
@@ -294,7 +332,6 @@
       margin-bottom: 4px;
     }
 
-    /* SMALL LAB ICON STRIP */
     .icon-strip {
       display: flex;
       flex-wrap: wrap;
@@ -412,17 +449,32 @@
   <!-- NAVBAR -->
   <header class="navbar">
     <div class="nav-container">
-      <div class="nav-logo">
-        <span class="nav-logo-badge">Cs</span>
-        ChemSus Technologies Pvt Ltd
+      <a href="index.html" class="nav-logo">
+        <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+        <span>ChemSus Technologies Pvt Ltd</span>
+      </a>
+
+      <div class="nav-actions">
+        <ul class="nav-menu">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="products.html">Products</a></li>
+          <li><a href="recognitions.html">Recognitions</a></li>
+          <li><a href="investors.html" class="active">Investors</a></li>
+          <li><a href="contact.html">Contact us</a></li>
+        </ul>
+
+        <!-- Search box with icon -->
+        <form class="search-form" id="siteSearchForm">
+          <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages: home, products...">
+          <span class="search-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 
+                       1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 
+                       5.5 5.5 0 0 1 11 0"></path>
+            </svg>
+          </span>
+        </form>
       </div>
-      <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="products.html">Products</a></li>
-        <li><a href="recognitions.html">Recognitions</a></li>
-        <li><a href="investors.html" class="active">Investors</a></li>
-        <li><a href="contact.html">Contact us</a></li>
-      </ul>
     </div>
   </header>
 
@@ -430,7 +482,7 @@
   <section class="hero">
     <div class="hero-content">
       <div class="hero-kicker">Capital for sustainable chemistry</div>
-      <h1 class="hero-title">Investors</h1>
+      <h1 class="hero-title" style="font-size: 50px;">Investors</h1>
       <p class="hero-subtitle">
         Strategic partnerships enabling advanced bamboo‑to‑chemicals platforms for nutraceutical, food, and personal‑care applications.
       </p>
@@ -449,18 +501,15 @@
 
     <!-- FUNDING CARD -->
     <div class="funding-wrapper">
-      <!-- LOGO SIDE -->
       <div class="funding-logo">
         <div class="funding-logo-inner">
-          <!-- Replace with actual BIRAC logo path -->
-          <img src="assets/investors.jpeg" alt="BIRAC - Biotechnology Industry Research Assistance Council">
+          <img src="assets/investors.png" alt="BIRAC - Biotechnology Industry Research Assistance Council">
         </div>
         <p class="funding-logo-caption">
           Biotechnology Industry Research Assistance Council (BIRAC) – Biotechnology Ignition Grant (BIG), North Eastern Region.
         </p>
       </div>
 
-      <!-- TEXT SIDE -->
       <div class="funding-content">
         <div class="funding-pill-row">
           <span class="funding-pill">BIRAC‑BIG (NER)</span>
@@ -489,24 +538,20 @@
           The grant accelerates the journey from bench‑scale chemistry to pre‑commercial deployment, enabling process validation, regulatory data generation, and early customer evaluations.
         </p>
 
-        <!-- LAB ICON STRIP -->
         <div class="icon-strip">
           <span class="icon-pill">
-            <!-- simple flask icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M9 2v2.5l-3.6 6.2A4.5 4.5 0 0 0 9.5 18h5a4.5 4.5 0 0 0 4.1-7.3L15 4.5V2h-2v3.1l3.2 5.5A2.5 2.5 0 0 1 14.5 16h-5a2.5 2.5 0 0 1-2.2-3.8L10 5.1V2H9z"/>
             </svg>
             Wet‑chemistry process scale‑up
           </span>
           <span class="icon-pill">
-            <!-- molecule icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M7 4a3 3 0 1 0 2.92 3.55l2.16 1.25a3 3 0 1 0 .04 3.4l2.2 1.27A3 3 0 1 0 17 12a3 3 0 0 0-.46.04l-2.2-1.27A3 3 0 0 0 9.92 7.6L7.76 6.34A3 3 0 0 0 7 4z"/>
             </svg>
             Biomass‑derived intermediates
           </span>
           <span class="icon-pill">
-            <!-- shield icon -->
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M12 2 5 5v6c0 5 3.4 9.3 7 11 3.6-1.7 7-6 7-11V5l-7-3zm0 2.2 5 2.2v4.6c0 3.9-2.3 7.5-5 9.1-2.7-1.6-5-5.2-5-9.1V6.4l5-2.2z"/>
             </svg>
@@ -516,7 +561,6 @@
       </div>
     </div>
 
-    <!-- EXTRA SECTIONS -->
     <div class="divider"></div>
 
     <section>
@@ -562,6 +606,29 @@
   <footer>
     &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
   </footer>
+
+  <!-- SIMPLE PAGE SEARCH / REDIRECT SCRIPT -->
+  <script>
+    document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
+      if (!query) return;
+
+      if (query.includes('product')) {
+        window.location.href = 'products.html';
+      } else if (query.includes('recognition') || query.includes('award')) {
+        window.location.href = 'recognitions.html';
+      } else if (query.includes('investor') || query.includes('funding')) {
+        window.location.href = 'investors.html';
+      } else if (query.includes('contact') || query.includes('address') || query.includes('phone')) {
+        window.location.href = 'contact.html';
+      } else if (query.includes('home') || query.includes('objective') || query.includes('chemsus')) {
+        window.location.href = 'index.html';
+      } else {
+        alert('No matching page. Try: home, products, recognitions, investors, contact.');
+      }
+    });
+  </script>
 
 </body>
 </html>
