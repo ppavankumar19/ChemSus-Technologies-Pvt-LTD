@@ -123,7 +123,7 @@
       pointer-events: none;
     }
 
-    /* HERO */
+    /* HERO with dotted lights + overlay */
     .hero {
       position: relative;
       background: radial-gradient(circle at top left, #052b3f, #031521);
@@ -135,6 +135,29 @@
       color: #fff;
       border-top: 3px solid var(--accent);
       overflow: hidden;
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 150px 150px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(135deg, rgba(0,184,176,0.18) 0, transparent 40%, transparent 60%, rgba(0,116,199,0.2) 100%);
+      mix-blend-mode: screen;
+      opacity: 0.5;
+      pointer-events: none;
     }
 
     .hero-content {
