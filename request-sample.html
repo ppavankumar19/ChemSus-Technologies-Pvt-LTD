@@ -31,6 +31,8 @@
       line-height: 1.6;
       color: var(--ink);
       background-color: var(--bg);
+      display: flex;
+      min-height: 100vh;
     }
 
     a {
@@ -38,23 +40,19 @@
       color: inherit;
     }
 
-    /* NAVBAR */
-    .navbar {
+    /* COMPACT SIDEBAR NAVBAR */
+    .sidebar {
+      width: 240px;
       background: var(--primary);
       color: #ffffff;
-      padding: 12px 0;
-      border-bottom: 3px solid var(--accent);
-    }
-
-    .nav-container {
-      max-width: 1150px;
-      margin: 0 auto;
-      padding: 0 18px;
+      border-right: 3px solid var(--accent);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
     }
 
     .nav-logo {
@@ -63,87 +61,100 @@
       gap: 8px;
       font-family: "Montserrat", sans-serif;
       font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.03em;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
       color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     .nav-logo-img {
-      height: 34px;
+      height: 24px;
       width: auto;
     }
 
     .nav-menu {
       list-style: none;
-      display: flex;
-      gap: 20px;
-      font-size: 15px;
-      flex-wrap: wrap;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
     }
 
     .nav-menu li a {
+      display: block;
       color: #ffffff;
-      padding-bottom: 4px;
-      border-bottom: 2px solid transparent;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
     }
 
     .nav-menu li a.active,
     .nav-menu li a:hover {
-      border-color: #ffffff;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
     }
 
     /* SEARCH */
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
     .search-form {
       position: relative;
     }
 
     .search-input {
-      padding: 6px 28px 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.75);
-      background: rgba(255,255,255,0.08);
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
       color: #ffffff;
-      font-size: 13px;
-      min-width: 170px;
+      font-size: 12.5px;
       outline: none;
+      backdrop-filter: blur(10px);
     }
 
     .search-input::placeholder {
       color: #d1d5db;
-      font-size: 12px;
+      font-size: 11.5px;
     }
 
     .search-icon {
       position: absolute;
-      right: 8px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       color: #ffffff;
       pointer-events: none;
     }
 
-    /* HERO */
+    /* MAIN WRAPPER */
+    .main-wrapper {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HERO – match home hero bg */
     .hero {
       position: relative;
       overflow: hidden;
-      background: radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
-                  #041424;
-      color: #ffffff;
+      background: radial-gradient(circle at top left, #052b3f, #031521);
       height: 260px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      color: #ffffff;
+      border-top: 3px solid var(--accent);
     }
 
     .hero::before {
@@ -151,10 +162,10 @@
       position: absolute;
       inset: 0;
       background-image:
-        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
-      background-size: 140px 140px;
-      opacity: 0.6;
+        radial-gradient(circle at 12% 25%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 82% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 160px 160px;
+      opacity: 0.7;
       pointer-events: none;
     }
 
@@ -175,7 +186,7 @@
 
     .hero-title {
       font-family: "Montserrat", sans-serif;
-      font-size: 38px;
+      font-size: 40px;
       font-weight: 700;
       margin-bottom: 10px;
     }
@@ -190,6 +201,9 @@
       max-width: 1150px;
       margin: 0 auto;
       padding: 34px 18px 42px 18px;
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
     }
 
     .section-header {
@@ -313,10 +327,6 @@
       box-shadow: 0 8px 20px rgba(0,116,199,0.3);
     }
 
-    .form-submit:active {
-      transform: translateY(0);
-    }
-
     .success-message {
       background: #dcfce7;
       color: #166534;
@@ -336,169 +346,209 @@
       margin-top: 22px;
     }
 
+    /* RESPONSIVE */
+    @media (max-width: 1050px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-wrapper {
+        margin-left: 0;
+      }
+
+      .mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .mobile-toggle svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (min-width: 1051px) {
+      .mobile-toggle {
+        display: none;
+      }
+    }
+
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
         gap: 16px;
       }
-      
+
       .form-container {
         padding: 24px 20px;
       }
-      
+
       .hero {
         height: 230px;
       }
-      
+
       .hero-title {
-        font-size: 30px;
+        font-size: 32px;
       }
     }
 
     @media (max-width: 580px) {
-      .nav-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-      
-      .nav-menu {
-        flex-wrap: wrap;
-        gap: 12px;
-        font-size: 14px;
-      }
-      
       .hero-title {
-        font-size: 26px;
+        font-size: 28px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="nav-logo">
-        <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
-        <span>ChemSus Technologies Pvt Ltd</span>
-      </a>
+  <!-- Mobile Toggle Button -->
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-      <div class="nav-actions">
-        <ul class="nav-menu">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="products.html">Products</a></li>
-          <li><a href="shop.html">Shop</a></li>
-          <li><a href="collaboration.html">Collaboration</a></li>
-          <li><a href="recognitions.html">Recognitions</a></li>
-          <li><a href="investors.html">Investors</a></li>
-          <li><a href="contact.html">Contact us</a></li>
-          <li><a href="request-sample.html" class="active">Request for Sample</a></li>
-          <li><a href="orders.html">Orders</a></li>
-        </ul>
+  <!-- SIDEBAR NAVBAR -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
 
-        <form class="search-form" id="siteSearchForm">
-          <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages: home, products...">
-          <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
-            </svg>
-          </span>
-        </form>
-      </div>
-    </div>
-  </header>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html" class="active">Request for Sample</a></li>
+      <li><a href="orders.html">Orders</a></li>
+    </ul>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-kicker">Sample Request</div>
-      <h1 class="hero-title">Request for Sample</h1>
-      <p class="hero-subtitle">
-        Request free samples of our sustainable bamboo-derived chemicals for evaluation and testing.
-      </p>
-    </div>
-  </section>
-
-  <!-- MAIN -->
-  <main>
-    <div class="section-header">
-      <h2>Sample Request Form</h2>
-      <span class="section-chip">Evaluation Samples</span>
-    </div>
-    <p class="section-intro">
-      Fill out the form below to request evaluation samples of our product. 
-      Our team will review and discuss with you and dispatch the sample.
-    </p>
-
-    <div class="form-container">
-      <div class="success-message" id="successMessage">
-        ✓ Thank you! Your sample request has been submitted successfully. Our team will contact you within 24 hours.
-      </div>
-
-      <form id="sampleRequestForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="companyName">Name of the Company</label>
-            <input type="text" id="companyName" class="form-input" name="companyName" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="individualName">Individual Name</label>
-            <input type="text" id="individualName" class="form-input" name="individualName" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="email">Email ID</label>
-            <input type="email" id="email" class="form-input" name="email" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="phone">Phone No</label>
-            <input type="tel" id="phone" class="form-input" name="phone" required>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label class="form-label" for="intendedUse">Intended use of the product</label>
-          <textarea id="intendedUse" class="form-textarea" name="intendedUse" placeholder="Please describe how you plan to use our products (e.g., R&D testing, product formulation, quality evaluation, etc.)" required></textarea>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="quantity">Anticipated Quantity required</label>
-            <input type="text" id="quantity" class="form-input" name="quantity" placeholder="e.g., 100g, 1kg, etc." required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="timeline">Time Line</label>
-            <input type="text" id="timeline" class="form-input" name="timeline" placeholder="e.g., 2 weeks, 1 month, urgent" required>
-          </div>
-        </div>
-
-        <!-- NEW ORDER FREQUENCY FIELD ADDED -->
-        <div class="form-group full-width">
-          <label class="form-label" for="orderFrequency">Order Frequency</label>
-          <select id="orderFrequency" class="form-select" name="orderFrequency" required>
-            <option value="">Select order frequency</option>
-            <option value="one-time">One-time evaluation</option>
-            <option value="monthly">Monthly recurring</option>
-            <option value="quarterly">Quarterly recurring</option>
-            <option value="other">Other (please specify)</option>
-          </select>
-        </div>
-
-        <button type="submit" class="form-submit">Submit Sample Request</button>
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </span>
       </form>
     </div>
-  </main>
+  </nav>
 
-  <footer>
-    &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
-  </footer>
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Sample Request</div>
+        <h1 class="hero-title">Request for Sample</h1>
+        <p class="hero-subtitle">
+          Request free samples of our sustainable bamboo-derived chemicals for evaluation and testing.
+        </p>
+      </div>
+    </section>
 
-  <!-- FORM HANDLING SCRIPT -->
+    <!-- MAIN -->
+    <main>
+      <div class="section-header">
+        <h2>Sample Request Form</h2>
+        <span class="section-chip">Evaluation Samples</span>
+      </div>
+      <p class="section-intro">
+        Fill out the form below to request evaluation samples of our product. 
+        Our team will review and discuss with you and dispatch the sample.
+      </p>
+
+      <div class="form-container">
+        <div class="success-message" id="successMessage">
+          ✓ Thank you! Your sample request has been submitted successfully. Our team will contact you within 24 hours.
+        </div>
+
+        <form id="sampleRequestForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="companyName">Name of the Company</label>
+              <input type="text" id="companyName" class="form-input" name="companyName" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="individualName">Individual Name</label>
+              <input type="text" id="individualName" class="form-input" name="individualName" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="email">Email ID</label>
+              <input type="email" id="email" class="form-input" name="email" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="phone">Phone No</label>
+              <input type="tel" id="phone" class="form-input" name="phone" required>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="intendedUse">Intended use of the product</label>
+            <textarea id="intendedUse" class="form-textarea" name="intendedUse" placeholder="Please describe how you plan to use our products (e.g., R&D testing, product formulation, quality evaluation, etc.)" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="quantity">Anticipated Quantity required</label>
+              <input type="text" id="quantity" class="form-input" name="quantity" placeholder="e.g., 100g, 1kg, etc." required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="timeline">Time Line</label>
+              <input type="text" id="timeline" class="form-input" name="timeline" placeholder="e.g., 2 weeks, 1 month, urgent" required>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="orderFrequency">Order Frequency</label>
+            <select id="orderFrequency" class="form-select" name="orderFrequency" required>
+              <option value="">Select order frequency</option>
+              <option value="one-time">One-time evaluation</option>
+              <option value="monthly">Monthly recurring</option>
+              <option value="quarterly">Quarterly recurring</option>
+              <option value="other">Other (please specify)</option>
+            </select>
+          </div>
+
+          <button type="submit" class="form-submit">Submit Sample Request</button>
+        </form>
+      </div>
+    </main>
+
+    <footer>
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- SCRIPTS -->
   <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
     // Site search functionality
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -528,28 +578,12 @@
       }
     });
 
-    // Form submission handler - UPDATED TO INCLUDE ORDER FREQUENCY
+    // Form submission handler
     document.getElementById('sampleRequestForm').addEventListener('submit', function(e) {
       e.preventDefault();
-      
-      // Show success message
       document.getElementById('successMessage').style.display = 'block';
       document.getElementById('sampleRequestForm').style.opacity = '0.7';
-      
-      // Scroll to success message
       document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
-      
-      // Log all form data including new order frequency field
-      console.log('Form submitted:', {
-        companyName: document.getElementById('companyName').value,
-        individualName: document.getElementById('individualName').value,
-        email: document.getElementById('email').value,
-        phone: document.getElementById('phone').value,
-        intendedUse: document.getElementById('intendedUse').value,
-        quantity: document.getElementById('quantity').value,
-        timeline: document.getElementById('timeline').value,
-        orderFrequency: document.getElementById('orderFrequency').value
-      });
     });
   </script>
 

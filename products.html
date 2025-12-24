@@ -25,27 +25,25 @@
       background: var(--bg);
       color: var(--ink);
       line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
     }
 
     a { text-decoration: none; color: inherit; }
 
-    /* NAVBAR */
-    .navbar {
+    /* COMPACT SIDEBAR NAVBAR */
+    .sidebar {
+      width: 240px;
       background: var(--primary);
-      color: #fff;
-      padding: 12px 0;
-      border-bottom: 3px solid var(--accent);
-    }
-
-    .nav-container {
-      max-width: 1150px;
-      margin: auto;
-      padding: 0 18px;
+      color: #ffffff;
+      border-right: 3px solid var(--accent);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
     }
 
     .nav-logo {
@@ -53,73 +51,87 @@
       align-items: center;
       gap: 8px;
       font-family: "Montserrat", sans-serif;
-      font-size: 20px;
+      font-size: 16px;
       font-weight: 700;
-      letter-spacing: 0.03em;
-      color: #fff;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
     }
 
     .nav-logo-img { 
-      height: 34px; 
+      height: 24px; 
       width: auto;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
     }
 
     .nav-menu {
       list-style: none;
-      display: flex;
-      gap: 20px;
-      font-size: 15px;
-      flex-wrap: wrap;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
     }
 
     .nav-menu li a {
-      color: #fff;
-      border-bottom: 2px solid transparent;
-      padding-bottom: 4px;
+      display: block;
+      color: #ffffff;
+      border-left: 3px solid transparent;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      transition: all 0.2s ease;
     }
 
     .nav-menu li a.active,
     .nav-menu li a:hover { 
-      border-color: #fff; 
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
     }
 
     /* SEARCH */
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
     .search-form {
       position: relative;
     }
 
     .search-input {
-      padding: 6px 28px 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.75);
-      background: rgba(255,255,255,0.08);
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
       color: #ffffff;
-      font-size: 13px;
-      min-width: 170px;
+      font-size: 12.5px;
       outline: none;
+      backdrop-filter: blur(10px);
     }
 
     .search-input::placeholder {
       color: #d1d5db;
-      font-size: 12px;
+      font-size: 11.5px;
     }
 
     .search-icon {
       position: absolute;
-      right: 8px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       color: #ffffff;
       pointer-events: none;
+    }
+
+    /* MAIN WRAPPER */
+    .main-wrapper {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     /* HERO */
@@ -167,7 +179,7 @@
 
     .hero-title {
       font-family: "Montserrat", sans-serif;
-      font-size: 50px;
+      font-size: 40px;
       font-weight: 700;
       margin-bottom: 10px;
     }
@@ -176,20 +188,24 @@
       font-size: 16px;
       color: #e2f3ff;
       max-width: 800px;
+      margin: 0 auto;
     }
 
     /* MAIN */
     main {
       max-width: 1150px;
-      margin: auto;
-      padding: 40px 18px;
+      margin: 0 auto;
+      padding: 34px 18px 42px 18px;
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
     }
 
     .section {
       background: #fff;
-      padding: 34px;
+      padding: 36px;
       border-radius: 14px;
-      box-shadow: 0 12px 28px rgba(15,23,42,0.12);
+      box-shadow: 0 14px 30px rgba(15,23,42,0.12);
       border-top: 4px solid var(--accent);
     }
 
@@ -200,7 +216,7 @@
 
     .section-header h2 {
       font-family: "Montserrat", sans-serif;
-      font-size: 26px;
+      font-size: 24px;
       color: var(--primary-dark);
       margin-bottom: 6px;
     }
@@ -226,7 +242,7 @@
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 28px;
+      gap: 24px;
       margin-top: 32px;
     }
 
@@ -286,59 +302,96 @@
       margin-top: 24px;
     }
 
+    /* RESPONSIVE */
+    @media (max-width: 1050px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-wrapper {
+        margin-left: 0;
+      }
+
+      .mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .mobile-toggle svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (min-width: 1051px) {
+      .mobile-toggle {
+        display: none;
+      }
+    }
+
     @media (max-width: 900px) {
       .product-grid {
         grid-template-columns: 1fr;
         gap: 24px;
       }
       .hero-title {
-        font-size: 38px;
+        font-size: 32px;
       }
     }
 
     @media (max-width: 580px) {
-      .nav-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-      .nav-menu {
-        flex-wrap: wrap;
-        gap: 12px;
-        font-size: 14px;
-      }
       .hero-title {
-        font-size: 32px;
+        font-size: 28px;
       }
     }
   </style>
 </head>
 <body>
 
-<header class="navbar">
-  <div class="nav-container">
+  <!-- Mobile Toggle Button -->
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
+
+  <!-- SIDEBAR NAVBAR -->
+  <nav class="sidebar" id="sidebar">
     <a href="index.html" class="nav-logo">
       <img src="assets/logo.jpg" class="nav-logo-img" alt="ChemSus Logo">
-      <span>ChemSus Technologies Pvt Ltd</span>
+      <span>ChemSus</span>
     </a>
 
-    <div class="nav-actions">
-      <ul class="nav-menu">
-        <li><a href="index.html">Home</a></li>
-        <li><a href="about.html">About Us</a></li>
-        <li><a href="products.html" class="active">Products</a></li>
-        <li><a href="shop.html">Shop</a></li>
-        <li><a href="collaboration.html">Collaboration</a></li>
-        <li><a href="recognitions.html">Recognitions</a></li>
-        <li><a href="investors.html">Investors</a></li>
-        <li><a href="contact.html">Contact us</a></li>
-        <li><a href="request-sample.html">Request for Sample</a></li>
-        <li><a href="orders.html">Orders</a></li>
-      </ul>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="products.html" class="active">Products</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="orders.html">Orders</a></li>
+    </ul>
 
-      <!-- Search box with icon -->
+    <div class="search-section">
       <form class="search-form" id="siteSearchForm">
-        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search products...">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
         <span class="search-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
@@ -346,106 +399,112 @@
         </span>
       </form>
     </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Bio-based Specialty Chemicals</div>
+        <h1 class="hero-title">Products</h1>
+        <p class="hero-subtitle">
+          High-purity, sustainable chemicals derived from renewable lignocellulosic biomass for
+          nutraceutical, food, cosmetic and industrial applications.
+        </p>
+      </div>
+    </section>
+
+    <main>
+      <section class="section">
+        <div class="section-header">
+          <h2>Our Product Portfolio</h2>
+          <span class="section-chip">Renewable Platform Molecules</span>
+          <p>Learn more about our sustainable chemical solutions</p>
+        </div>
+
+        <div class="product-grid">
+
+          <a href="products/5-hmf.html" class="product-card">
+            <img src="assets/chemical1.avif">
+            <h3>5-Hydroxymethylfurfural (5-HMF)</h3>
+            <p>Biomass-derived platform molecule used in fuels, polymers and pharma.</p>
+          </a>
+
+          <a href="products/calcium-levulinate.html" class="product-card">
+            <img src="assets/chemical2.png">
+            <h3>Calcium Levulinate</h3>
+            <p>Highly bioavailable calcium salt for nutraceutical applications.</p>
+          </a>
+
+          <a href="products/sodium-levulinate.html" class="product-card">
+            <img src="assets/chemical3.jpg">
+            <h3>Sodium Levulinate</h3>
+            <p>Biodegradable preservative for food and cosmetics.</p>
+          </a>
+
+          <a href="products/ethyl-levulinate.html" class="product-card">
+            <img src="assets/chemical4.jpeg">
+            <h3>Ethyl Levulinate</h3>
+            <p>Green solvent and fragrance ingredient.</p>
+          </a>
+
+          <a href="products/methyl-levulinate.html" class="product-card">
+            <img src="assets/chemical5.jpeg">
+            <h3>Methyl Levulinate</h3>
+            <p>Bio-based ester used in fuels and fine chemicals.</p>
+          </a>
+
+          <a href="products/levulinic-acid.html" class="product-card">
+            <img src="assets/chemical6.jpeg">
+            <h3>Levulinic Acid</h3>
+            <p>Key bio-platform chemical derived from biomass.</p>
+          </a>
+
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
   </div>
-</header>
 
-<section class="hero">
-  <div class="hero-content">
-    <div class="hero-kicker">Bio-based Specialty Chemicals</div>
-    <h1 class="hero-title">Products</h1>
-    <p class="hero-subtitle">
-      High-purity, sustainable chemicals derived from renewable lignocellulosic biomass for
-      nutraceutical, food, cosmetic and industrial applications.
-    </p>
-  </div>
-</section>
-
-<main>
-  <section class="section">
-    <div class="section-header">
-      <h2>Our Product Portfolio</h2>
-      <span class="section-chip">Renewable Platform Molecules</span>
-      <p>Learn more about our sustainable chemical solutions</p>
-    </div>
-
-    <div class="product-grid">
-
-      <a href="products/5-hmf.html" class="product-card">
-        <img src="assets/chemical1.avif">
-        <h3>5-Hydroxymethylfurfural (5-HMF)</h3>
-        <p>Biomass-derived platform molecule used in fuels, polymers and pharma.</p>
-      </a>
-
-      <a href="products/calcium-levulinate.html" class="product-card">
-        <img src="assets/chemical2.png">
-        <h3>Calcium Levulinate</h3>
-        <p>Highly bioavailable calcium salt for nutraceutical applications.</p>
-      </a>
-
-      <a href="products/sodium-levulinate.html" class="product-card">
-        <img src="assets/chemical3.jpg">
-        <h3>Sodium Levulinate</h3>
-        <p>Biodegradable preservative for food and cosmetics.</p>
-      </a>
-
-      <a href="products/ethyl-levulinate.html" class="product-card">
-        <img src="assets/chemical4.jpeg">
-        <h3>Ethyl Levulinate</h3>
-        <p>Green solvent and fragrance ingredient.</p>
-      </a>
-
-      <a href="products/methyl-levulinate.html" class="product-card">
-        <img src="assets/chemical5.jpeg">
-        <h3>Methyl Levulinate</h3>
-        <p>Bio-based ester used in fuels and fine chemicals.</p>
-      </a>
-
-      <a href="products/levulinic-acid.html" class="product-card">
-        <img src="assets/chemical6.jpeg">
-        <h3>Levulinic Acid</h3>
-        <p>Key bio-platform chemical derived from biomass.</p>
-      </a>
-
-    </div>
-  </section>
-</main>
-
-<footer>
-  © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
-</footer>
-
-<!-- UPDATED PAGE SEARCH / REDIRECT SCRIPT -->
-<script>
-  document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
-    if (!query) return;
-
-    if (query.includes('product') || query.includes('shop') || query.includes('chemical')) {
-      window.location.href = 'products.html';
-    } else if (query.includes('shop')) {
-      window.location.href = 'shop.html';
-    } else if (query.includes('recognition') || query.includes('award')) {
-      window.location.href = 'recognitions.html';
-    } else if (query.includes('investor') || query.includes('funding')) {
-      window.location.href = 'investors.html';
-    } else if (query.includes('contact') || query.includes('address') || query.includes('phone')) {
-      window.location.href = 'contact.html';
-    } else if (query.includes('home') || query.includes('objective') || query.includes('chemsus')) {
-      window.location.href = 'index.html';
-    } else if (query.includes('about') || query.includes('company')) {
-      window.location.href = 'about.html';
-    } else if (query.includes('collab') || query.includes('collaboration') || query.includes('partner')) {
-      window.location.href = 'collaboration.html';
-    } else if (query.includes('sample') || query.includes('request')) {
-      window.location.href = 'request-sample.html';
-    } else if (query.includes('order') || query.includes('orders')) {
-      window.location.href = 'orders.html';
-    } else {
-      alert('Try searching: 5-HMF, calcium levulinate, sodium levulinate, levulinic acid, shop, orders.');
+  <!-- SEARCH SCRIPT -->
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
     }
-  });
-</script>
+
+    document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
+      if (!query) return;
+
+      if (query.includes('product') || query.includes('shop') || query.includes('chemical')) {
+        window.location.href = 'products.html';
+      } else if (query.includes('shop')) {
+        window.location.href = 'shop.html';
+      } else if (query.includes('recognition') || query.includes('award')) {
+        window.location.href = 'recognitions.html';
+      } else if (query.includes('investor') || query.includes('funding')) {
+        window.location.href = 'investors.html';
+      } else if (query.includes('contact') || query.includes('address') || query.includes('phone')) {
+        window.location.href = 'contact.html';
+      } else if (query.includes('home') || query.includes('objective') || query.includes('chemsus')) {
+        window.location.href = 'index.html';
+      } else if (query.includes('about') || query.includes('company')) {
+        window.location.href = 'about.html';
+      } else if (query.includes('collab') || query.includes('collaboration') || query.includes('partner')) {
+        window.location.href = 'collaboration.html';
+      } else if (query.includes('sample') || query.includes('request')) {
+        window.location.href = 'request-sample.html';
+      } else if (query.includes('order') || query.includes('orders')) {
+        window.location.href = 'orders.html';
+      } else {
+        alert('Try searching: 5-HMF, calcium levulinate, sodium levulinate, levulinic acid, shop, orders.');
+      }
+    });
+  </script>
 
 </body>
 </html>

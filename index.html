@@ -29,6 +29,8 @@
       line-height: 1.6;
       color: var(--ink);
       background-color: var(--bg);
+      display: flex;
+      min-height: 100vh;
     }
 
     a {
@@ -36,23 +38,19 @@
       color: inherit;
     }
 
-    /* NAVBAR */
-    .navbar {
+    /* COMPACT SIDEBAR NAVBAR */
+    .sidebar {
+      width: 240px; /* Reduced from 280px */
       background: var(--primary);
       color: #ffffff;
-      padding: 12px 0;
-      border-bottom: 3px solid var(--accent);
-    }
-
-    .nav-container {
-      max-width: 1150px;
-      margin: 0 auto;
-      padding: 0 18px;
+      border-right: 3px solid var(--accent);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
     }
 
     .nav-logo {
@@ -61,76 +59,91 @@
       gap: 8px;
       font-family: "Montserrat", sans-serif;
       font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.03em;
+      font-size: 16px; /* Reduced from 18px */
+      letter-spacing: 0.02em;
       white-space: nowrap;
       color: #ffffff;
+      padding: 16px 20px; /* Reduced padding */
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     .nav-logo-img {
-      height: 34px;
+      height: 24px; /* Reduced from 28px */
       width: auto;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
     }
 
     .nav-menu {
       list-style: none;
-      display: flex;
-      gap: 20px;
-      font-size: 15px;
-      flex-wrap: wrap;
+      padding: 8px 0; /* Reduced padding */
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-menu li {
+      margin: 0;
     }
 
     .nav-menu li a {
+      display: block;
       color: #ffffff;
-      padding-bottom: 4px;
-      border-bottom: 2px solid transparent;
+      padding: 10px 20px; /* Reduced padding from 12px 24px */
+      font-size: 13.5px; /* Slightly reduced */
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
     }
 
     .nav-menu li a.active,
     .nav-menu li a:hover {
-      border-color: #ffffff;
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
     }
 
-    /* SEARCH (with icon) */
+    /* SEARCH */
+    .search-section {
+      padding: 12px 20px 16px; /* Reduced padding */
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
     .search-form {
       position: relative;
     }
 
     .search-input {
-      padding: 6px 28px 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.75);
-      background: rgba(255,255,255,0.08);
+      width: 100%;
+      padding: 8px 32px 8px 12px; /* Reduced padding */
+      border-radius: 6px; /* Slightly smaller radius */
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
       color: #ffffff;
-      font-size: 13px;
-      min-width: 170px;
+      font-size: 12.5px; /* Slightly reduced */
       outline: none;
+      backdrop-filter: blur(10px);
     }
 
     .search-input::placeholder {
       color: #d1d5db;
-      font-size: 12px;
+      font-size: 11.5px;
     }
 
     .search-icon {
       position: absolute;
-      right: 8px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
+      width: 14px; /* Slightly smaller */
+      height: 14px;
       color: #ffffff;
       pointer-events: none;
     }
 
-    /* HERO – chemical frame */
+    /* MAIN CONTENT WITH OFFSET */
+    .main-wrapper {
+      margin-left: 240px; /* Updated to match sidebar width */
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    /* HERO */
     .hero {
       position: relative;
       overflow: hidden;
@@ -313,6 +326,47 @@
       margin-top: 20px;
     }
 
+    @media (max-width: 1050px) { /* Adjusted breakpoint */
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      
+      .main-wrapper {
+        margin-left: 0;
+      }
+      
+      /* Mobile menu toggle */
+      .mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+      
+      .mobile-toggle svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (min-width: 1051px) {
+      .mobile-toggle {
+        display: none;
+      }
+    }
+
     @media (max-width: 900px) {
       .objective-grid {
         grid-template-columns: 1fr;
@@ -326,157 +380,152 @@
       .hero-title {
         font-size: 28px;
       }
-      .search-input {
-        width: 100%;
-      }
-      .nav-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-      .nav-menu {
-        flex-wrap: wrap;
-        gap: 12px;
-        font-size: 14px;
-      }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="nav-logo">
-        <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
-        <span>ChemSus Technologies Pvt Ltd</span>
-      </a>
+  <!-- Mobile Toggle Button (Hidden on Desktop) -->
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-      <div class="nav-actions">
-        <ul class="nav-menu">
-          <li><a href="index.html" class="active">Home</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="products.html">Products</a></li>
-          <li><a href="shop.html">Shop</a></li>
-          <li><a href="collaboration.html">Collaboration</a></li>
-          <li><a href="recognitions.html">Recognitions</a></li>
-          <li><a href="investors.html">Investors</a></li>
-          <li><a href="contact.html">Contact us</a></li>
-          <li><a href="request-sample.html">Request for Sample</a></li>
-          <li><a href="orders.html">Orders</a></li>
-        </ul>
+  <!-- COMPACT SIDEBAR NAVBAR -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
 
-        <!-- Search box with icon -->
-        <form class="search-form" id="siteSearchForm">
-          <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages: home, products...">
-          <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 
-                       1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 
-                       5.5 5.5 0 0 1 11 0"></path>
-            </svg>
-          </span>
-        </form>
-      </div>
+    <ul class="nav-menu">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="orders.html">Orders</a></li>
+    </ul>
+
+    <!-- Search box -->
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </span>
+      </form>
     </div>
-  </header>
-
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-kicker">RENEWABLE BIOMASS TO CHEMISTRY</div>
-      <h1 class="hero-title" >Lignocellulose‑based Specialty Chemicals</h1>
-      <p class="hero-subtitle">
-        Sustainable, green and future‑ready chemical solutions derived from renewable biomass for health, food and industrial applications.
-      </p>
-    </div>
-  </section>
+  </nav>
 
   <!-- MAIN CONTENT -->
-  <main>
-
-    <!-- OBJECTIVE -->
-    <section class="section">
-      <div class="objective-grid">
-        <div class="objective-logo">
-          <div class="objective-logo-inner">
-            <img src="assets/logo.jpg" alt="ChemSus Logo">
-          </div>
-        </div>
-
-        <div>
-          <div class="section-header">
-            <h2>Objective</h2>
-            <span class="section-chip">Our mission</span>
-          </div>
-          <p>
-            To develop sustainable, green and futuristic chemical processes using renewable
-            lignocellulosic biomass.
-          </p>
-          <p>
-            ChemSus Technologies focuses on the development of specialty chemicals including
-            cosmetic and food preservatives, disinfectants, active pharmaceutical ingredients,
-            anti‑corrosion agents, pesticides and ingredients for paints, inks and polymers.
-          </p>
-          <p>
-            Our processes emphasize eco‑friendly chemistry, scalability and reduced dependence
-            on fossil‑based resources.
-          </p>
-
-          <div class="icon-row">
-            <span class="icon-pill">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M9 2v2.5l-3.6 6.2A4.5 4.5 0 0 0 9.5 18h5a4.5 4.5 0 0 0 4.1-7.3L15 4.5V2h-2v3.1l3.2 5.5A2.5 2.5 0 0 1 14.5 16h-5a2.5 2.5 0 0 1-2.2-3.8L10 5.1V2H9z"></path>
-              </svg>
-              Green process development
-            </span>
-            <span class="icon-pill">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M7 4a3 3 0 1 0 2.92 3.55l2.16 1.25a3 3 0 1 0 .04 3.4l2.2 1.27A3 3 0 1 0 17 12a3 3 0 0 0-.46.04l-2.2-1.27A3 3 0 0 0 9.92 7.6L7.76 6.34A3 3 0 0 0 7 4z"></path>
-              </svg>
-              Biomass‑derived intermediates
-            </span>
-            <span class="icon-pill">
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M12 2 5 5v6c0 5 3.4 9.3 7 11 3.6-1.7 7-6 7-11V5l-7-3zm0 2.2 5 2.2v4.6c0 3.9-2.3 7.5-5 9.1-2.7-1.6-5-5.2-5-9.1V6.4l5-2.2z"></path>
-              </svg>
-              Reduced fossil dependence
-            </span>
-          </div>
-        </div>
+  <div class="main-wrapper">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">RENEWABLE BIOMASS TO CHEMISTRY</div>
+        <h1 class="hero-title">Lignocellulose‑based Specialty Chemicals</h1>
+        <p class="hero-subtitle">
+          Sustainable, green and future‑ready chemical solutions derived from renewable biomass for health, food and industrial applications.
+        </p>
       </div>
     </section>
 
-    <!-- FEATURES -->
-    <section class="section">
-      <div class="section-header">
-        <h2>What We Focus On</h2>
-        <span class="section-chip">Core areas</span>
-      </div>
-      <div class="features">
-        <div class="feature">
-          <h3>Sustainable Chemistry</h3>
-          <p>Green processes built on renewable lignocellulosic biomass, designed for lower carbon footprint and circular use of resources.</p>
-        </div>
-        <div class="feature">
-          <h3>Specialty Chemicals</h3>
-          <p>High‑value products for pharmaceutical, food, cosmetic and industrial applications, with strong emphasis on performance and safety.</p>
-        </div>
-        <div class="feature">
-          <h3>Industrial Scale‑up</h3>
-          <p>End‑to‑end development from laboratory research through pilot‑scale validation to commercial deployment with partners.</p>
-        </div>
-      </div>
-    </section>
+    <!-- MAIN CONTENT -->
+    <main>
+      <!-- OBJECTIVE -->
+      <section class="section">
+        <div class="objective-grid">
+          <div class="objective-logo">
+            <div class="objective-logo-inner">
+              <img src="assets/logo.jpg" alt="ChemSus Logo">
+            </div>
+          </div>
 
-  </main>
+          <div>
+            <div class="section-header">
+              <h2>Objective</h2>
+              <span class="section-chip">Our mission</span>
+            </div>
+            <p>
+              To develop sustainable, green and futuristic chemical processes using renewable
+              lignocellulosic biomass.
+            </p>
+            <p>
+              ChemSus Technologies focuses on the development of specialty chemicals including
+              cosmetic and food preservatives, disinfectants, active pharmaceutical ingredients,
+              anti‑corrosion agents, pesticides and ingredients for paints, inks and polymers.
+            </p>
+            <p>
+              Our processes emphasize eco‑friendly chemistry, scalability and reduced dependence
+              on fossil‑based resources.
+            </p>
 
-  <footer>
-    © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
-  </footer>
+            <div class="icon-row">
+              <span class="icon-pill">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M9 2v2.5l-3.6 6.2A4.5 4.5 0 0 0 9.5 18h5a4.5 4.5 0 0 0 4.1-7.3L15 4.5V2h-2v3.1l3.2 5.5A2.5 2.5 0 0 1 14.5 16h-5a2.5 2.5 0 0 1-2.2-3.8L10 5.1V2H9z"></path>
+                </svg>
+                Green process development
+              </span>
+              <span class="icon-pill">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M7 4a3 3 0 1 0 2.92 3.55l2.16 1.25a3 3 0 1 0 .04 3.4l2.2 1.27A3 3 0 1 0 17 12a3 3 0 0 0-.46.04l-2.2-1.27A3 3 0 0 0 9.92 7.6L7.76 6.34A3 3 0 0 0 7 4z"></path>
+                </svg>
+                Biomass‑derived intermediates
+              </span>
+              <span class="icon-pill">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2 5 5v6c0 5 3.4 9.3 7 11 3.6-1.7 7-6 7-11V5l-7-3zm0 2.2 5 2.2v4.6c0 3.9-2.3 7.5-5 9.1-2.7-1.6-5-5.2-5-9.1V6.4l5-2.2z"></path>
+                </svg>
+                Reduced fossil dependence
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
 
-  <!-- UPDATED PAGE SEARCH / REDIRECT SCRIPT -->
+      <!-- FEATURES -->
+      <section class="section">
+        <div class="section-header">
+          <h2>What We Focus On</h2>
+          <span class="section-chip">Core areas</span>
+        </div>
+        <div class="features">
+          <div class="feature">
+            <h3>Sustainable Chemistry</h3>
+            <p>Green processes built on renewable lignocellulosic biomass, designed for lower carbon footprint and circular use of resources.</p>
+          </div>
+          <div class="feature">
+            <h3>Specialty Chemicals</h3>
+            <p>High‑value products for pharmaceutical, food, cosmetic and industrial applications, with strong emphasis on performance and safety.</p>
+          </div>
+          <div class="feature">
+            <h3>Industrial Scale‑up</h3>
+            <p>End‑to‑end development from laboratory research through pilot‑scale validation to commercial deployment with partners.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- PAGE SEARCH / REDIRECT SCRIPT -->
   <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();

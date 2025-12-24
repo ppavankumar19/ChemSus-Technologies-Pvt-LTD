@@ -31,6 +31,8 @@
       line-height: 1.6;
       color: var(--ink);
       background-color: var(--bg);
+      display: flex;
+      min-height: 100vh;
     }
 
     a {
@@ -38,23 +40,19 @@
       color: inherit;
     }
 
-    /* NAVBAR */
-    .navbar {
+    /* COMPACT SIDEBAR NAVBAR */
+    .sidebar {
+      width: 240px;
       background: var(--primary);
       color: #ffffff;
-      padding: 12px 0;
-      border-bottom: 3px solid var(--accent);
-    }
-
-    .nav-container {
-      max-width: 1150px;
-      margin: 0 auto;
-      padding: 0 18px;
+      border-right: 3px solid var(--accent);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
     }
 
     .nav-logo {
@@ -63,72 +61,86 @@
       gap: 8px;
       font-family: "Montserrat", sans-serif;
       font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.03em;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
       color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     .nav-logo-img {
-      height: 34px;
+      height: 24px;
       width: auto;
     }
 
     .nav-menu {
       list-style: none;
-      display: flex;
-      gap: 20px;
-      font-size: 15px;
-      flex-wrap: wrap;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
     }
 
     .nav-menu li a {
+      display: block;
       color: #ffffff;
-      padding-bottom: 4px;
-      border-bottom: 2px solid transparent;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
     }
 
     .nav-menu li a.active,
     .nav-menu li a:hover {
-      border-color: #ffffff;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
     }
 
     /* SEARCH */
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
     .search-form {
       position: relative;
     }
 
     .search-input {
-      padding: 6px 28px 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.75);
-      background: rgba(255,255,255,0.08);
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
       color: #ffffff;
-      font-size: 13px;
-      min-width: 170px;
+      font-size: 12.5px;
       outline: none;
+      backdrop-filter: blur(10px);
     }
 
     .search-input::placeholder {
       color: #d1d5db;
-      font-size: 12px;
+      font-size: 11.5px;
     }
 
     .search-icon {
       position: absolute;
-      right: 8px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       color: #ffffff;
       pointer-events: none;
+    }
+
+    /* MAIN WRAPPER */
+    .main-wrapper {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
     /* HERO */
@@ -175,7 +187,7 @@
 
     .hero-title {
       font-family: "Montserrat", sans-serif;
-      font-size: 38px;
+      font-size: 40px;
       font-weight: 700;
       margin-bottom: 10px;
     }
@@ -190,6 +202,9 @@
       max-width: 1150px;
       margin: 0 auto;
       padding: 34px 18px 42px 18px;
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
     }
 
     .section-header {
@@ -369,6 +384,47 @@
       margin-top: 22px;
     }
 
+    /* RESPONSIVE */
+    @media (max-width: 1050px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-wrapper {
+        margin-left: 0;
+      }
+
+      .mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .mobile-toggle svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (min-width: 1051px) {
+      .mobile-toggle {
+        display: none;
+      }
+    }
+
     @media (max-width: 768px) {
       .products-grid {
         grid-template-columns: 1fr;
@@ -380,7 +436,7 @@
       }
       
       .hero-title {
-        font-size: 30px;
+        font-size: 32px;
       }
       
       .product-actions {
@@ -389,206 +445,197 @@
     }
 
     @media (max-width: 580px) {
-      .nav-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-      
-      .nav-menu {
-        flex-wrap: wrap;
-        gap: 12px;
-        font-size: 14px;
-      }
-      
       .hero-title {
-        font-size: 26px;
+        font-size: 28px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="nav-logo">
-        <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
-        <span>ChemSus Technologies Pvt Ltd</span>
-      </a>
+  <!-- Mobile Toggle Button -->
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-      <div class="nav-actions">
-        <ul class="nav-menu">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="products.html">Products</a></li>
-          <li><a href="shop.html" class="active">Shop</a></li>
-          <li><a href="collaboration.html">Collaboration</a></li>
-          <li><a href="recognitions.html">Recognitions</a></li>
-          <li><a href="investors.html">Investors</a></li>
-          <li><a href="contact.html">Contact us</a></li>
-          <li><a href="request-sample.html">Request for Sample</a></li>
-          <li><a href="orders.html">Orders</a></li>
-        </ul>
+  <!-- SIDEBAR NAVBAR -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
 
-        <form class="search-form" id="siteSearchForm">
-          <input type="search" id="siteSearchInput" class="search-input" placeholder="Search products...">
-          <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
-            </svg>
-          </span>
-        </form>
-      </div>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="orders.html">Orders</a></li>
+    </ul>
+
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </span>
+      </form>
     </div>
-  </header>
+  </nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-kicker">Sustainable Chemicals</div>
-      <h1 class="hero-title" style="font-size: 50px;">Shop</h1>
-      <p class="hero-subtitle">
-        Premium bamboo-derived chemicals for nutraceutical, food, and personal care applications.
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Sustainable Chemicals</div>
+        <h1 class="hero-title">Shop</h1>
+        <p class="hero-subtitle">
+          Premium bamboo-derived chemicals for nutraceutical, food, and personal care applications.
+        </p>
+      </div>
+    </section>
+
+    <!-- MAIN -->
+    <main>
+      <div class="section-header">
+        <h2>Our Products</h2>
+      </div>
+      <p class="section-intro">
+        High-purity, pharmaceutical-grade chemicals derived from sustainable bamboo biomass. 
+        Contact sales for volume pricing and custom specifications.
       </p>
-    </div>
-  </section>
 
-  <!-- MAIN -->
-  <main>
-    <div class="section-header">
-      <h2>Our Products</h2>
-    </div>
-    <p class="section-intro">
-      High-purity, pharmaceutical-grade chemicals derived from sustainable bamboo biomass. 
-      Contact sales for volume pricing and custom specifications.
-    </p>
+      <div class="products-grid">
+      
+        <!-- Product 1: Calcium Levulinate -->
+        <div class="product-card">
+          <span class="product-badge">Bestseller</span>
+          <div class="product-image">🧪</div>
+          <h3 class="product-title">Calcium Levulinate</h3>
+          <p class="product-subtitle">Pharma-grade nutritional supplement</p>
+          <ul class="product-features">
+            <li>99.5% purity, GMP certified</li>
+            <li>Calcium bioavailability enhancer</li>
+            <li>Tablet & capsule formulation ready</li>
+          </ul>
+          <div class="product-price">₹2,500 / kg</div>
+          <div class="product-actions">
+            <button class="btn-buy" onclick="buyNow('Calcium Levulinate',2500)">Buy Now</button>
+            <button class="btn-sample" onclick="addToCart('Calcium Levulinate',2500)">Add to cart</button>
+          </div>
+        </div>
+      
+        <!-- Product 2: Sodium Levulinate -->
+        <div class="product-card">
+          <div class="product-image">💧</div>
+          <h3 class="product-title">Sodium Levulinate</h3>
+          <p class="product-subtitle">Natural preservative & stabilizer</p>
+          <ul class="product-features">
+            <li>Food-grade antimicrobial</li>
+            <li>ECOCERT approved cosmetic preservative</li>
+            <li>Stable in pH 7–9 range</li>
+          </ul>
+          <div class="product-price">₹1,800 / kg</div>
+          <div class="product-actions">
+            <button class="btn-buy" onclick="buyNow('Sodium Levulinate',1800)">Buy Now</button>
+            <button class="btn-sample" onclick="addToCart('Sodium Levulinate',1800)">Add to cart</button>
+          </div>
+        </div>
+      
+        <!-- Product 3: Levulinic Acid -->
+        <div class="product-card">
+          <span class="product-badge">New</span>
+          <div class="product-image">🔬</div>
+          <h3 class="product-title">Levulinic Acid</h3>
+          <p class="product-subtitle">Versatile platform chemical</p>
+          <ul class="product-features">
+            <li>98%+ purity</li>
+            <li>Key building block for derivatives</li>
+            <li>Low color & odor</li>
+          </ul>
+          <div class="product-price">₹1,200 / kg</div>
+          <div class="product-actions">
+            <button class="btn-buy" onclick="buyNow('Levulinic Acid',1200)">Buy Now</button>
+            <button class="btn-sample" onclick="addToCart('Levulinic Acid',1200)">Add to cart</button>
+          </div>
+        </div>
+      
+        <!-- Product 4: 5-Hydroxymethylfurfural (5-HMF) -->
+        <div class="product-card">
+          <span class="product-badge">Popular</span>
+          <div class="product-image">🧬</div>
+          <h3 class="product-title">5-Hydroxymethylfurfural (5-HMF)</h3>
+          <p class="product-subtitle">Biomass-derived platform chemical</p>
+          <ul class="product-features">
+            <li>Derived from sugars & cellulose</li>
+            <li>Intermediate for fuels & polymers</li>
+            <li>High chemical versatility</li>
+          </ul>
+          <div class="product-price">₹3,200 / kg</div>
+          <div class="product-actions">
+            <button class="btn-buy" onclick="buyNow('5-Hydroxymethylfurfural (5-HMF)',3200)">Buy Now</button>
+            <button class="btn-sample" onclick="addToCart('5-Hydroxymethylfurfural (5-HMF)',3200)">Add to cart</button>
+          </div>
+        </div>
+      
+        <!-- Product 5: Ethyl Levulinate -->
+        <div class="product-card">
+          <div class="product-image">⚗️</div>
+          <h3 class="product-title">Ethyl Levulinate</h3>
+          <p class="product-subtitle">Green solvent & fuel additive</p>
+          <ul class="product-features">
+            <li>Bio-based ester</li>
+            <li>Used in flavors & fragrances</li>
+            <li>Low toxicity, biodegradable</li>
+          </ul>
+          <div class="product-price">₹2,200 / kg</div>
+          <div class="product-actions">
+            <button class="btn-buy" onclick="buyNow('Ethyl Levulinate',2200)">Buy Now</button>
+            <button class="btn-sample" onclick="addToCart('Ethyl Levulinate',2200)">Add to cart</button>
+          </div>
+        </div>
+      
+        <!-- Product 6: Methyl Levulinate -->
+        <div class="product-card">
+          <div class="product-image">🧪</div>
+          <h3 class="product-title">Methyl Levulinate</h3>
+          <p class="product-subtitle">Renewable solvent & intermediate</p>
+          <ul class="product-features">
+            <li>Biomass-derived</li>
+            <li>Used in coatings & resins</li>
+            <li>High purity, clean odor</li>
+          </ul>
+          <div class="product-price">₹2,000 / kg</div>
+          <div class="product-actions">
+            <button class="btn-buy" onclick="buyNow('Methyl Levulinate',2000)">Buy Now</button>
+            <button class="btn-sample" onclick="addToCart('Methyl Levulinate',2000)">Add to cart</button>
+          </div>
+        </div>
+      
+      </div>
+    </main>
 
-    <div class="products-grid">
-    
-      <!-- Product 1: Calcium Levulinate -->
-      <div class="product-card">
-        <span class="product-badge">Bestseller</span>
-        <div class="product-image">🧪</div>
-        <h3 class="product-title">Calcium Levulinate</h3>
-        <p class="product-subtitle">Pharma-grade nutritional supplement</p>
-        <ul class="product-features">
-          <li>99.5% purity, GMP certified</li>
-          <li>Calcium bioavailability enhancer</li>
-          <li>Tablet & capsule formulation ready</li>
-          <a href="products/calcium-levulinate.html">More Details</a>
-        </ul>
-        <div class="product-price">₹2,500 / kg</div>
-        <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Calcium Levulinate',2500)">Buy Now</button>
-          <button class="btn-sample" onclick="addToCart('Calcium Levulinate',2500)">Add to cart</button>
-        </div>
-      </div>
-    
-      <!-- Product 2: Sodium Levulinate -->
-      <div class="product-card">
-        <div class="product-image">💧</div>
-        <h3 class="product-title">Sodium Levulinate</h3>
-        <p class="product-subtitle">Natural preservative & stabilizer</p>
-        <ul class="product-features">
-          <li>Food-grade antimicrobial</li>
-          <li>ECOCERT approved cosmetic preservative</li>
-          <li>Stable in pH 7–9 range</li>
-          <a href="products/sodium-levulinate.html">More Details</a>
-        </ul>
-        <div class="product-price">₹1,800 / kg</div>
-        <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Sodium Levulinate',1800)">Buy Now</button>
-          <button class="btn-sample" onclick="addToCart('Sodium Levulinate',1800)">Add to cart</button>
-        </div>
-      </div>
-    
-      <!-- Product 3: Levulinic Acid -->
-      <div class="product-card">
-        <span class="product-badge">New</span>
-        <div class="product-image">🔬</div>
-        <h3 class="product-title">Levulinic Acid</h3>
-        <p class="product-subtitle">Versatile platform chemical</p>
-        <ul class="product-features">
-          <li>98%+ purity</li>
-          <li>Key building block for derivatives</li>
-          <li>Low color & odor</li>
-          <a href="products/levulinic-acid.html">More Details</a>
-        </ul>
-        <div class="product-price">₹1,200 / kg</div>
-        <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Levulinic Acid',1200)">Buy Now</button>
-          <button class="btn-sample" onclick="addToCart('Levulinic Acid',1200)">Add to cart</button>
-        </div>
-      </div>
-    
-      <!-- Product 4: 5-Hydroxymethylfurfural (5-HMF) -->
-      <div class="product-card">
-        <span class="product-badge">Popular</span>
-        <div class="product-image">🧬</div>
-        <h3 class="product-title">5-Hydroxymethylfurfural (5-HMF)</h3>
-        <p class="product-subtitle">Biomass-derived platform chemical</p>
-        <ul class="product-features">
-          <li>Derived from sugars & cellulose</li>
-          <li>Intermediate for fuels & polymers</li>
-          <li>High chemical versatility</li>
-          <a href="products/5-hmf.html">More Details</a>
-        </ul>
-        <div class="product-price">₹3,200 / kg</div>
-        <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('5-Hydroxymethylfurfural (5-HMF)',3200)">Buy Now</button>
-          <button class="btn-sample" onclick="addToCart('5-Hydroxymethylfurfural (5-HMF)',3200)">Add to cart</button>
-        </div>
-      </div>
-    
-      <!-- Product 5: Ethyl Levulinate -->
-      <div class="product-card">
-        <div class="product-image">⚗️</div>
-        <h3 class="product-title">Ethyl Levulinate</h3>
-        <p class="product-subtitle">Green solvent & fuel additive</p>
-        <ul class="product-features">
-          <li>Bio-based ester</li>
-          <li>Used in flavors & fragrances</li>
-          <li>Low toxicity, biodegradable</li>
-          <a href="products/ethyl-levulinate.html">More Details</a>
-        </ul>
-        <div class="product-price">₹2,200 / kg</div>
-        <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Ethyl Levulinate',2200)">Buy Now</button>
-          <button class="btn-sample" onclick="addToCart('Ethyl Levulinate',2200)">Add to cart</button>
-        </div>
-      </div>
-    
-      <!-- Product 6: Methyl Levulinate -->
-      <div class="product-card">
-        <div class="product-image">🧪</div>
-        <h3 class="product-title">Methyl Levulinate</h3>
-        <p class="product-subtitle">Renewable solvent & intermediate</p>
-        <ul class="product-features">
-          <li>Biomass-derived</li>
-          <li>Used in coatings & resins</li>
-          <li>High purity, clean odor</li>
-          <a href="products/methyl-levulinate.html">More Details</a>
-        </ul>
-        <div class="product-price">₹2,000 / kg</div>
-        <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Methyl Levulinate',2000)">Buy Now</button>
-          <button class="btn-sample" onclick="addToCart('Methyl Levulinate',2000)">Add to cart</button>
-        </div>
-      </div>
-    
-    </div>
-    
-
-    
-  </main>
-
-  <footer>
-    &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
-  </footer>
+    <footer>
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
+  </div>
 
   <!-- SCRIPTS -->
   <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
     // Site search functionality
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -634,10 +681,10 @@
       }
     }
 
-    // Request Sample
-    function requestSample(productName) {
-      alert(`📦 Free sample request for ${productName}\n\nRedirecting to Sample Request page...`);
-      window.location.href = 'request-sample.html';
+    // Add to cart (placeholder)
+    function addToCart(productName, pricePerKg) {
+      alert(`🛒 ${productName} added to cart!\n\nProceed to Orders page to checkout.`);
+      window.location.href = 'orders.html';
     }
   </script>
 

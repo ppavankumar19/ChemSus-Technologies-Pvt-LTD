@@ -31,6 +31,8 @@
       line-height: 1.6;
       color: var(--ink);
       background-color: var(--bg);
+      display: flex;
+      min-height: 100vh;
     }
 
     a {
@@ -38,23 +40,19 @@
       color: inherit;
     }
 
-    /* NAVBAR */
-    .navbar {
+    /* COMPACT SIDEBAR NAVBAR */
+    .sidebar {
+      width: 240px;
       background: var(--primary);
       color: #ffffff;
-      padding: 12px 0;
-      border-bottom: 3px solid var(--accent);
-    }
-
-    .nav-container {
-      max-width: 1150px;
-      margin: 0 auto;
-      padding: 0 18px;
+      border-right: 3px solid var(--accent);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      flex-wrap: wrap;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
     }
 
     .nav-logo {
@@ -63,87 +61,100 @@
       gap: 8px;
       font-family: "Montserrat", sans-serif;
       font-weight: 700;
-      font-size: 20px;
-      letter-spacing: 0.03em;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
       color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
     .nav-logo-img {
-      height: 34px;
+      height: 24px;
       width: auto;
     }
 
     .nav-menu {
       list-style: none;
-      display: flex;
-      gap: 20px;
-      font-size: 15px;
-      flex-wrap: wrap;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
     }
 
     .nav-menu li a {
+      display: block;
       color: #ffffff;
-      padding-bottom: 4px;
-      border-bottom: 2px solid transparent;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
     }
 
     .nav-menu li a.active,
     .nav-menu li a:hover {
-      border-color: #ffffff;
-    }
-
-    .nav-actions {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
     }
 
     /* SEARCH */
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
     .search-form {
       position: relative;
     }
 
     .search-input {
-      padding: 6px 28px 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.75);
-      background: rgba(255,255,255,0.08);
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
       color: #ffffff;
-      font-size: 13px;
-      min-width: 170px;
+      font-size: 12.5px;
       outline: none;
+      backdrop-filter: blur(10px);
     }
 
     .search-input::placeholder {
       color: #d1d5db;
-      font-size: 12px;
+      font-size: 11.5px;
     }
 
     .search-icon {
       position: absolute;
-      right: 8px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       color: #ffffff;
       pointer-events: none;
     }
 
-    /* HERO */
+    /* MAIN CONTENT WRAPPER */
+    .main-wrapper {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HERO – match home/collaboration style */
     .hero {
       position: relative;
       overflow: hidden;
-      background: radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
-                  #041424;
-      color: #ffffff;
+      background: radial-gradient(circle at top left, #052b3f, #031521);
       height: 260px;
       display: flex;
       align-items: center;
       justify-content: center;
       text-align: center;
+      color: #ffffff;
+      border-top: 3px solid var(--accent);
     }
 
     .hero::before {
@@ -151,10 +162,10 @@
       position: absolute;
       inset: 0;
       background-image:
-        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
-      background-size: 140px 140px;
-      opacity: 0.6;
+        radial-gradient(circle at 12% 25%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 82% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 160px 160px;
+      opacity: 0.7;
       pointer-events: none;
     }
 
@@ -175,7 +186,7 @@
 
     .hero-title {
       font-family: "Montserrat", sans-serif;
-      font-size: 38px;
+      font-size: 40px;
       font-weight: 700;
       margin-bottom: 10px;
     }
@@ -190,6 +201,9 @@
       max-width: 1150px;
       margin: 0 auto;
       padding: 34px 18px 42px 18px;
+      width: 100%;
+      box-sizing: border-box;
+      flex: 1;
     }
 
     .section-header {
@@ -376,237 +390,277 @@
       margin-top: 22px;
     }
 
+    /* RESPONSIVE */
+    @media (max-width: 1050px) {
+      .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .main-wrapper {
+        margin-left: 0;
+      }
+
+      .mobile-toggle {
+        display: block;
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1001;
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .mobile-toggle svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    @media (min-width: 1051px) {
+      .mobile-toggle {
+        display: none;
+      }
+    }
+
     @media (max-width: 768px) {
       .form-row {
         grid-template-columns: 1fr;
         gap: 16px;
       }
-      
+
       .auth-container, .order-form-container {
         padding: 24px 20px;
       }
-      
+
       .hero {
         height: 230px;
       }
-      
+
       .hero-title {
-        font-size: 30px;
+        font-size: 32px;
       }
     }
 
     @media (max-width: 580px) {
-      .nav-container {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 6px;
-      }
-      
-      .nav-menu {
-        flex-wrap: wrap;
-        gap: 12px;
-        font-size: 14px;
-      }
-      
       .hero-title {
-        font-size: 26px;
+        font-size: 28px;
       }
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <div class="nav-container">
-      <a href="index.html" class="nav-logo">
-        <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
-        <span>ChemSus Technologies Pvt Ltd</span>
-      </a>
+  <!-- Mobile Toggle Button -->
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-      <div class="nav-actions">
-        <ul class="nav-menu">
-          <li><a href="index.html">Home</a></li>
-          <li><a href="about.html">About Us</a></li>
-          <li><a href="products.html">Products</a></li>
-          <li><a href="shop.html">Shop</a></li>
-          <li><a href="collaboration.html">Collaboration</a></li>
-          <li><a href="recognitions.html">Recognitions</a></li>
-          <li><a href="investors.html">Investors</a></li>
-          <li><a href="contact.html">Contact us</a></li>
-          <li><a href="request-sample.html">Request for Sample</a></li>
-          <li><a href="orders.html" class="active">Orders</a></li>
-        </ul>
+  <!-- SIDEBAR NAVBAR -->
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
 
-        <form class="search-form" id="siteSearchForm">
-          <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages: home, products...">
-          <span class="search-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-              <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
-            </svg>
-          </span>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="orders.html" class="active">Orders</a></li>
+    </ul>
+
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </span>
+      </form>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-wrapper">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Place Your Order</div>
+        <h1 class="hero-title">Orders</h1>
+        <p class="hero-subtitle">
+          Please register or login to place bulk orders for our pharmaceutical-grade levulinic acid derivatives and preservatives.
+        </p>
+      </div>
+    </section>
+
+    <!-- MAIN -->
+    <main>
+      <div class="section-header">
+        <h2>Place Order</h2>
+      </div>
+
+      <!-- AUTH CONTAINER (Register/Login) -->
+      <div class="auth-container active" id="authContainer">
+        <div class="auth-tabs">
+          <button class="auth-tab active" onclick="showAuthForm('register')">Register</button>
+          <button class="auth-tab" onclick="showAuthForm('login')">Login</button>
+        </div>
+
+        <!-- REGISTER FORM -->
+        <form class="auth-form active" id="registerForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label required" for="regName">Name of the person</label>
+              <input type="text" id="regName" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="regDesignation">Designation</label>
+              <input type="text" id="regDesignation" class="form-input" placeholder="e.g., Procurement Manager" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label required" for="regCompany">Company Name</label>
+              <input type="text" id="regCompany" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="regEmail">Email ID</label>
+              <input type="email" id="regEmail" class="form-input" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label required" for="regContact">Contact No</label>
+              <input type="tel" id="regContact" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="regProduct">Product Details</label>
+              <input type="text" id="regProduct" class="form-input" placeholder="e.g., Calcium Levulinate" required>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label required" for="regBusiness">Main Business of the company</label>
+            <textarea id="regBusiness" class="form-textarea" placeholder="Describe your company's main business activities" required></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label required" for="regPassword">Password</label>
+              <input type="password" id="regPassword" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label required" for="regConfirmPassword">Confirm Password</label>
+              <input type="password" id="regConfirmPassword" class="form-input" required>
+            </div>
+          </div>
+
+          <button type="submit" class="auth-submit">Register & Continue</button>
+        </form>
+
+        <!-- LOGIN FORM -->
+        <form class="auth-form" id="loginForm">
+          <div class="form-group">
+            <label class="form-label required" for="loginEmail">Email ID</label>
+            <input type="email" id="loginEmail" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label required" for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-input" required>
+          </div>
+          <button type="submit" class="auth-submit">Login & Continue</button>
         </form>
       </div>
-    </div>
-  </header>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-kicker">Place Your Order</div>
-      <h1 class="hero-title">Orders</h1>
+      <!-- ORDER FORM CONTAINER -->
+      <div class="order-form-container" id="orderFormContainer">
+        <div class="success-message" id="successMessage">
+          ✓ Order request submitted successfully! Our team will contact you within 24 hours with pricing and delivery details.
+        </div>
 
-    </div>
-  </section>
+        <form id="orderForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="name">Name</label>
+              <input type="text" id="name" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="contact">Contact</label>
+              <input type="tel" id="contact" class="form-input" required>
+            </div>
+          </div>
 
-  <!-- MAIN -->
-  <main>
-    <div class="section-header">
-      <h2>Place Order</h2>
-    </div>
-    <p class="section-intro">
-      Please register or login to place bulk orders for our pharmaceutical-grade levulinic acid derivatives and preservatives.
-    </p>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="email">Mail ID</label>
+              <input type="email" id="email" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="component">Component</label>
+              <input type="text" id="component" class="form-input" placeholder="e.g., Calcium Levulinate, Sodium Levulinate" required>
+            </div>
+          </div>
 
-    <!-- AUTH CONTAINER (Register/Login) -->
-    <div class="auth-container active" id="authContainer">
-      <div class="auth-tabs">
-        <button class="auth-tab active" onclick="showAuthForm('register')">Register</button>
-        <button class="auth-tab" onclick="showAuthForm('login')">Login</button>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="role">Role</label>
+              <select id="role" class="form-input" required>
+                <option value="">Select your role</option>
+                <option value="procurement">Procurement/Purchasing</option>
+                <option value="r-and-d">R&D/Technical</option>
+                <option value="production">Production/Operations</option>
+                <option value="quality">Quality Control</option>
+                <option value="management">Management/Executive</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="companyDetails">Company Details</label>
+              <input type="text" id="companyDetails" class="form-input" placeholder="Company name and address" required>
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label class="form-label" for="productInterest">Products interested and intended use</label>
+            <textarea id="productInterest" class="form-textarea" placeholder="Specify products and how you intend to use them (e.g., Calcium Levulinate for nutraceutical formulation, 500kg/month requirement)" required></textarea>
+          </div>
+
+          <button type="submit" class="form-submit">Submit Order Request</button>
+        </form>
       </div>
+    </main>
 
-      <!-- UPDATED REGISTER FORM -->
-      <form class="auth-form active" id="registerForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label required" for="regName">Name of the person</label>
-            <input type="text" id="regName" class="form-input" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label required" for="regDesignation">Designation</label>
-            <input type="text" id="regDesignation" class="form-input" placeholder="e.g., Procurement Manager" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label required" for="regCompany">Company Name</label>
-            <input type="text" id="regCompany" class="form-input" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label required" for="regEmail">Email ID</label>
-            <input type="email" id="regEmail" class="form-input" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label required" for="regContact">Contact No</label>
-            <input type="tel" id="regContact" class="form-input" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label required" for="regProduct">Product Details</label>
-            <input type="text" id="regProduct" class="form-input" placeholder="e.g., Calcium Levulinate" required>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label class="form-label required" for="regBusiness">Main Business of the company</label>
-          <textarea id="regBusiness" class="form-textarea" placeholder="Describe your company's main business activities" required></textarea>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label required" for="regPassword">Password</label>
-            <input type="password" id="regPassword" class="form-input" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label required" for="regConfirmPassword">Confirm Password</label>
-            <input type="password" id="regConfirmPassword" class="form-input" required>
-          </div>
-        </div>
-
-        <button type="submit" class="auth-submit">Register & Continue</button>
-      </form>
-
-      <!-- LOGIN FORM (Simplified) -->
-      <form class="auth-form" id="loginForm">
-        <div class="form-group">
-          <label class="form-label required" for="loginEmail">Email ID</label>
-          <input type="email" id="loginEmail" class="form-input" required>
-        </div>
-        <div class="form-group">
-          <label class="form-label required" for="loginPassword">Password</label>
-          <input type="password" id="loginPassword" class="form-input" required>
-        </div>
-        <button type="submit" class="auth-submit">Login & Continue</button>
-      </form>
-    </div>
-
-    <!-- ORDER FORM CONTAINER -->
-    <div class="order-form-container" id="orderFormContainer">
-      <div class="success-message" id="successMessage">
-        ✓ Order request submitted successfully! Our team will contact you within 24 hours with pricing and delivery details.
-      </div>
-
-      <form id="orderForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="name">Name</label>
-            <input type="text" id="name" class="form-input" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="contact">Contact</label>
-            <input type="tel" id="contact" class="form-input" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="email">Mail ID</label>
-            <input type="email" id="email" class="form-input" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="component">Component</label>
-            <input type="text" id="component" class="form-input" placeholder="e.g., Calcium Levulinate, Sodium Levulinate" required>
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label" for="role">Role</label>
-            <select id="role" class="form-input" required>
-              <option value="">Select your role</option>
-              <option value="procurement">Procurement/Purchasing</option>
-              <option value="r-and-d">R&D/Technical</option>
-              <option value="production">Production/Operations</option>
-              <option value="quality">Quality Control</option>
-              <option value="management">Management/Executive</option>
-              <option value="other">Other</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label" for="companyDetails">Company Details</label>
-            <input type="text" id="companyDetails" class="form-input" placeholder="Company name and address" required>
-          </div>
-        </div>
-
-        <div class="form-group full-width">
-          <label class="form-label" for="productInterest">Products interested and intended use</label>
-          <textarea id="productInterest" class="form-textarea" placeholder="Specify products and how you intend to use them (e.g., Calcium Levulinate for nutraceutical formulation, 500kg/month requirement)" required></textarea>
-        </div>
-
-        <button type="submit" class="form-submit">Submit Order Request</button>
-      </form>
-    </div>
-  </main>
-
-  <footer>
-    &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
-  </footer>
+    <footer>
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
+  </div>
 
   <!-- SCRIPTS -->
   <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
     // Site search functionality
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -664,16 +718,6 @@
       
       // Simulate registration success
       showOrderForm();
-      console.log('Registration:', {
-        name: document.getElementById('regName').value,
-        designation: document.getElementById('regDesignation').value,
-        company: document.getElementById('regCompany').value,
-        email: document.getElementById('regEmail').value,
-        contact: document.getElementById('regContact').value,
-        product: document.getElementById('regProduct').value,
-        business: document.getElementById('regBusiness').value,
-        password: password
-      });
     });
 
     // Login form handler
@@ -681,9 +725,6 @@
       e.preventDefault();
       // Simulate login success
       showOrderForm();
-      console.log('Login:', {
-        email: document.getElementById('loginEmail').value
-      });
     });
 
     // Show order form after auth
@@ -700,16 +741,6 @@
       // Show success message
       document.getElementById('successMessage').style.display = 'block';
       document.getElementById('orderForm').style.opacity = '0.7';
-      
-      console.log('Order submitted:', {
-        name: document.getElementById('name').value,
-        contact: document.getElementById('contact').value,
-        email: document.getElementById('email').value,
-        component: document.getElementById('component').value,
-        role: document.getElementById('role').value,
-        companyDetails: document.getElementById('companyDetails').value,
-        productInterest: document.getElementById('productInterest').value
-      });
     });
   </script>
 
