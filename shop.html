@@ -458,7 +458,6 @@
   <main>
     <div class="section-header">
       <h2>Our Products</h2>
-      <span class="section-chip">B2B Pricing</span>
     </div>
     <p class="section-intro">
       High-purity, pharmaceutical-grade chemicals derived from sustainable bamboo biomass. 
@@ -466,6 +465,7 @@
     </p>
 
     <div class="products-grid">
+    
       <!-- Product 1: Calcium Levulinate -->
       <div class="product-card">
         <span class="product-badge">Bestseller</span>
@@ -475,32 +475,34 @@
         <ul class="product-features">
           <li>99.5% purity, GMP certified</li>
           <li>Calcium bioavailability enhancer</li>
-          <li>Ready for tablet/capsule formulation</li>
+          <li>Tablet & capsule formulation ready</li>
+          <a href="products/calcium-levulinate.html">More Details</a>
         </ul>
         <div class="product-price">₹2,500 / kg</div>
         <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Calcium Levulinate', 2500)">Buy Now</button>
-          <button class="btn-sample" onclick="requestSample('Calcium Levulinate')">Add to cart</button>
+          <button class="btn-buy" onclick="buyNow('Calcium Levulinate',2500)">Buy Now</button>
+          <button class="btn-sample" onclick="addToCart('Calcium Levulinate',2500)">Add to cart</button>
         </div>
       </div>
-
+    
       <!-- Product 2: Sodium Levulinate -->
       <div class="product-card">
         <div class="product-image">💧</div>
         <h3 class="product-title">Sodium Levulinate</h3>
         <p class="product-subtitle">Natural preservative & stabilizer</p>
         <ul class="product-features">
-          <li>Food-grade, broad-spectrum antimicrobial</li>
-          <li>Cosmetic preservative (ECOCERT approved)</li>
-          <li>pH 7-9 stability range</li>
+          <li>Food-grade antimicrobial</li>
+          <li>ECOCERT approved cosmetic preservative</li>
+          <li>Stable in pH 7–9 range</li>
+          <a href="products/sodium-levulinate.html">More Details</a>
         </ul>
         <div class="product-price">₹1,800 / kg</div>
         <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Sodium Levulinate', 1800)">Buy Now</button>
-          <button class="btn-sample" onclick="requestSample('Sodium Levulinate')">Add to cart</button>
+          <button class="btn-buy" onclick="buyNow('Sodium Levulinate',1800)">Buy Now</button>
+          <button class="btn-sample" onclick="addToCart('Sodium Levulinate',1800)">Add to cart</button>
         </div>
       </div>
-
+    
       <!-- Product 3: Levulinic Acid -->
       <div class="product-card">
         <span class="product-badge">New</span>
@@ -508,17 +510,77 @@
         <h3 class="product-title">Levulinic Acid</h3>
         <p class="product-subtitle">Versatile platform chemical</p>
         <ul class="product-features">
-          <li>98%+ purity, distillation purified</li>
-          <li>Building block for derivatives</li>
-          <li>Low color, odor-free</li>
+          <li>98%+ purity</li>
+          <li>Key building block for derivatives</li>
+          <li>Low color & odor</li>
+          <a href="products/levulinic-acid.html">More Details</a>
         </ul>
         <div class="product-price">₹1,200 / kg</div>
         <div class="product-actions">
-          <button class="btn-buy" onclick="buyNow('Levulinic Acid', 1200)">Buy Now</button>
-          <button class="btn-sample" onclick="requestSample('Levulinic Acid')">Add to cart</button>
+          <button class="btn-buy" onclick="buyNow('Levulinic Acid',1200)">Buy Now</button>
+          <button class="btn-sample" onclick="addToCart('Levulinic Acid',1200)">Add to cart</button>
         </div>
       </div>
+    
+      <!-- Product 4: 5-Hydroxymethylfurfural (5-HMF) -->
+      <div class="product-card">
+        <span class="product-badge">Popular</span>
+        <div class="product-image">🧬</div>
+        <h3 class="product-title">5-Hydroxymethylfurfural (5-HMF)</h3>
+        <p class="product-subtitle">Biomass-derived platform chemical</p>
+        <ul class="product-features">
+          <li>Derived from sugars & cellulose</li>
+          <li>Intermediate for fuels & polymers</li>
+          <li>High chemical versatility</li>
+          <a href="products/5-hmf.html">More Details</a>
+        </ul>
+        <div class="product-price">₹3,200 / kg</div>
+        <div class="product-actions">
+          <button class="btn-buy" onclick="buyNow('5-Hydroxymethylfurfural (5-HMF)',3200)">Buy Now</button>
+          <button class="btn-sample" onclick="addToCart('5-Hydroxymethylfurfural (5-HMF)',3200)">Add to cart</button>
+        </div>
+      </div>
+    
+      <!-- Product 5: Ethyl Levulinate -->
+      <div class="product-card">
+        <div class="product-image">⚗️</div>
+        <h3 class="product-title">Ethyl Levulinate</h3>
+        <p class="product-subtitle">Green solvent & fuel additive</p>
+        <ul class="product-features">
+          <li>Bio-based ester</li>
+          <li>Used in flavors & fragrances</li>
+          <li>Low toxicity, biodegradable</li>
+          <a href="products/ethyl-levulinate.html">More Details</a>
+        </ul>
+        <div class="product-price">₹2,200 / kg</div>
+        <div class="product-actions">
+          <button class="btn-buy" onclick="buyNow('Ethyl Levulinate',2200)">Buy Now</button>
+          <button class="btn-sample" onclick="addToCart('Ethyl Levulinate',2200)">Add to cart</button>
+        </div>
+      </div>
+    
+      <!-- Product 6: Methyl Levulinate -->
+      <div class="product-card">
+        <div class="product-image">🧪</div>
+        <h3 class="product-title">Methyl Levulinate</h3>
+        <p class="product-subtitle">Renewable solvent & intermediate</p>
+        <ul class="product-features">
+          <li>Biomass-derived</li>
+          <li>Used in coatings & resins</li>
+          <li>High purity, clean odor</li>
+          <a href="products/methyl-levulinate.html">More Details</a>
+        </ul>
+        <div class="product-price">₹2,000 / kg</div>
+        <div class="product-actions">
+          <button class="btn-buy" onclick="buyNow('Methyl Levulinate',2000)">Buy Now</button>
+          <button class="btn-sample" onclick="addToCart('Methyl Levulinate',2000)">Add to cart</button>
+        </div>
+      </div>
+    
     </div>
+    
+
+    
   </main>
 
   <footer>
