@@ -96,6 +96,16 @@
       border-left-color: var(--accent);
     }
 
+    #cart-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
     /* SEARCH */
     .search-section {
       padding: 12px 20px 16px;
@@ -143,13 +153,14 @@
       flex-direction: column;
     }
 
-    /* HERO */
+    /* HERO – theme from first snippet, dots via radial-gradient [web:42][web:44] */
     .hero {
       position: relative;
       overflow: hidden;
-      background: radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
-                  radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
-                  #041424;
+      background:
+        radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
+        #041424;
       color: #ffffff;
       height: 260px;
       display: flex;
@@ -221,16 +232,6 @@
       color: #123559;
     }
 
-    .section-chip {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-      background: #e0f7f6;
-      color: #04726d;
-      padding: 4px 8px;
-      border-radius: 999px;
-    }
-
     .section-intro {
       font-size: 15px;
       margin-bottom: 26px;
@@ -252,9 +253,8 @@
       padding: 28px;
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
       border-top: 4px solid var(--accent);
-      transition: all 0.3s ease;
       position: relative;
-      overflow: hidden;
+      transition: all 0.3s ease;
     }
 
     .product-card:hover {
@@ -272,7 +272,6 @@
       border-radius: 20px;
       font-size: 12px;
       font-weight: 600;
-      letter-spacing: 0.05em;
     }
 
     .product-image {
@@ -285,7 +284,6 @@
       align-items: center;
       justify-content: center;
       font-size: 48px;
-      position: relative;
     }
 
     .product-title {
@@ -300,28 +298,18 @@
       font-size: 14px;
       color: #64748b;
       margin-bottom: 12px;
-      font-weight: 500;
     }
 
     .product-features {
       list-style: none;
       margin-bottom: 20px;
-    }
-
-    .product-features li {
-      display: flex;
-      align-items: center;
-      gap: 8px;
       font-size: 14px;
-      color: #374151;
-      margin-bottom: 6px;
     }
 
     .product-features li::before {
-      content: "✓";
+      content: "✓ ";
       color: var(--accent);
       font-weight: 700;
-      font-size: 16px;
     }
 
     .product-price {
@@ -332,47 +320,70 @@
       margin-bottom: 16px;
     }
 
+    /* SIDE BY SIDE ACTIONS + CART CONTROLS */
     .product-actions {
       display: flex;
-      gap: 12px;
+      gap: 10px;
+      align-items: center;
     }
 
     .btn-buy {
       flex: 1;
       background: linear-gradient(135deg, var(--accent), #00d4cc);
       color: #ffffff;
-      padding: 14px 20px;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 600;
-      font-family: "Montserrat", sans-serif;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-buy:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 24px rgba(0,184,176,0.4);
-    }
-
-    .btn-sample {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: #ffffff;
-      padding: 14px 20px;
+      padding: 14px 10px;
       border: none;
       border-radius: 8px;
       font-size: 14px;
       font-weight: 600;
       font-family: "Montserrat", sans-serif;
       cursor: pointer;
-      transition: all 0.2s ease;
-      text-align: center;
     }
 
-    .btn-sample:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 20px rgba(0,116,199,0.3);
+    .cart-btn-container {
+      flex: 1;
+      height: 48px;
+      display: flex;
+    }
+
+    .btn-cart {
+      width: 100%;
+      height: 100%;
+      background: var(--primary);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      cursor: pointer;
+    }
+
+    .qty-selector {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 100%;
+      background: #f1f5f9;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+    }
+
+    .qty-btn {
+      width: 35px;
+      height: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .qty-value {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--primary-dark);
     }
 
     footer {
@@ -430,15 +441,15 @@
         grid-template-columns: 1fr;
         gap: 20px;
       }
-      
+
       .hero {
         height: 230px;
       }
-      
+
       .hero-title {
         font-size: 32px;
       }
-      
+
       .product-actions {
         flex-direction: column;
       }
@@ -475,6 +486,7 @@
       <li><a href="collaboration.html">Collaboration</a></li>
       <li><a href="recognitions.html">Recognitions</a></li>
       <li><a href="investors.html">Investors</a></li>
+      <li><a href="cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
       <li><a href="contact.html">Contact us</a></li>
       <li><a href="request-sample.html">Request for Sample</a></li>
       <li><a href="orders.html">Orders</a></li>
@@ -484,7 +496,7 @@
       <form class="search-form" id="siteSearchForm">
         <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
         <span class="search-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
           </svg>
         </span>
@@ -511,14 +523,12 @@
         <h2>Our Products</h2>
       </div>
       <p class="section-intro">
-        High-purity, pharmaceutical-grade chemicals derived from sustainable bamboo biomass. 
-        Contact sales for volume pricing and custom specifications.
+        High-purity, pharmaceutical-grade chemicals derived from sustainable bamboo biomass. Contact sales for volume pricing and custom specifications.
       </p>
 
       <div class="products-grid">
-      
         <!-- Product 1: Calcium Levulinate -->
-        <div class="product-card">
+        <div class="product-card" data-name="Calcium Levulinate" data-price="2500">
           <span class="product-badge">Bestseller</span>
           <div class="product-image">🧪</div>
           <h3 class="product-title">Calcium Levulinate</h3>
@@ -527,16 +537,25 @@
             <li>99.5% purity, GMP certified</li>
             <li>Calcium bioavailability enhancer</li>
             <li>Tablet & capsule formulation ready</li>
-          </ul>
+<br><a href="products/calcium-levulinate.html"
+              style="background-color: #007bff; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px;">
+              More Details </a>          </ul>
           <div class="product-price">₹2,500 / kg</div>
           <div class="product-actions">
-            <button class="btn-buy" onclick="buyNow('Calcium Levulinate',2500)">Buy Now</button>
-            <button class="btn-sample" onclick="addToCart('Calcium Levulinate',2500)">Add to cart</button>
+            <button class="btn-buy" onclick="buyNowSilent('Calcium Levulinate', 2500)">Buy Now</button>
+            <div class="cart-btn-container">
+              <button class="btn-cart" onclick="updateItem('Calcium Levulinate', 2500, 1)">Add to Cart</button>
+              <div class="qty-selector">
+                <button class="qty-btn" onclick="updateItem('Calcium Levulinate', 2500, -1)">-</button>
+                <span class="qty-value">0</span>
+                <button class="qty-btn" onclick="updateItem('Calcium Levulinate', 2500, 1)">+</button>
+              </div>
+            </div>
           </div>
         </div>
-      
+
         <!-- Product 2: Sodium Levulinate -->
-        <div class="product-card">
+        <div class="product-card" data-name="Sodium Levulinate" data-price="1800">
           <div class="product-image">💧</div>
           <h3 class="product-title">Sodium Levulinate</h3>
           <p class="product-subtitle">Natural preservative & stabilizer</p>
@@ -544,16 +563,26 @@
             <li>Food-grade antimicrobial</li>
             <li>ECOCERT approved cosmetic preservative</li>
             <li>Stable in pH 7–9 range</li>
+<br><a href="products/sodium-levulinate.html"
+                          style="background-color: #007bff; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px;">
+                          More Details </a>
           </ul>
           <div class="product-price">₹1,800 / kg</div>
           <div class="product-actions">
-            <button class="btn-buy" onclick="buyNow('Sodium Levulinate',1800)">Buy Now</button>
-            <button class="btn-sample" onclick="addToCart('Sodium Levulinate',1800)">Add to cart</button>
+            <button class="btn-buy" onclick="buyNowSilent('Sodium Levulinate', 1800)">Buy Now</button>
+            <div class="cart-btn-container">
+              <button class="btn-cart" onclick="updateItem('Sodium Levulinate', 1800, 1)">Add to Cart</button>
+              <div class="qty-selector">
+                <button class="qty-btn" onclick="updateItem('Sodium Levulinate', 1800, -1)">-</button>
+                <span class="qty-value">0</span>
+                <button class="qty-btn" onclick="updateItem('Sodium Levulinate', 1800, 1)">+</button>
+              </div>
+            </div>
           </div>
         </div>
-      
+
         <!-- Product 3: Levulinic Acid -->
-        <div class="product-card">
+        <div class="product-card" data-name="Levulinic Acid" data-price="1200">
           <span class="product-badge">New</span>
           <div class="product-image">🔬</div>
           <h3 class="product-title">Levulinic Acid</h3>
@@ -562,16 +591,26 @@
             <li>98%+ purity</li>
             <li>Key building block for derivatives</li>
             <li>Low color & odor</li>
+            <br><a href="products/levulinic-acid.html"
+              style="background-color: #007bff; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px;">
+              More Details </a>
           </ul>
           <div class="product-price">₹1,200 / kg</div>
           <div class="product-actions">
-            <button class="btn-buy" onclick="buyNow('Levulinic Acid',1200)">Buy Now</button>
-            <button class="btn-sample" onclick="addToCart('Levulinic Acid',1200)">Add to cart</button>
+            <button class="btn-buy" onclick="buyNowSilent('Levulinic Acid', 1200)">Buy Now</button>
+            <div class="cart-btn-container">
+              <button class="btn-cart" onclick="updateItem('Levulinic Acid', 1200, 1)">Add to Cart</button>
+              <div class="qty-selector">
+                <button class="qty-btn" onclick="updateItem('Levulinic Acid', 1200, -1)">-</button>
+                <span class="qty-value">0</span>
+                <button class="qty-btn" onclick="updateItem('Levulinic Acid', 1200, 1)">+</button>
+              </div>
+            </div>
           </div>
         </div>
-      
-        <!-- Product 4: 5-Hydroxymethylfurfural (5-HMF) -->
-        <div class="product-card">
+
+        <!-- Product 4: 5-HMF -->
+        <div class="product-card" data-name="5-Hydroxymethylfurfural (5-HMF)" data-price="3200">
           <span class="product-badge">Popular</span>
           <div class="product-image">🧬</div>
           <h3 class="product-title">5-Hydroxymethylfurfural (5-HMF)</h3>
@@ -580,16 +619,25 @@
             <li>Derived from sugars & cellulose</li>
             <li>Intermediate for fuels & polymers</li>
             <li>High chemical versatility</li>
-          </ul>
+<br><a href="products/5-hmf.html"
+              style="background-color: #007bff; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px;">
+              More Details </a>          </ul>
           <div class="product-price">₹3,200 / kg</div>
           <div class="product-actions">
-            <button class="btn-buy" onclick="buyNow('5-Hydroxymethylfurfural (5-HMF)',3200)">Buy Now</button>
-            <button class="btn-sample" onclick="addToCart('5-Hydroxymethylfurfural (5-HMF)',3200)">Add to cart</button>
+            <button class="btn-buy" onclick="buyNowSilent('5-Hydroxymethylfurfural (5-HMF)', 3200)">Buy Now</button>
+            <div class="cart-btn-container">
+              <button class="btn-cart" onclick="updateItem('5-Hydroxymethylfurfural (5-HMF)', 3200, 1)">Add to Cart</button>
+              <div class="qty-selector">
+                <button class="qty-btn" onclick="updateItem('5-Hydroxymethylfurfural (5-HMF)', 3200, -1)">-</button>
+                <span class="qty-value">0</span>
+                <button class="qty-btn" onclick="updateItem('5-Hydroxymethylfurfural (5-HMF)', 3200, 1)">+</button>
+              </div>
+            </div>
           </div>
         </div>
-      
+
         <!-- Product 5: Ethyl Levulinate -->
-        <div class="product-card">
+        <div class="product-card" data-name="Ethyl Levulinate" data-price="2200">
           <div class="product-image">⚗️</div>
           <h3 class="product-title">Ethyl Levulinate</h3>
           <p class="product-subtitle">Green solvent & fuel additive</p>
@@ -597,36 +645,56 @@
             <li>Bio-based ester</li>
             <li>Used in flavors & fragrances</li>
             <li>Low toxicity, biodegradable</li>
+            <br><a href="products/ethyl-levulinate.html"
+              style="background-color: #007bff; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px;">
+              More Details </a>
           </ul>
           <div class="product-price">₹2,200 / kg</div>
           <div class="product-actions">
-            <button class="btn-buy" onclick="buyNow('Ethyl Levulinate',2200)">Buy Now</button>
-            <button class="btn-sample" onclick="addToCart('Ethyl Levulinate',2200)">Add to cart</button>
+            <button class="btn-buy" onclick="buyNowSilent('Ethyl Levulinate', 2200)">Buy Now</button>
+            <div class="cart-btn-container">
+              <button class="btn-cart" onclick="updateItem('Ethyl Levulinate', 2200, 1)">Add to Cart</button>
+              <div class="qty-selector">
+                <button class="qty-btn" onclick="updateItem('Ethyl Levulinate', 2200, -1)">-</button>
+                <span class="qty-value">0</span>
+                <button class="qty-btn" onclick="updateItem('Ethyl Levulinate', 2200, 1)">+</button>
+              </div>
+            </div>
           </div>
         </div>
-      
+
         <!-- Product 6: Methyl Levulinate -->
-        <div class="product-card">
+        <div class="product-card" data-name="Methyl Levulinate" data-price="2000">
           <div class="product-image">🧪</div>
           <h3 class="product-title">Methyl Levulinate</h3>
           <p class="product-subtitle">Renewable solvent & intermediate</p>
           <ul class="product-features">
             <li>Biomass-derived</li>
             <li>Used in coatings & resins</li>
-            <li>High purity, clean odor</li>
+            <li>High purity, clean odor</li>       
+            <br><a href="products/methyl-levulinate.html"
+              style="background-color: #007bff; color: white; padding: 8px 14px; text-decoration: none; border-radius: 5px;">
+              More Details </a>
           </ul>
           <div class="product-price">₹2,000 / kg</div>
           <div class="product-actions">
-            <button class="btn-buy" onclick="buyNow('Methyl Levulinate',2000)">Buy Now</button>
-            <button class="btn-sample" onclick="addToCart('Methyl Levulinate',2000)">Add to cart</button>
+            <button class="btn-buy" onclick="buyNowSilent('Methyl Levulinate', 2000)">Buy Now</button>
+            <div class="cart-btn-container">
+              <button class="btn-cart" onclick="updateItem('Methyl Levulinate', 2000, 1)">Add to Cart</button>
+              <div class="qty-selector">
+                <button class="qty-btn" onclick="updateItem('Methyl Levulinate', 2000, -1)">-</button>
+                <span class="qty-value">0</span>
+                <button class="qty-btn" onclick="updateItem('Methyl Levulinate', 2000, 1)">+</button>
+              </div>
+            </div>
           </div>
         </div>
-      
+
       </div>
     </main>
 
     <footer>
-      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+      &copy; 2025 ChemSus Technologies Pvt Ltd.
     </footer>
   </div>
 
@@ -636,57 +704,76 @@
       document.getElementById('sidebar').classList.toggle('open');
     }
 
-    // Site search functionality
+    let cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+
+    function updateItem(pName, pPrice, delta) {
+      const existing = cart.find(item => item.name === pName);
+      if (existing) {
+        existing.quantity += delta;
+        if (existing.quantity <= 0) {
+          cart = cart.filter(item => item.name !== pName);
+        }
+      } else if (delta > 0) {
+        cart.push({ name: pName, price: pPrice, quantity: 1 });
+      }
+      saveCart();
+      syncUI();
+    }
+
+    function saveCart() {
+      localStorage.setItem('chemsusCart', JSON.stringify(cart));
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      document.getElementById('cart-count').innerText = count;
+    }
+
+    function syncUI() {
+      document.querySelectorAll('.product-card').forEach(card => {
+        const pName = card.getAttribute('data-name');
+        const item = cart.find(i => i.name === pName);
+        const cartBtn = card.querySelector('.btn-cart');
+        const qtySelector = card.querySelector('.qty-selector');
+        const qtyValue = card.querySelector('.qty-value');
+
+        if (item && item.quantity > 0) {
+          cartBtn.style.display = 'none';
+          qtySelector.style.display = 'flex';
+          qtyValue.innerText = item.quantity;
+        } else {
+          cartBtn.style.display = 'block';
+          qtySelector.style.display = 'none';
+        }
+      });
+    }
+
+    function buyNowSilent(name, price) {
+      const existing = cart.find(i => i.name === name);
+      if (!existing) {
+        cart.push({ name: name, price: price, quantity: 1 });
+      }
+      saveCart();
+      window.location.href = 'orders.html';
+    }
+
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
       if (!query) return;
-
-      if (query.includes('product') || query.includes('shop')) {
-        window.location.href = 'products.html';
-      } else if (query.includes('calcium') || query.includes('levulinate')) {
-        document.querySelector('.product-card:nth-child(1)').scrollIntoView({ behavior: 'smooth' });
-      } else if (query.includes('sodium') || query.includes('preservative')) {
-        document.querySelector('.product-card:nth-child(2)').scrollIntoView({ behavior: 'smooth' });
-      } else if (query.includes('levulinic') || query.includes('acid')) {
-        document.querySelector('.product-card:nth-child(3)').scrollIntoView({ behavior: 'smooth' });
-      } else if (query.includes('recognition') || query.includes('award')) {
-        window.location.href = 'recognitions.html';
-      } else if (query.includes('investor') || query.includes('funding')) {
-        window.location.href = 'investors.html';
-      } else if (query.includes('contact') || query.includes('address') || query.includes('phone')) {
-        window.location.href = 'contact.html';
-      } else if (query.includes('home') || query.includes('objective') || query.includes('chemsus')) {
-        window.location.href = 'index.html';
-      } else if (query.includes('about') || query.includes('company')) {
-        window.location.href = 'about.html';
-      } else if (query.includes('collab') || query.includes('collaboration') || query.includes('partner')) {
-        window.location.href = 'collaboration.html';
-      } else if (query.includes('sample') || query.includes('request')) {
-        window.location.href = 'request-sample.html';
-      } else if (query.includes('order') || query.includes('orders')) {
-        window.location.href = 'orders.html';
-      } else {
-        alert('Try searching: calcium levulinate, sodium levulinate, levulinic acid');
-      }
+      if (query.includes('cart')) window.location.href = 'cart.html';
+      else if (query.includes('product') || query.includes('shop')) window.location.href = 'shop.html';
+      else if (query.includes('calcium')) document.querySelector('.product-card:nth-child(1)').scrollIntoView({ behavior: 'smooth' });
+      else if (query.includes('sodium')) document.querySelector('.product-card:nth-child(2)').scrollIntoView({ behavior: 'smooth' });
+      else if (query.includes('levulinic')) document.querySelector('.product-card:nth-child(3)').scrollIntoView({ behavior: 'smooth' });
+      else if (query.includes('recognition')) window.location.href = 'recognitions.html';
+      else if (query.includes('investor')) window.location.href = 'investors.html';
+      else if (query.includes('contact')) window.location.href = 'contact.html';
+      else if (query.includes('about')) window.location.href = 'about.html';
+      else if (query.includes('collab')) window.location.href = 'collaboration.html';
+      else if (query.includes('sample')) window.location.href = 'request-sample.html';
+      else if (query.includes('order')) window.location.href = 'orders.html';
     });
 
-    // Buy Now functionality
-    function buyNow(productName, pricePerKg) {
-      const quantity = prompt(`Enter quantity in kg for ${productName}:\nPrice: ₹${pricePerKg}/kg`, '1');
-      if (quantity && !isNaN(quantity) && quantity > 0) {
-        const total = (parseFloat(quantity) * pricePerKg).toLocaleString('en-IN');
-        alert(`✅ ${productName}\nQuantity: ${quantity} kg\nTotal: ₹${total}\n\nRedirecting to Orders page...`);
-        window.location.href = 'orders.html';
-      }
-    }
-
-    // Add to cart (placeholder)
-    function addToCart(productName, pricePerKg) {
-      alert(`🛒 ${productName} added to cart!\n\nProceed to Orders page to checkout.`);
-      window.location.href = 'orders.html';
-    }
+    saveCart();
+    syncUI();
   </script>
-
 </body>
 </html>

@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Cart | ChemSus Technologies Pvt Ltd</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0074c7;
+      --primary-dark: #00508a;
+      --accent: #00b8b0;
+      --bg: #F3F7FB;
+      --ink: #1f2933;
+      --danger: #e53e3e;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Open Sans", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    #cart-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    /* SIDEBAR – aligned with shop.html */
+    .sidebar {
+      width: 240px;
+      background: var(--primary);
+      color: #ffffff;
+      border-right: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-logo-img { height: 24px; width: auto; }
+
+    .nav-menu {
+      list-style: none;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-menu li a {
+      display: block;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav-menu li a:hover,
+    .nav-menu li a.active {
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
+    }
+
+    /* MAIN CONTENT WRAPPER */
+    .main-wrapper {
+      margin-left: 240px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* HERO – same style language as shop hero [web:43] */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
+        #041424;
+      color: #ffffff;
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-top: 3px solid var(--accent);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 140px 140px;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      padding: 0 18px;
+    }
+
+    .hero-kicker {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #b9e6ff;
+    }
+
+    .hero-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: #e2f3ff;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px 40px 20px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .cart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .cart-header h2 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 22px;
+      color: #123559;
+    }
+
+    .cart-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e0f7f6;
+      color: #04726d;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    /* CART CARD */
+    .cart-container {
+      background: #ffffff;
+      padding: 26px 24px;
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th {
+      text-align: left;
+      padding: 12px 8px;
+      border-bottom: 2px solid var(--bg);
+      color: var(--primary-dark);
+      font-family: "Montserrat", sans-serif;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 14px 8px;
+      border-bottom: 1px solid #edf2f7;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    td strong {
+      font-family: "Montserrat", sans-serif;
+      font-size: 14px;
+    }
+
+    .qty-btn {
+      background: #e5edf7;
+      border: none;
+      padding: 4px 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: 700;
+      color: #1f2937;
+      font-size: 14px;
+    }
+
+    .qty-display {
+      display: inline-block;
+      min-width: 22px;
+      text-align: center;
+      font-weight: 600;
+      margin: 0 8px;
+    }
+
+    .remove-btn {
+      color: var(--danger);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      border: none;
+      background: none;
+    }
+
+    .remove-btn:hover { text-decoration: underline; }
+
+    .cart-summary {
+      text-align: right;
+      padding-top: 18px;
+      border-top: 2px solid var(--bg);
+    }
+
+    .summary-label {
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .total-price {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+      font-family: "Montserrat", sans-serif;
+      margin-top: 4px;
+    }
+
+    .checkout-row {
+      margin-top: 18px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .continue-link {
+      font-size: 13px;
+      color: var(--primary-dark);
+      font-weight: 600;
+      text-decoration: underline;
+    }
+
+    .checkout-btn {
+      background: linear-gradient(135deg, var(--accent), #00d4cc);
+      color: white;
+      border: none;
+      padding: 13px 32px;
+      border-radius: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: "Montserrat", sans-serif;
+      font-size: 14px;
+      transition: 0.25s ease;
+    }
+
+    .checkout-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 32px rgba(0,184,176,0.35);
+    }
+
+    /* EMPTY STATE */
+    .empty-msg {
+      text-align: center;
+      padding: 48px 20px;
+    }
+
+    .empty-icon {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .empty-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 20px;
+      margin-bottom: 6px;
+      color: #111827;
+    }
+
+    .empty-text {
+      font-size: 14px;
+      color: #4b5563;
+      margin-bottom: 16px;
+    }
+
+    .empty-msg a {
+      color: white;
+      background: var(--primary);
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    @media (max-width: 1050px) {
+      .sidebar { display: none; }
+      .main-wrapper { margin-left: 0; }
+      main { padding: 24px 16px 32px 16px; }
+      .cart-container { padding: 20px 16px; }
+      table { font-size: 13px; }
+      th:nth-child(2), td:nth-child(2) { display: none; } /* hide price column label on small screens */
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sidebar">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="cart.html" class="active">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="orders.html">Orders</a></li>
+    </ul>
+  </nav>
+
+  <div class="main-wrapper">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Order Overview</div>
+        <h1 class="hero-title">Your Shopping Cart</h1>
+        <p class="hero-subtitle">Review items, adjust quantities, and proceed to secure checkout.</p>
+      </div>
+    </section>
+
+    <main>
+      <div class="cart-header">
+        <h2>Cart Details</h2>
+        <span class="cart-tag">Live total</span>
+      </div>
+      <div id="cart-content" class="cart-container">
+        <!-- filled by JS -->
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function updateCartCount(cart) {
+      const countSpan = document.getElementById('cart-count');
+      const totalCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+      countSpan.textContent = totalCount;
+    }
+
+    function renderCart() {
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      const container = document.getElementById('cart-content');
+
+      updateCartCount(cart);
+
+      if (cart.length === 0) {
+        container.innerHTML = `
+          <div class="empty-msg">
+            <div class="empty-icon">🧺</div>
+            <div class="empty-title">Your cart is currently empty</div>
+            <p class="empty-text">Explore our sustainable, bamboo-derived chemicals and add items to your cart.</p>
+            <a href="shop.html">Browse products</a>
+          </div>`;
+        return;
+      }
+
+      let html = `
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price / kg</th>
+              <th>Quantity</th>
+              <th>Subtotal</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+      let grandTotal = 0;
+
+      cart.forEach((item, index) => {
+        const subtotal = item.price * item.quantity;
+        grandTotal += subtotal;
+        html += `
+          <tr>
+            <td><strong>${item.name}</strong></td>
+            <td>₹${item.price.toLocaleString('en-IN')}</td>
+            <td>
+              <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+              <span class="qty-display">${item.quantity}</span>
+              <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+            </td>
+            <td>₹${subtotal.toLocaleString('en-IN')}</td>
+            <td><button class="remove-btn" onclick="removeItem(${index})">Remove</button></td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>
+        <div class="cart-summary">
+          <div class="summary-label">Grand Total (excl. taxes & shipping)</div>
+          <div class="total-price">₹${grandTotal.toLocaleString('en-IN')}</div>
+          <div class="checkout-row">
+            <a href="shop.html" class="continue-link">← Continue shopping</a>
+            <button class="checkout-btn" onclick="checkout()">Proceed to checkout</button>
+          </div>
+        </div>`;
+
+      container.innerHTML = html;
+    }
+
+    window.updateQty = function(index, change) {
+      let cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      if (!cart[index]) return;
+      cart[index].quantity += change;
+      if (cart[index].quantity <= 0) {
+        cart.splice(index, 1);
+      }
+      localStorage.setItem('chemsusCart', JSON.stringify(cart));
+      renderCart();
+    };
+
+    window.removeItem = function(index) {
+      let cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('chemsusCart', JSON.stringify(cart));
+      renderCart();
+    };
+
+    window.checkout = function() {
+      alert("Proceeding to checkout... Redirecting to Orders.");
+      window.location.href = 'orders.html';
+    };
+
+    renderCart();
+  </script>
+</body>
+</html>
