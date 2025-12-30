@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <title>Buy Now | ChemSus Technologies Pvt Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
   <style>
     :root {
       --primary: #0074c7;
@@ -16,9 +14,7 @@
       --bg: #F3F7FB;
       --ink: #1f2933;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: "Open Sans", Arial, sans-serif;
       background: var(--bg);
@@ -27,9 +23,7 @@
       display: flex;
       min-height: 100vh;
     }
-
     a { text-decoration: none; color: inherit; }
-
     .sidebar {
       width: 240px;
       background: var(--primary);
@@ -43,7 +37,6 @@
       top: 0;
       z-index: 1000;
     }
-
     .nav-logo {
       display: inline-flex;
       align-items: center;
@@ -57,16 +50,13 @@
       border-bottom: 1px solid rgba(255,255,255,0.1);
       white-space: nowrap;
     }
-
     .nav-logo-img { height: 24px; width: auto; }
-
     .nav-menu {
       list-style: none;
       padding: 8px 0;
       flex: 1;
       overflow-y: auto;
     }
-
     .nav-menu li a {
       display: block;
       color: #ffffff;
@@ -75,13 +65,11 @@
       border-left: 3px solid transparent;
       transition: all 0.2s ease;
     }
-
     .nav-menu li a.active,
     .nav-menu li a:hover {
       background: rgba(255,255,255,0.1);
       border-left-color: var(--accent);
     }
-
     .main-wrapper {
       margin-left: 240px;
       flex: 1;
@@ -89,7 +77,6 @@
       display: flex;
       flex-direction: column;
     }
-
     .hero {
       position: relative;
       overflow: hidden;
@@ -105,7 +92,6 @@
       text-align: center;
       border-top: 3px solid var(--accent);
     }
-
     .hero::before {
       content: "";
       position: absolute;
@@ -117,14 +103,12 @@
       opacity: 0.6;
       pointer-events: none;
     }
-
     .hero-content {
       position: relative;
       z-index: 1;
       max-width: 720px;
       padding: 0 18px;
     }
-
     .hero-kicker {
       font-size: 12px;
       letter-spacing: 0.18em;
@@ -132,19 +116,16 @@
       margin-bottom: 6px;
       color: #b9e6ff;
     }
-
     .hero-title {
       font-family: "Montserrat", sans-serif;
       font-size: 32px;
       font-weight: 700;
       margin-bottom: 6px;
     }
-
     .hero-subtitle {
       font-size: 14px;
       color: #e2f3ff;
     }
-
     main {
       max-width: 900px;
       margin: 0 auto;
@@ -152,7 +133,6 @@
       width: 100%;
       flex: 1;
     }
-
     .buy-card {
       background: #ffffff;
       padding: 28px;
@@ -160,7 +140,6 @@
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
       border-top: 4px solid var(--accent);
     }
-
     .buy-header {
       display: flex;
       justify-content: space-between;
@@ -168,14 +147,12 @@
       gap: 16px;
       margin-bottom: 18px;
     }
-
     .buy-title {
       font-family: "Montserrat", sans-serif;
       font-size: 22px;
       font-weight: 700;
       color: #123559;
     }
-
     .buy-tag {
       font-size: 11px;
       padding: 4px 8px;
@@ -185,7 +162,6 @@
       text-transform: uppercase;
       letter-spacing: 0.16em;
     }
-
     .buy-price {
       font-family: "Montserrat", sans-serif;
       font-size: 24px;
@@ -193,26 +169,22 @@
       color: var(--primary);
       margin-bottom: 6px;
     }
-
     .buy-note {
       font-size: 13px;
       color: #4b5563;
       margin-bottom: 12px;
     }
-
     .qty-row {
       display: flex;
       align-items: center;
       gap: 10px;
       margin: 18px 0;
     }
-
     .qty-label {
       font-size: 14px;
       font-weight: 600;
       color: #1f2937;
     }
-
     .qty-input {
       width: 90px;
       padding: 8px 10px;
@@ -221,7 +193,6 @@
       font-size: 14px;
       font-family: inherit;
     }
-
     .totals-row {
       display: flex;
       justify-content: space-between;
@@ -231,20 +202,17 @@
       border-top: 1px dashed #e5e7eb;
       font-size: 14px;
     }
-
     .totals-row strong {
       font-family: "Montserrat", sans-serif;
       font-size: 18px;
       color: var(--primary-dark);
     }
-
     .actions-row {
       margin-top: 20px;
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
     }
-
     .btn-primary {
       background: linear-gradient(135deg, var(--accent), #00d4cc);
       color: #ffffff;
@@ -256,7 +224,6 @@
       font-family: "Montserrat", sans-serif;
       cursor: pointer;
     }
-
     .btn-secondary {
       background: transparent;
       color: #123559;
@@ -268,7 +235,6 @@
       border: 1px solid #cbd5e1;
       cursor: pointer;
     }
-
     footer {
       background: #06121f;
       color: #cbd5f5;
@@ -277,7 +243,6 @@
       padding: 14px 0;
       margin-top: 22px;
     }
-
     @media (max-width: 1050px) {
       .sidebar { display: none; }
       .main-wrapper { margin-left: 0; }
@@ -285,7 +250,6 @@
   </style>
 </head>
 <body>
-
   <nav class="sidebar">
     <a href="index.html" class="nav-logo">
       <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
@@ -299,7 +263,6 @@
       <li><a href="orders.html">Orders</a></li>
     </ul>
   </nav>
-
   <div class="main-wrapper">
     <section class="hero">
       <div class="hero-content">
@@ -310,7 +273,6 @@
         </p>
       </div>
     </section>
-
     <main>
       <div class="buy-card">
         <div class="buy-header">
@@ -320,44 +282,39 @@
           </div>
           <div>
             <div class="buy-price" id="unitPriceText">₹0 / kg</div>
-            <div class="buy-note">Unit price (excl. taxes &amp; shipping)</div>
+            <div class="buy-note">Unit price (excl. taxes & shipping)</div>
           </div>
         </div>
-
         <div class="qty-row">
           <span class="qty-label">Quantity (kg)</span>
           <input type="number" id="quantityInput" class="qty-input" value="1" min="1" step="1">
         </div>
-
         <div class="totals-row">
           <div>This product total (₹)</div>
           <strong id="lineTotalText">₹0</strong>
         </div>
-
         <div class="actions-row">
-          <button class="btn-primary" onclick="placeOrder()">Place Order &amp; Go to Orders</button>
+          <button class="btn-primary" onclick="placeOrder()">Place Order & Go to Orders</button>
           <button class="btn-secondary" onclick="window.location.href='shop.html'">← Back to Shop</button>
         </div>
       </div>
     </main>
-
     <footer>
       &copy; 2025 ChemSus Technologies Pvt Ltd.
     </footer>
   </div>
-
   <script>
     // Read product and show unit price
-    const params      = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
     const productName = params.get('name') || 'Product';
-    const unitPrice   = parseFloat(params.get('price')) || 0;
+    const unitPrice = parseFloat(params.get('price')) || 0;
 
-    document.getElementById('heroProductName').textContent    = 'Buy ' + productName;
+    document.getElementById('heroProductName').textContent = 'Buy ' + productName;
     document.getElementById('productNameHeading').textContent = productName;
     document.getElementById('unitPriceText').textContent =
       '₹' + unitPrice.toLocaleString('en-IN') + ' / kg';
 
-    const qtyInput      = document.getElementById('quantityInput');
+    const qtyInput = document.getElementById('quantityInput');
     const lineTotalText = document.getElementById('lineTotalText');
 
     function updateLineTotal() {
@@ -370,26 +327,24 @@
 
     qtyInput.addEventListener('input', updateLineTotal);
 
-    // Save order and go to orders.html (login/auth page)
+    // ✅ FIXED: Correct sessionStorage key and data structure
     function placeOrder() {
-      const { qty } = updateLineTotal();
-
-      const orderItem = {
-        name: productName,
-        price: unitPrice,
-        quantity: qty
+      const { qty, total } = updateLineTotal();
+      
+      const buyNowData = {
+        productName: document.getElementById('productNameHeading').textContent,
+        quantity: qty,
+        unitPrice: unitPrice
       };
-
-      localStorage.setItem('chemsusLatestOrder', JSON.stringify(orderItem));
-
-      // Step 1: go to Orders for authentication
-      window.location.href = 'orders.html';
+      
+      // ✅ FIXED: Use 'buyNowData' key to match orders2.html
+      sessionStorage.setItem('buyNowData', JSON.stringify(buyNowData));
+      
+      window.location.href = 'orders2.html';
     }
 
     window.placeOrder = placeOrder;
-
     updateLineTotal();
   </script>
-
 </body>
 </html>

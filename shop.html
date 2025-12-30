@@ -771,12 +771,13 @@
     }
 
     // Buy Now → go to buynow.html with query params
-    function goToBuyPage(name, price) {
-      const params = new URLSearchParams();
-      params.set('name', name);
-      params.set('price', String(price));
-      window.location.href = 'buynow.html?' + params.toString();
-    }
+function goToBuyPage(name, price) {
+  const params = new URLSearchParams();
+  params.set('name', name);
+  params.set('price', String(price));
+  window.location.href = 'buynow.html?' + params.toString();
+}
+
 
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -808,4 +809,5 @@
 
 </body>
 </html>
+
 
