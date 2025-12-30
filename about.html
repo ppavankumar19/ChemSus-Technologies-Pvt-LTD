@@ -6,7 +6,6 @@
   <link rel="icon" type="image/png" href="assets/logo.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
   <style>
@@ -24,66 +23,101 @@
       font-family: "Open Sans", Arial, sans-serif;
       background: var(--bg);
       color: var(--ink);
+      line-height: 1.6;
       display: flex;
       min-height: 100vh;
-      line-height: 1.7;
     }
 
     a { text-decoration: none; color: inherit; }
 
-    /* SIDEBAR */
+    /* SIDEBAR (Complete Navigation) */
     .sidebar {
       width: 240px;
       background: var(--primary);
-      color: #fff;
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 100vh;
+      color: #ffffff;
       border-right: 3px solid var(--accent);
       display: flex;
       flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0; top: 0; z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
     }
+
+    .sidebar.open { transform: translateX(0); }
 
     .nav-logo {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 8px;
-      padding: 16px 20px;
+      font-family: "Montserrat", sans-serif;
       font-weight: 700;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
+      font-size: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    .nav-logo-img { height: 24px; }
+    .nav-logo-img { height: 24px; width: auto; }
 
-    .nav-menu { list-style: none; padding: 8px 0; flex: 1; }
-
+    .nav-menu { list-style: none; padding: 8px 0; flex: 1; overflow-y: auto; }
     .nav-menu li a {
       display: block;
+      color: #ffffff;
       padding: 10px 20px;
-      font-size: 14px;
+      font-size: 13.5px;
       border-left: 3px solid transparent;
+      transition: all 0.2s ease;
     }
-
-    .nav-menu li a:hover,
-    .nav-menu li a.active {
-      background: rgba(255,255,255,0.12);
+    .nav-menu li a.active, .nav-menu li a:hover {
+      background: rgba(255,255,255,0.1);
       border-left-color: var(--accent);
     }
 
-    /* MAIN */
+    #cart-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    .search-section { padding: 12px 20px 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+      font-size: 12.5px;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+
     .main-wrapper {
-      margin-left: 240px;
+      margin-left: 0;
       flex: 1;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
+      transition: margin-left 0.3s ease;
     }
+
+    .main-wrapper.sidebar-open { margin-left: 240px; }
 
     /* HERO */
     .hero {
-      height: 260px;
-      background: linear-gradient(135deg, #020617, #031525 45%, #052b3f 100%);
-      color: #fff;
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
+        #041424;
+      color: #ffffff;
+      height: 240px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -91,220 +125,214 @@
       border-top: 3px solid var(--accent);
     }
 
-    .hero-content { max-width: 820px; padding: 0 20px; }
-
-    .hero-title {
-      font-family: "Montserrat", sans-serif;
-      font-size: 40px;
-      font-weight: 700;
-      margin-bottom: 12px;
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 140px 140px;
+      opacity: 0.6;
+      pointer-events: none;
     }
 
-    .hero-subtitle {
-      font-size: 16px;
-      color: #e0f2fe;
-    }
+    .hero-content { position: relative; z-index: 1; max-width: 820px; padding: 0 18px; }
+    .hero-kicker { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #b9e6ff; margin-bottom: 6px; }
+    .hero-title { font-family: "Montserrat", sans-serif; font-size: 36px; font-weight: 700; margin-bottom: 8px; }
 
-    main {
-      max-width: 1150px;
-      margin: auto;
-      padding: 36px 18px 48px;
-      flex: 1;
-    }
-
-    .section {
-      background: #fff;
+    /* MAIN CONTENT */
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 18px 40px; width: 100%; flex: 1; }
+    
+    .info-section {
+      background: #ffffff;
       padding: 36px;
-      margin-bottom: 28px;
-      border-radius: 14px;
-      box-shadow: 0 14px 30px rgba(15,23,42,0.12);
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
       border-top: 4px solid var(--accent);
+      margin-bottom: 30px;
     }
 
-    .section h2 {
+    .section-title {
       font-family: "Montserrat", sans-serif;
-      font-size: 24px;
+      font-size: 22px;
+      font-weight: 700;
       color: var(--primary-dark);
-      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e2e8f0;
+      margin-bottom: 20px;
     }
 
-    .section p {
-      font-size: 15px;
-      color: #374151;
-      margin-bottom: 14px;
+    .content-text { font-size: 15px; color: #374151; margin-bottom: 16px; line-height: 1.8; }
+
+    .features-list { margin-left: 20px; font-size: 14.5px; color: #374151; list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; }
+    .features-list li { margin-bottom: 8px; position: relative; }
+    .features-list li::before {
+      content: "▸";
+      color: var(--accent);
+      font-weight: 700;
+      position: absolute;
+      left: -20px;
     }
 
-    /* LISTS */
-    ul.clean-list {
-      padding-left: 18px;
-      margin-top: 10px;
+    .strengths-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-top: 10px; }
+    .strength-card { background: #f8fafc; padding: 20px; border-radius: 12px; border-left: 4px solid var(--primary); }
+    .strength-card h4 { font-family: "Montserrat", sans-serif; color: var(--primary-dark); margin-bottom: 8px; }
+
+    /* MOBILE TOGGLE */
+    .mobile-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
-    ul.clean-list li {
-      margin-bottom: 8px;
-      font-size: 15px;
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .sidebar-overlay.active { display: block; }
+
+    @media (min-width: 1051px) {
+      .sidebar { transform: translateX(0); }
+      .main-wrapper { margin-left: 240px; }
+      .mobile-toggle { display: none; }
     }
 
-    /* VALUES GRID */
-    .values {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 22px;
-      margin-top: 18px;
-    }
-
-    .value-box {
-      background: linear-gradient(135deg, #f1f9ff, #e8f4ff);
-      padding: 22px;
-      border-radius: 12px;
-      border-top: 4px solid var(--accent);
-    }
-
-    .value-box h3 {
-      font-family: "Montserrat", sans-serif;
-      font-size: 18px;
-      color: var(--primary-dark);
-      margin-bottom: 10px;
-    }
-
-    footer {
-      background: #06121f;
-      color: #cbd5f5;
-      font-size: 13px;
-      text-align: center;
-      padding: 24px;
-    }
-
-    @media(max-width:900px){
-      .sidebar { display:none; }
-      .main-wrapper { margin-left:0; }
-      .hero-title { font-size: 30px; }
+    @media (max-width: 900px) {
+      .info-section { padding: 28px 20px; }
+      .hero-title { font-size: 28px; }
     }
   </style>
 </head>
-
 <body>
 
-<nav class="sidebar">
-  <a href="index.html" class="nav-logo">
-    <img src="assets/logo.jpg" class="nav-logo-img">
-    <span>ChemSus</span>
-  </a>
-  <ul class="nav-menu">
-    <li><a href="index.html">Home</a></li>
-    <li><a href="about.html" class="active">About Us</a></li>
-    <li><a href="products.html">Products</a></li>
-    <li><a href="shop.html">Shop</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
-</nav>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-<div class="main-wrapper">
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1 class="hero-title">About ChemSus Technologies</h1>
-      <p class="hero-subtitle">
-        A young Indian specialty and sustainable chemicals company focused on high-quality, value-added chemical solutions.
-      </p>
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html" class="active">About Us</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="orders.html">Orders</a></li>
+    </ul>
+    <div class="search-section">
+      <form class="search-form">
+        <input type="search" class="search-input" placeholder="Search...">
+      </form>
     </div>
-  </section>
+  </nav>
 
-  <main>
+  <div class="main-wrapper" id="mainWrapper">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Specialty & Sustainable Chemicals</div>
+        <h1 class="hero-title">About ChemSus Technologies</h1>
+        <p class="hero-subtitle">Innovating at the intersection of chemistry and sustainability to provide high-purity chemical solutions.</p>
+      </div>
+    </section>
 
-    <!-- INTRO -->
-    <div class="section">
-      <p>
-        ChemSus Technologies Private Limited is classified as an Indian non-government company limited by shares and is a
-        young Indian specialty and sustainable chemicals company focused on developing and manufacturing high-quality,
-        value-added chemical products for diverse industries.
-      </p>
-    </div>
+    <main>
+      <div class="info-section">
+        <p class="content-text">
+          ChemSus Technologies Private Limited is an Indian specialty chemicals company dedicated to the manufacturing of value-added products. Our operations are guided by the principles of green chemistry, aiming for safer, cleaner, and more efficient industrial processes.
+        </p>
+      </div>
 
-    <!-- WHO WE ARE -->
-    <div class="section">
-      <h2>Who We Are</h2>
-      <p>
-        ChemSus Technologies Private Limited is a private, unlisted Indian company incorporated on 29 May 2023 and
-        registered with RoC–Shillong in Assam, India. The company operates from North Guwahati, Kamrup, building from a
-        strong regional base while serving customers across India and beyond.
-      </p>
-    </div>
+      <div class="info-section">
+        <h2 class="section-title">Who We Are</h2>
+        <p class="content-text">
+          Incorporated on 29 May 2023 and registered in Assam, India, ChemSus Technologies operates from North Guwahati. We have strong roots in the region, including incubation support from ecosystems like IIT Guwahati, allowing us to serve customers across the nation and globally.
+        </p>
+      </div>
 
-    <!-- WHAT WE DO -->
-    <div class="section">
-      <h2>What We Do</h2>
-      <p>
-        ChemSus Technologies operates in the broader specialty chemicals and allied sectors, spanning pharmaceuticals,
-        performance ingredients, and advanced intermediates.
-      </p>
-      <p>
-        Our scope includes the development and manufacture of customized specialty chemicals, functional additives,
-        and high-purity intermediates tailored to customer and industry needs, including medicinal applications,
-        nutraceuticals, agrochemicals, and food & cosmetic additives.
-      </p>
-    </div>
+      <div class="info-section">
+        <h2 class="section-title">Our Strengths</h2>
+        <div class="strengths-grid">
+          <div class="strength-card">
+            <h4>IIT Guwahati Support</h4>
+            <p class="content-text">Incubated within a world-class technology ecosystem for technical excellence.</p>
+          </div>
+          <div class="strength-card">
+            <h4>Quality Standards</h4>
+            <p class="content-text">Focus on high-purity intermediates (up to 99%) for sensitive industrial uses.</p>
+          </div>
+          <div class="strength-card">
+            <h4>Sustainable Routes</h4>
+            <p class="content-text">Processes designed to minimize environmental footprint and energy use.</p>
+          </div>
+        </div>
+      </div>
 
-    <!-- INDUSTRIES -->
-    <div class="section">
-      <h2>Industries We Serve</h2>
-      <ul class="clean-list">
-        <li>Pharmaceuticals</li>
-        <li>Biochemicals</li>
-        <li>Green Chemistry</li>
-        <li>Personal Care</li>
-        <li>Fragrance</li>
-        <li>Agrochemicals</li>
-        <li>Research & Academia</li>
-      </ul>
-    </div>
+      <div class="info-section">
+        <h2 class="section-title">Industries We Serve</h2>
+        <ul class="features-list">
+          <li>Pharmaceuticals</li>
+          <li>Biochemicals & Bio-solvents</li>
+          <li>Green Chemistry Research</li>
+          <li>Personal Care & Cosmetics</li>
+          <li>Fragrance & Flavor Industries</li>
+          <li>Modern Agrochemicals</li>
+          <li>Advanced Material Science</li>
+        </ul>
+      </div>
 
-    <!-- STRENGTHS -->
-    <div class="section">
-      <h2>Our Strengths</h2>
-      <ul class="clean-list">
-        <li>High-purity chemicals (up to 99%)</li>
-        <li>Eco-friendly and sustainable processes</li>
-        <li>Trusted academic roots (IIT Guwahati)</li>
-        <li>Reliable delivery and strong technical support</li>
-        <li>Scalable production for diverse customer needs</li>
-      </ul>
-    </div>
+      <div class="info-section" style="background: linear-gradient(135deg, #041424, #00508a); color: #fff;">
+        <h2 class="section-title" style="color: var(--accent); border-color: rgba(255,255,255,0.1);">Purpose & Vision</h2>
+        <p class="content-text" style="color: #e2f3ff;">
+          Our vision is to enable environmentally responsible specialty chemical solutions that support better health, cleaner processes, and more sustainable value chains for our global partners.
+        </p>
+      </div>
+    </main>
 
-    <!-- PURPOSE & VISION -->
-    <div class="section">
-      <h2>Purpose & Vision</h2>
-      <p>
-        ChemSus Technologies positions itself at the intersection of chemistry and sustainability, aligning its
-        portfolio with green and resource-efficient chemical innovation.
-      </p>
-      <p>
-        Our vision is to enable safer, more efficient, and environmentally responsible specialty chemical solutions
-        that support better health, cleaner processes, and more sustainable value chains for partner industries.
-      </p>
-    </div>
+    <footer style="background:#06121f; color:#cbd5f5; text-align:center; padding:16px 0; font-size:13px; margin-top:auto;">
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
+  </div>
 
-    <!-- INNOVATION -->
-    <div class="section">
-      <h2>Innovation & Sustainability Focus</h2>
-      <p>
-        The company leverages incubation and technology support ecosystems to design specialty chemistry routes that
-        minimize waste, energy use, and environmental footprint.
-      </p>
-      <p>
-        This innovation-driven approach enables ChemSus Technologies to develop next-generation specialty products,
-        from bio-based intermediates to cleaner process aids, guided by the principles of green chemistry and circularity.
-      </p>
-    </div>
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+      mainWrapper.classList.toggle('sidebar-open');
+    }
 
-  </main>
-
-  <footer>
-    © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
-  </footer>
-
-</div>
-
+    // Initialize Cart Badge
+    (function() {
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      const badge = document.getElementById('cart-count');
+      if (badge) badge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    })();
+  </script>
 </body>
 </html>
+

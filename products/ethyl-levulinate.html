@@ -4,291 +4,389 @@
   <meta charset="UTF-8">
   <title>Ethyl Levulinate | ChemSus Technologies Pvt Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Google Fonts -->
+  <link rel="icon" type="image/png" href="../assets/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
+  
   <style>
     :root {
-      --primary:#0074c7;
-      --primary-dark:#00508a;
-      --accent:#00b8b0;
-      --bg:#F3F7FB;
-      --ink:#1f2933;
+      --primary: #0074c7;
+      --primary-dark: #00508a;
+      --accent: #00b8b0;
+      --bg: #F3F7FB;
+      --ink: #1f2933;
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body{
-      font-family:"Open Sans",Arial,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      line-height:1.6;
+    body {
+      font-family: "Open Sans", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
     }
 
-    a{text-decoration:none}
+    a { text-decoration: none; color: inherit; }
 
-    /* TOP BAR */
-    header{
-      background:var(--primary);
-      padding:12px 18px;
+    /* SIDEBAR NAVIGATION */
+    .sidebar {
+      width: 240px;
+      background: var(--primary);
+      color: #ffffff;
+      border-right: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0; top: 0; z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
     }
 
-    .top-back-link{
-      color:#fff;
-      font-weight:600;
-      font-size:14px;
+    .sidebar.open { transform: translateX(0); }
+
+    .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* HERO */
-    .hero{
+    .nav-logo-img { height: 24px; width: auto; }
+
+    .nav-menu { list-style: none; padding: 8px 0; flex: 1; overflow-y: auto; }
+    .nav-menu li a {
+      display: block;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .nav-menu li a.active, .nav-menu li a:hover {
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
+    }
+
+    #cart-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    .search-section { padding: 12px 20px 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+      font-size: 12.5px;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .main-wrapper {
+      margin-left: 0;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-wrapper.sidebar-open { margin-left: 240px; }
+
+    /* HERO SECTION WITH BACKGROUND PATTERN */
+    .hero {
+      position: relative;
+      overflow: hidden;
       background:
-        radial-gradient(circle at top left, rgba(0,184,176,.18), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(0,116,199,.2), transparent 55%),
+        radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
         #041424;
-      color:#fff;
-      padding:40px 18px 36px;
-      text-align:center;
+      color: #ffffff;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-top: 3px solid var(--accent);
     }
 
-    .hero-kicker{
-      font-size:12px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:#b9e6ff;
-      margin-bottom:6px;
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 140px 140px;
+      opacity: 0.6;
+      pointer-events: none;
     }
 
-    .hero-title{
-      font-family:"Montserrat",sans-serif;
-      font-size:32px;
-      font-weight:700;
-      margin-bottom:8px;
+    .hero-content { position: relative; z-index: 1; max-width: 720px; padding: 0 18px; }
+    .hero-kicker { font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: #b9e6ff; margin-bottom: 6px; }
+    .hero-title { font-family: "Montserrat", sans-serif; font-size: 32px; font-weight: 700; }
+
+    /* PRODUCT CARD & CONTENT */
+    main { max-width: 1100px; margin: 0 auto; padding: 32px 18px 40px; width: 100%; flex: 1; }
+    .product-card {
+      background: #ffffff;
+      padding: 36px;
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+      border-top: 4px solid var(--accent);
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 36px;
     }
 
-    .hero-subtitle{
-      font-size:14px;
-      color:#e2f3ff;
+    .product-image {
+      position: relative;
+      height: 320px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 116, 199, 0.15);
     }
 
-    /* MAIN */
-    main{
-      max-width:1000px;
-      margin:auto;
-      padding:32px 18px 40px;
+    .product-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease; }
+    .product-image:hover img { transform: scale(1.05); }
+
+    .content-section { display: flex; flex-direction: column; gap: 24px; }
+    .meta-chip {
+      display: inline-block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      background: #e0f7f6;
+      color: #04726d;
+      padding: 4px 8px;
+      border-radius: 999px;
+      width: fit-content;
     }
 
-    .box{
-      background:#fff;
-      padding:30px;
-      border-radius:16px;
-      box-shadow:0 14px 30px rgba(15,23,42,.12);
-      display:grid;
-      grid-template-columns:1.1fr 1.4fr;
-      gap:30px;
-      border-top:4px solid var(--accent);
+    .section-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin: 20px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
     }
 
-    .box-img{
-      background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
-      border-radius:12px;
-      padding:20px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    .features-list { margin-left: 20px; font-size: 14.5px; color: #374151; list-style: none; }
+    .features-list li { margin-bottom: 8px; position: relative; }
+    .features-list li::before {
+      content: "▸";
+      color: var(--accent);
+      font-weight: 700;
+      position: absolute;
+      left: -20px;
     }
 
-    .box-img img{
-      width:100%;
-      max-height:260px;
-      object-fit:contain;
+    .actions { margin-top: 32px; display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-primary, .btn-secondary {
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex: 1;
+      transition: all 0.2s ease;
     }
 
-    .meta-chip{
-      display:inline-block;
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      background:#e0f7f6;
-      color:#04726d;
-      padding:4px 8px;
-      border-radius:999px;
-      margin-bottom:14px;
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #00d4cc); color: #ffffff; box-shadow: 0 8px 20px rgba(0,184,176,0.3); }
+    .btn-secondary { border: 2px solid var(--primary); color: var(--primary); background: transparent; }
+    .btn-primary:hover, .btn-secondary:hover { transform: translateY(-2px); }
+
+    /* FIXED WHATSAPP BUTTON STYLES */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25d366, #20ba5f);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 28px rgba(37, 211, 102, 0.4);
+      z-index: 1100;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
 
-    .lead{
-      font-size:14px;
-      color:#4b5563;
-      margin-bottom:16px;
+    .whatsapp-float:hover {
+      transform: scale(1.1) translateY(-5px);
+      box-shadow: 0 16px 36px rgba(37, 211, 102, 0.5);
     }
 
-    h3{
-      font-family:"Montserrat",sans-serif;
-      font-size:16px;
-      margin:14px 0 8px;
-      color:#1f2937;
+    .whatsapp-float svg { width: 32px; height: 32px; fill: #ffffff; }
+
+    /* SIDEBAR OVERLAY & MOBILE TOGGLE */
+    .mobile-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
     }
 
-    ul{
-      margin-left:18px;
-      margin-bottom:8px;
-      font-size:14px;
-      color:#374151;
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+    .sidebar-overlay.active { display: block; }
+
+    @media (min-width: 1051px) {
+      .sidebar { transform: translateX(0); }
+      .main-wrapper { margin-left: 240px; }
+      .mobile-toggle { display: none; }
     }
 
-    li+li{margin-top:4px}
-
-    .actions{
-      margin-top:26px;
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-    }
-
-    .btn-primary,
-    .btn-outline{
-      padding:11px 20px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:600;
-      font-family:"Montserrat",sans-serif;
-      border:none;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-
-    .btn-primary{
-      background:linear-gradient(135deg,#0074c7,#00508a);
-      color:#fff;
-    }
-
-    .btn-outline{
-      background:transparent;
-      border:1px solid #cbd5e1;
-      color:#123559;
-    }
-
-    .btn-primary:hover,
-    .btn-outline:hover{
-      transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.15);
-    }
-
-    @media(max-width:800px){
-      .box{grid-template-columns:1fr;padding:22px 18px}
-      .box-img{order:-1}
-      .hero-title{font-size:26px}
-    }
-
-    /* FLOATING WHATSAPP */
-    .whatsapp-float{
-      position:fixed;
-      width:56px;height:56px;
-      bottom:24px;right:20px;
-      background:#25d366;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 10px 20px rgba(0,0,0,.25);
-      z-index:1000;
-    }
-
-    .whatsapp-float svg{
-      width:28px;height:28px;fill:#fff;
+    @media (max-width: 900px) {
+      .product-card { grid-template-columns: 1fr; padding: 28px 20px; }
     }
   </style>
 </head>
-
 <body>
 
-<header>
-  <a href="../products.html" class="top-back-link">← Back to Products</a>
-</header>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-<section class="hero">
-  <div class="hero-kicker">Bio-based solvent & fragrance ingredient</div>
-  <h1 class="hero-title">Ethyl Levulinate</h1>
-  <p class="hero-subtitle">
-    Sustainable ester for flavours, fragrances, green solvents, and advanced chemical synthesis.
-  </p>
-</section>
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-<main>
-  <div class="box">
-
-    <!-- IMAGE -->
-    <div class="box-img">
-      <!-- Replace with fragrance-related AI generated image if needed -->
-      <img src="../assets/4ai.JPEG" alt="Ethyl Levulinate – fragrance and solvent applications">
+  <nav class="sidebar" id="sidebar">
+    <a href="../index.html" class="nav-logo">
+      <img src="../assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About Us</a></li>
+      <li><a href="../products.html" class="active">Products</a></li>
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../collaboration.html">Collaboration</a></li>
+      <li><a href="../recognitions.html">Recognitions</a></li>
+      <li><a href="../investors.html">Investors</a></li>
+      <li><a href="../cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="../contact.html">Contact us</a></li>
+      <li><a href="../request-sample.html">Request for Sample</a></li>
+      <li><a href="../orders.html">Orders</a></li>
+    </ul>
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+      </form>
     </div>
+  </nav>
 
-    <!-- CONTENT -->
-    <div class="box-content">
-
-      <span class="meta-chip">Product overview</span>
-
-      <p class="lead">
-        Ethyl Levulinate (CAS No.: 539-88-8) is a bio-based ester primarily used as a solvent,
-        flavour and fragrance ingredient, and versatile chemical intermediate.
-        Its low toxicity, good solvency, and renewable origin make it highly attractive
-        for green and sustainable formulations.
-      </p>
-
-      <h3>Flavor & Fragrance Applications</h3>
-      <ul>
-        <li>Food-grade flavouring agent imparting sweet, fruity notes in beverages,
-            confectionery, and baked goods</li>
-        <li>Used in fragrances and personal-care products for its mild, fruity,
-            creamy aroma</li>
-        <li>Supports fruity, floral, and gourmand fragrance accords</li>
-      </ul>
-
-      <h3>Polymers & Materials</h3>
-      <ul>
-        <li>Used in the synthesis of biodegradable polymers and sustainable plastics</li>
-        <li>Acts as a versatile intermediate in organic chemistry research</li>
-        <li>Enables development of fine chemicals and advanced materials</li>
-      </ul>
-
-      <h3>Solvent & Green Chemistry</h3>
-      <ul>
-        <li>Biodegradable solvent for coatings, paints, and cleaning formulations</li>
-        <li>Used in extraction of natural products</li>
-        <li>Key building block for levulinic-acid-derived specialty esters</li>
-      </ul>
-
-      <h3>Additional Properties</h3>
-      <ul>
-        <li>Derived from biomass such as carbohydrate wastes</li>
-        <li>Aligned with renewable and circular-economy processes</li>
-        <li>Good thermal stability and wide solvent compatibility</li>
-        <li>Relatively low toxicity, supporting safe industrial use</li>
-      </ul>
-
-      <!-- ACTIONS -->
-      <div class="actions">
-        <a href="../shop.html#ethyl-levulinate" class="btn-primary">🛒 Go to Shop</a>
-        <a href="../products.html" class="btn-outline">← Back to Products</a>
+  <div class="main-wrapper" id="mainWrapper">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Bio-based solvent & fragrance ingredient</div>
+        <h1 class="hero-title">Ethyl Levulinate</h1>
+        <p class="hero-subtitle">Sustainable ester for flavours, fragrances, and advanced chemical synthesis.</p>
       </div>
+    </section>
 
-    </div>
+    <main>
+      <div class="product-card">
+        <div class="product-image">
+          <img src="../assets/4ai.JPEG" alt="Ethyl Levulinate – fragrance and solvent applications">
+        </div>
+
+        <div class="content-section">
+          <span class="meta-chip">Product overview</span>
+          <p class="lead">
+            Ethyl Levulinate (CAS No.: 539-88-8) is a bio-based ester primarily used as a solvent, flavour and fragrance ingredient. Its low toxicity and renewable origin make it ideal for green chemistry and sustainable formulations.
+          </p>
+
+          <div class="section-group">
+            <h3 class="section-title">Flavor & Fragrance</h3>
+            <ul class="features-list">
+              <li>Food-grade flavouring for sweet, fruity notes in beverages and sweets</li>
+              <li>Used in personal-care products for its mild, creamy aroma</li>
+              <li>Supports fruity, floral, and gourmand fragrance accords</li>
+            </ul>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Solvent & Green Chemistry</h3>
+            <ul class="features-list">
+              <li>Biodegradable solvent for coatings, paints, and cleaning agents</li>
+              <li>Effective in the extraction of natural botanical products</li>
+              <li>Renewable building block for levulinic-acid-derived specialty esters</li>
+            </ul>
+          </div>
+
+          <div class="actions">
+            <a href="../shop.html#ethyl-levulinate" class="btn-primary">🛒 Buy Ethyl Levulinate</a>
+            <a href="../products.html" class="btn-secondary">← All Products</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer style="background:#06121f; color:#cbd5f5; text-align:center; padding:16px 0; font-size:13px; margin-top:auto;">
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
   </div>
-</main>
 
-<!-- WHATSAPP -->
-<a
-  href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%27m%20interested%20in%20Ethyl%20Levulinate."
-  class="whatsapp-float"
-  target="_blank"
-  aria-label="Chat with us on WhatsApp about Ethyl Levulinate"
->
-  <svg viewBox="0 0 32 32">
-    <path d="M16.04 3C9.4 3 4 8.25 4 14.73c0 2.48.82 4.79 2.23 6.68L4 29l7.86-2.07a12.2 12.2 0 0 0 4.18.7h.01c6.64 0 12.04-5.25 12.04-11.73C28.09 8.25 22.68 3 16.04 3z"/>
-  </svg>
-</a>
+  <a href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I'm%20interested%20in%20Ethyl%20Levulinate." 
+     class="whatsapp-float" target="_blank" aria-label="Chat with us on WhatsApp">
+    <svg viewBox="0 0 32 32">
+      <path d="M16.04 3C9.4 3 4 8.25 4 14.73c0 2.48.82 4.79 2.23 6.68L4 29l7.86-2.07a12.2 12.2 0 0 0 4.18.7h.01c6.64 0 12.04-5.25 12.04-11.73C28.09 8.25 22.68 3 16.04 3z"/>
+    </svg>
+  </a>
 
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+      mainWrapper.classList.toggle('sidebar-open');
+    }
+
+    (function() {
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      const badge = document.getElementById('cart-count');
+      if (badge) badge.textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+    })();
+  </script>
 </body>
 </html>

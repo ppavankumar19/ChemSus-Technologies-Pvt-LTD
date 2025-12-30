@@ -4,10 +4,9 @@
   <meta charset="UTF-8">
   <title>Sodium Levulinate | ChemSus Technologies Pvt Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Google Fonts -->
+  <link rel="icon" type="image/png" href="../assets/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
+  
   <style>
     :root {
       --primary: #0074c7;
@@ -24,35 +23,158 @@
       background: var(--bg);
       color: var(--ink);
       line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
     }
 
-    a { text-decoration: none; }
+    a { text-decoration: none; color: inherit; }
 
-    /* TOP BAR */
-    header {
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
       background: var(--primary);
       color: #ffffff;
-      padding: 12px 18px;
+      border-right: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
     }
 
-    .top-back-link {
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .nav-logo {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-weight: 600;
-      font-size: 14px;
+      gap: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
       color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-logo-img { height: 24px; width: auto; }
+
+    .nav-menu {
+      list-style: none;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-menu li a {
+      display: block;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav-menu li a.active,
+    .nav-menu li a:hover {
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
+    }
+
+    #cart-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .search-form { position: relative; }
+    .search-input {
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+      font-size: 12.5px;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-input::placeholder { color: #d1d5db; font-size: 11.5px; }
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #ffffff;
+      pointer-events: none;
+    }
+
+    .main-wrapper {
+      margin-left: 0;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-wrapper.sidebar-open {
+      margin-left: 240px;
     }
 
     /* HERO */
     .hero {
+      position: relative;
+      overflow: hidden;
       background:
         radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
         radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
         #041424;
       color: #ffffff;
-      padding: 40px 18px 36px;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       text-align: center;
+      border-top: 3px solid var(--accent);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 140px 140px;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      padding: 0 18px;
     }
 
     .hero-kicker {
@@ -67,58 +189,59 @@
       font-family: "Montserrat", sans-serif;
       font-size: 32px;
       font-weight: 700;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    .hero-subtitle {
-      font-size: 14px;
-      color: #e2f3ff;
-    }
+    .hero-subtitle { font-size: 14px; color: #e2f3ff; }
 
-    /* MAIN CONTENT */
+    /* MAIN */
     main {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 32px 18px 40px;
+      width: 100%;
+      flex: 1;
     }
 
-    .box {
+    .product-card {
       background: #ffffff;
-      padding: 30px;
+      padding: 36px;
       border-radius: 16px;
       box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-      display: grid;
-      grid-template-columns: 1.1fr 1.4fr;
-      gap: 30px;
       border-top: 4px solid var(--accent);
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 36px;
     }
 
-    .box-img {
+    .product-image {
+      position: relative;
+      height: 320px;
+      border-radius: 16px;
+      overflow: hidden;
       background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
-      border-radius: 12px;
-      padding: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 116, 199, 0.15);
     }
 
-    .box-img img {
+    .product-image img {
       width: 100%;
-      max-height: 260px;
-      object-fit: contain;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.3s ease;
     }
 
-    .box-content h1 {
-      font-family: "Montserrat", sans-serif;
-      font-size: 24px;
-      margin-bottom: 10px;
-      color: #123559;
+    .product-image:hover img {
+      transform: scale(1.05);
     }
 
-    .lead {
-      font-size: 14px;
-      color: #4b5563;
-      margin-bottom: 16px;
+    .content-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
     .meta-chip {
@@ -130,190 +253,296 @@
       color: #04726d;
       padding: 4px 8px;
       border-radius: 999px;
-      margin-bottom: 14px;
     }
 
-    h3 {
+    .lead {
+      font-size: 15px;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+
+    .section-title {
       font-family: "Montserrat", sans-serif;
-      font-size: 16px;
-      margin-top: 14px;
-      margin-bottom: 8px;
-      color: #1f2937;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin: 20px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
     }
 
-    ul {
-      margin-left: 18px;
-      margin-bottom: 8px;
-      font-size: 14px;
+    .features-list {
+      margin-left: 20px;
+      font-size: 14.5px;
       color: #374151;
+      list-style: none;
     }
 
-    li + li { margin-top: 4px; }
+    .features-list li {
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .features-list li::before {
+      content: "▸";
+      color: var(--accent);
+      font-weight: 700;
+      position: absolute;
+      left: -20px;
+      top: 0;
+    }
 
     .actions {
-      margin-top: 26px;
+      margin-top: 32px;
       display: flex;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
     }
 
-    .btn-primary,
-    .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 11px 20px;
-      border-radius: 999px;
-      font-size: 13px;
+    .btn-primary, .btn-secondary {
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 14px;
       font-weight: 600;
       font-family: "Montserrat", sans-serif;
-      cursor: pointer;
-      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      flex: 1;
+      min-width: 160px;
+      justify-content: center;
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, #0074c7, #00508a);
+      background: linear-gradient(135deg, var(--accent), #00d4cc);
       color: #ffffff;
+      box-shadow: 0 8px 20px rgba(0,184,176,0.3);
     }
 
-    .btn-outline {
+    .btn-secondary {
       background: transparent;
-      color: #123559;
-      border: 1px solid #cbd5e1;
+      color: var(--primary);
+      border: 2px solid var(--primary);
     }
 
-    .btn-primary:hover,
-    .btn-outline:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 18px rgba(15, 23, 42, 0.15);
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,184,176,0.4);
     }
 
-    @media (max-width: 800px) {
-      .box {
-        grid-template-columns: 1fr;
-        padding: 22px 18px;
-      }
-      .box-img { order: -1; }
-      .hero-title { font-size: 26px; }
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-2px);
     }
 
-    /* FLOATING WHATSAPP BUTTON */
+    footer {
+      background: #06121f;
+      color: #cbd5f5;
+      font-size: 13px;
+      text-align: center;
+      padding: 16px 0;
+      margin-top: auto;
+    }
+
+    /* WHATSAPP BUTTON */
     .whatsapp-float {
       position: fixed;
-      width: 56px;
-      height: 56px;
       bottom: 24px;
-      right: 20px;
-      background-color: #25d366;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25d366, #20ba5f);
       border-radius: 50%;
-      box-shadow: 0 10px 20px rgba(0,0,0,0.25);
-      z-index: 1000;
       display: flex;
       align-items: center;
       justify-content: center;
+      box-shadow: 0 12px 28px rgba(37, 211, 102, 0.4);
+      z-index: 1000;
+      transition: all 0.2s ease;
     }
 
-    .whatsapp-float svg {
-      width: 28px;
-      height: 28px;
-      fill: #ffffff;
+    .whatsapp-float svg { width: 32px; height: 32px; fill: #ffffff; }
+
+    /* MOBILE TOGGLE */
+    .mobile-toggle {
+      display: block;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .mobile-toggle svg { width: 20px; height: 20px; }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    .sidebar-overlay.active { display: block; }
+
+    @media (min-width: 1051px) {
+      .sidebar { transform: translateX(0); }
+      .main-wrapper { margin-left: 240px; }
+      .mobile-toggle { display: none; }
+    }
+
+    @media (max-width: 900px) {
+      .product-card { grid-template-columns: 1fr; padding: 28px 20px; }
+      .product-image { height: 280px; }
+      .hero-title { font-size: 28px; }
     }
   </style>
 </head>
-
 <body>
 
-<header>
-  <a href="../products.html" class="top-back-link">← Back to Products</a>
-</header>
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-<section class="hero">
-  <div class="hero-kicker">Cosmetic-grade preservative</div>
-  <h1 class="hero-title">Sodium Levulinate</h1>
-  <p class="hero-subtitle">
-    Mild, bio-based preservative and skin-/hair-conditioning agent for clean and natural formulations.
-  </p>
-</section>
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-<main>
-  <div class="box">
-
-    <!-- IMAGE -->
-    <div class="box-img">
-      <img src="../assets/3ai.JPEG" alt="Sodium Levulinate – cosmetic applications">
+  <nav class="sidebar" id="sidebar">
+    <a href="../index.html" class="nav-logo">
+      <img src="../assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About Us</a></li>
+      <li><a href="../products.html" class="active">Products</a></li>
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../collaboration.html">Collaboration</a></li>
+      <li><a href="../recognitions.html">Recognitions</a></li>
+      <li><a href="../investors.html">Investors</a></li>
+      <li><a href="../cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="../contact.html">Contact us</a></li>
+      <li><a href="../request-sample.html">Request for Sample</a></li>
+      <li><a href="../orders.html">Orders</a></li>
+    </ul>
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </span>
+      </form>
     </div>
+  </nav>
 
-    <!-- CONTENT -->
-    <div class="box-content">
-      <span class="meta-chip">Product overview</span>
-      <h1>Sodium Levulinate</h1>
-
-      <p class="lead">
-        Sodium Levulinate (CAS No.: 539-88-8) is a water-soluble, white crystalline solid
-        widely used in cosmetics and personal-care products as a mild preservative
-        and skin-/hair-conditioning agent. Its easy incorporation into emulsions,
-        shampoos, gels, serums, and creams makes it especially suitable for modern
-        clean-label formulations.
-      </p>
-
-      <h3>Main Uses</h3>
-      <ul>
-        <li>Mild, “natural” preservative inhibiting bacteria, yeasts, and molds</li>
-        <li>Extends shelf life of cosmetic and personal-care formulations</li>
-        <li>Skin-conditioning agent improving softness, smoothness, and hydration</li>
-        <li>Hair-conditioning agent enhancing softness and shine</li>
-      </ul>
-
-      <h3>Role in Formulations</h3>
-      <ul>
-        <li>Common in clean, natural, and organic skincare and haircare products</li>
-        <li>Used as an alternative to harsher synthetic preservatives</li>
-        <li>Often combined with organic acid salts (e.g., sodium anisate) for
-            broad-spectrum antimicrobial efficacy</li>
-      </ul>
-
-      <h3>Additional Properties</h3>
-      <ul>
-        <li>Mild antibacterial and antimicrobial activity</li>
-        <li>Supports blemish-prone and oily-skin formulations</li>
-        <li>Helps stabilize emulsions</li>
-        <li>Most effective in slightly acidic formulations (pH ~4–6)</li>
-      </ul>
-
-      <h3>Safety & Regulatory</h3>
-      <ul>
-        <li>Generally safe and well-tolerated, including for sensitive skin</li>
-        <li>Accepted under cosmetic ingredient nomenclature (INCI)</li>
-        <li>Approved by regulatory bodies for personal-care use,
-            including natural and organic product lines</li>
-      </ul>
-
-      <!-- ACTION BUTTONS -->
-      <div class="actions">
-        <a href="../shop.html#sodium-levulinate" class="btn-primary">
-          🛒 Go to Shop
-        </a>
-        <a href="../products.html" class="btn-outline">
-          ← Back to Products
-        </a>
+  <div class="main-wrapper" id="mainWrapper">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Cosmetic-grade preservative</div>
+        <h1 class="hero-title">Sodium Levulinate</h1>
+        <p class="hero-subtitle">
+          Mild, bio-based preservative and skin-/hair-conditioning agent for clean and natural formulations.
+        </p>
       </div>
+    </section>
 
-    </div>
+    <main>
+      <div class="product-card">
+        <div class="product-image">
+          <img src="../assets/3ai.JPEG" alt="Sodium Levulinate – cosmetic applications">
+        </div>
+
+        <div class="content-section">
+          <span class="meta-chip">Product overview</span>
+          
+          <p class="lead">
+            Sodium Levulinate (CAS No.: 539-88-8) is a water-soluble, white crystalline solid widely used in cosmetics and personal-care products. It functions as a mild preservative and conditioning agent, making it essential for modern clean-label and organic formulations.
+          </p>
+
+          <div class="section-group">
+            <h3 class="section-title">Main Applications</h3>
+            <ul class="features-list">
+              <li>Inhibits bacteria, yeasts, and molds in water-based products</li>
+              <li>Improves skin softness, smoothness, and hydration</li>
+              <li>Enhances hair softness and shine in shampoos and conditioners</li>
+              <li>Extends shelf life of serums, gels, and emulsions</li>
+            </ul>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Formulation Advantages</h3>
+            <ul class="features-list">
+              <li>100% bio-based alternative to harsh synthetic preservatives</li>
+              <li>Highly effective in slightly acidic formulations (pH 4.0–6.0)</li>
+              <li>Excellent synergy with Sodium Anisate for broad-spectrum protection</li>
+              <li>Supports blemish-prone and sensitive skin formulations</li>
+            </ul>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Safety & Regulatory</h3>
+            <ul class="features-list">
+              <li>Generally safe (GRAS) and well-tolerated by all skin types</li>
+              <li>Accepted under INCI nomenclature for global compliance</li>
+              <li>Approved for use in ECOCERT and COSMOS certified products</li>
+            </ul>
+          </div>
+
+          <div class="actions">
+            <a href="../shop.html#sodium-levulinate" class="btn-primary">🛒 Buy Sodium Levulinate</a>
+            <a href="../products.html" class="btn-secondary">← All Products</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
   </div>
-</main>
 
-<!-- FLOATING WHATSAPP -->
-<a
-  href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%27m%20interested%20in%20Sodium%20Levulinate."
-  class="whatsapp-float"
-  target="_blank"
-  aria-label="Chat with us on WhatsApp about Sodium Levulinate"
->
-  <svg viewBox="0 0 32 32">
-    <path d="M16.04 3C9.4 3 4 8.25 4 14.73c0 2.48.82 4.79 2.23 6.68L4 29l7.86-2.07a12.2 12.2 0 0 0 4.18.7h.01c6.64 0 12.04-5.25 12.04-11.73C28.09 8.25 22.68 3 16.04 3z"/>
-  </svg>
-</a>
+  <a href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I'm%20interested%20in%20Sodium%20Levulinate." 
+     class="whatsapp-float" target="_blank" aria-label="Chat about Sodium Levulinate">
+    <svg viewBox="0 0 32 32">
+      <path d="M16.04 3C9.4 3 4 8.25 4 14.73c0 2.48.82 4.79 2.23 6.68L4 29l7.86-2.07a12.2 12.2 0 0 0 4.18.7h.01c6.64 0 12.04-5.25 12.04-11.73C28.09 8.25 22.68 3 16.04 3z"/>
+    </svg>
+  </a>
 
+  <script>
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+      mainWrapper.classList.toggle('sidebar-open');
+    }
+
+    (function() {
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById('cart-count');
+      if (badge) badge.textContent = count;
+    })();
+
+    document.getElementById('siteSearchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
+      if (query.includes('shop')) window.location.href = '../shop.html';
+      else if (query.includes('product')) window.location.href = '../products.html';
+      else window.location.href = '../index.html';
+    });
+  </script>
 </body>
 </html>

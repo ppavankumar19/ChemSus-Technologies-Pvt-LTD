@@ -4,297 +4,669 @@
   <meta charset="UTF-8">
   <title>5-Hydroxymethylfurfural (5-HMF) | ChemSus Technologies Pvt Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Google Fonts -->
+  <link rel="icon" type="image/png" href="../assets/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-
+  
   <style>
-    :root{
-      --primary:#0074c7;
-      --primary-dark:#00508a;
-      --accent:#00b8b0;
-      --bg:#F3F7FB;
-      --ink:#1f2933;
+    :root {
+      --primary: #0074c7;
+      --primary-dark: #00508a;
+      --accent: #00b8b0;
+      --bg: #F3F7FB;
+      --ink: #1f2933;
     }
 
-    *{box-sizing:border-box;margin:0;padding:0}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body{
-      font-family:"Open Sans",Arial,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      line-height:1.6;
+    body {
+      font-family: "Open Sans", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      display: flex;
+      min-height: 100vh;
     }
 
-    a{text-decoration:none}
+    a { text-decoration: none; color: inherit; }
 
-    /* TOP BAR */
-    header{
-      background:var(--primary);
-      padding:12px 18px;
+    /* SIDEBAR */
+    .sidebar {
+      width: 240px;
+      background: var(--primary);
+      color: #ffffff;
+      border-right: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1000;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
     }
 
-    .top-back-link{
-      color:#fff;
-      font-weight:600;
-      font-size:14px;
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .nav-logo-img { height: 24px; width: auto; }
+
+    .nav-menu {
+      list-style: none;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-menu li a {
+      display: block;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav-menu li a.active,
+    .nav-menu li a:hover {
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
+    }
+
+    #cart-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .search-form { position: relative; }
+    .search-input {
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+      font-size: 12.5px;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-input::placeholder { color: #d1d5db; font-size: 11.5px; }
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #ffffff;
+      pointer-events: none;
+    }
+
+    .main-wrapper {
+      margin-left: 0;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s ease;
+    }
+
+    .main-wrapper.sidebar-open {
+      margin-left: 240px;
     }
 
     /* HERO */
-    .hero{
+    .hero {
+      position: relative;
+      overflow: hidden;
       background:
-        radial-gradient(circle at top left, rgba(0,184,176,.18), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(0,116,199,.2), transparent 55%),
+        radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
         #041424;
-      color:#fff;
-      padding:40px 18px 36px;
-      text-align:center;
+      color: #ffffff;
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-top: 3px solid var(--accent);
     }
 
-    .hero-kicker{
-      font-size:12px;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-      color:#b9e6ff;
-      margin-bottom:6px;
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 140px 140px;
+      opacity: 0.6;
+      pointer-events: none;
     }
 
-    .hero-title{
-      font-family:"Montserrat",sans-serif;
-      font-size:32px;
-      font-weight:700;
-      margin-bottom:8px;
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      padding: 0 18px;
     }
 
-    .hero-subtitle{
-      font-size:14px;
-      color:#e2f3ff;
+    .hero-kicker {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #b9e6ff;
     }
+
+    .hero-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero-subtitle { font-size: 14px; color: #e2f3ff; }
 
     /* MAIN */
-    main{
-      max-width:1000px;
-      margin:auto;
-      padding:32px 18px 40px;
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 18px 40px;
+      width: 100%;
+      flex: 1;
     }
 
-    .box{
-      background:#fff;
-      padding:30px;
-      border-radius:16px;
-      box-shadow:0 14px 30px rgba(15,23,42,.12);
-      display:grid;
-      grid-template-columns:1.1fr 1.4fr;
-      gap:30px;
-      border-top:4px solid var(--accent);
+    .product-card {
+      background: #ffffff;
+      padding: 36px;
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+      border-top: 4px solid var(--accent);
+      display: grid;
+      grid-template-columns: 1fr 1.6fr;
+      gap: 36px;
     }
 
-    .box-img{
-      background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
-      border-radius:12px;
-      padding:20px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
+    /* ENHANCED IMAGE LAYOUT */
+    .product-image {
+      position: relative;
+      height: 320px;
+      border-radius: 16px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(0, 116, 199, 0.15);
     }
 
-    .box-img img{
-      width:100%;
-      max-height:260px;
-      object-fit:contain;
+    .product-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform 0.3s ease;
     }
 
-    .meta-chip{
-      display:inline-block;
-      font-size:11px;
-      text-transform:uppercase;
-      letter-spacing:.16em;
-      background:#e0f7f6;
-      color:#04726d;
-      padding:4px 8px;
-      border-radius:999px;
-      margin-bottom:14px;
+    .product-image:hover img {
+      transform: scale(1.05);
     }
 
-    .lead{
-      font-size:14px;
-      color:#4b5563;
-      margin-bottom:16px;
+    .product-image::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(0,184,176,0.08), transparent 50%);
+      pointer-events: none;
     }
 
-    h3{
-      font-family:"Montserrat",sans-serif;
-      font-size:16px;
-      margin:14px 0 8px;
-      color:#1f2937;
+    .content-section {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
     }
 
-    ul{
-      margin-left:18px;
-      margin-bottom:8px;
-      font-size:14px;
-      color:#374151;
+    .meta-chip {
+      display: inline-block;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+      background: #e0f7f6;
+      color: #04726d;
+      padding: 4px 8px;
+      border-radius: 999px;
     }
 
-    li+li{margin-top:4px}
-
-    .actions{
-      margin-top:26px;
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
+    .lead {
+      font-size: 15px;
+      color: #4b5563;
+      line-height: 1.7;
     }
 
-    .btn-primary,
-    .btn-outline{
-      padding:11px 20px;
-      border-radius:999px;
-      font-size:13px;
-      font-weight:600;
-      font-family:"Montserrat",sans-serif;
-      border:none;
-      cursor:pointer;
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
+    .section-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin: 20px 0 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #e2e8f0;
     }
 
-    .btn-primary{
-      background:linear-gradient(135deg,#0074c7,#00508a);
-      color:#fff;
+    .features-list {
+      margin-left: 20px;
+      font-size: 14.5px;
+      color: #374151;
     }
 
-    .btn-outline{
-      background:transparent;
-      border:1px solid #cbd5e1;
-      color:#123559;
+    .features-list li {
+      margin-bottom: 8px;
+      position: relative;
     }
 
-    .btn-primary:hover,
-    .btn-outline:hover{
-      transform:translateY(-1px);
-      box-shadow:0 10px 18px rgba(15,23,42,.15);
+    .features-list li::before {
+      content: "▸";
+      color: var(--accent);
+      font-weight: 700;
+      position: absolute;
+      left: -20px;
+      top: 0;
     }
 
-    @media(max-width:800px){
-      .box{grid-template-columns:1fr;padding:22px 18px}
-      .box-img{order:-1}
-      .hero-title{font-size:26px}
+    .actions {
+      margin-top: 32px;
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
     }
 
-    /* FLOATING WHATSAPP */
-    .whatsapp-float{
-      position:fixed;
-      width:56px;height:56px;
-      bottom:24px;right:20px;
-      background:#25d366;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 10px 20px rgba(0,0,0,.25);
-      z-index:1000;
+    .btn-primary, .btn-secondary {
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      flex: 1;
+      min-width: 160px;
+      justify-content: center;
     }
 
-    .whatsapp-float svg{
-      width:28px;height:28px;fill:#fff;
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #00d4cc);
+      color: #ffffff;
+      box-shadow: 0 8px 20px rgba(0,184,176,0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(0,184,176,0.4);
+    }
+
+    .btn-secondary:hover {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    footer {
+      background: #06121f;
+      color: #cbd5f5;
+      font-size: 13px;
+      text-align: center;
+      padding: 16px 0;
+      margin-top: auto;
+    }
+
+    /* WHATSAPP BUTTON */
+    .whatsapp-float {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #25d366, #20ba5f);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 28px rgba(37, 211, 102, 0.4);
+      z-index: 1000;
+      transition: all 0.2s ease;
+    }
+
+    .whatsapp-float:hover {
+      transform: scale(1.1) translateY(-4px);
+      box-shadow: 0 16px 36px rgba(37, 211, 102, 0.5);
+    }
+
+    .whatsapp-float svg {
+      width: 32px;
+      height: 32px;
+      fill: #ffffff;
+    }
+
+    /* MOBILE TOGGLE */
+    .mobile-toggle {
+      display: block;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1001;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .mobile-toggle svg { width: 20px; height: 20px; }
+
+    /* OVERLAY FOR MOBILE SIDEBAR */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+    }
+
+    /* DESKTOP: Sidebar always visible */
+    @media (min-width: 1051px) {
+      .sidebar {
+        transform: translateX(0);
+      }
+      .main-wrapper {
+        margin-left: 240px;
+      }
+      .mobile-toggle {
+        display: none;
+      }
+    }
+
+    /* TABLET & MOBILE */
+    @media (max-width: 1050px) {
+      .main-wrapper {
+        margin-left: 0;
+      }
+      .main-wrapper.sidebar-open {
+        margin-left: 0;
+      }
+    }
+
+    /* MOBILE: Single column layout */
+    @media (max-width: 900px) {
+      .product-card {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 28px 20px;
+      }
+      .product-image {
+        height: 280px;
+        width: 100%;
+      }
+      .hero {
+        height: 200px;
+      }
+      .hero-title {
+        font-size: 28px;
+      }
+      main {
+        padding: 24px 16px 32px;
+      }
+    }
+
+    /* SMALL MOBILE */
+    @media (max-width: 580px) {
+      .hero-title {
+        font-size: 24px;
+      }
+      .hero-subtitle {
+        font-size: 13px;
+      }
+      .product-card {
+        padding: 24px 16px;
+      }
+      .product-image {
+        height: 240px;
+      }
+      .btn-primary, .btn-secondary {
+        padding: 12px 20px;
+        font-size: 13px;
+        min-width: 140px;
+      }
+      .actions {
+        flex-direction: column;
+      }
+      main {
+        padding: 20px 12px 24px;
+      }
+      .whatsapp-float {
+        bottom: 20px;
+        right: 20px;
+        width: 56px;
+        height: 56px;
+      }
+      .whatsapp-float svg {
+        width: 28px;
+        height: 28px;
+      }
+    }
+
+    /* EXTRA SMALL */
+    @media (max-width: 400px) {
+      .hero {
+        height: 180px;
+        padding: 0 16px;
+      }
+      .hero-title {
+        font-size: 22px;
+      }
+      .lead {
+        font-size: 14px;
+      }
+      .section-title {
+        font-size: 16px;
+      }
     }
   </style>
 </head>
-
 <body>
 
-<header>
-  <a href="../products.html" class="top-back-link">← Back to Products</a>
-</header>
+  <!-- MOBILE SIDEBAR OVERLAY -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
-<section class="hero">
-  <div class="hero-kicker">Biomass-derived platform chemical</div>
-  <h1 class="hero-title">5-Hydroxymethylfurfural (5-HMF)</h1>
-  <p class="hero-subtitle">
-    High-value intermediate from biomass enabling next-generation fuels,
-    polymers, resins, and advanced research applications.
-  </p>
-</section>
+  <!-- Mobile Toggle -->
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
 
-<main>
-  <div class="box">
-
-    <!-- IMAGE -->
-    <div class="box-img">
-      <!-- Replace with AI generated image related to bioplastics / fuels -->
-      <img src="../assets/1ai.JPEG" alt="5-HMF – biomass-derived platform chemical">
+  <!-- SIDEBAR -->
+  <nav class="sidebar" id="sidebar">
+    <a href="../index.html" class="nav-logo">
+      <img src="../assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="../index.html">Home</a></li>
+      <li><a href="../about.html">About Us</a></li>
+      <li><a href="../products.html" class="active">Products</a></li>
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../collaboration.html">Collaboration</a></li>
+      <li><a href="../recognitions.html">Recognitions</a></li>
+      <li><a href="../investors.html">Investors</a></li>
+      <li><a href="../cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="../contact.html">Contact us</a></li>
+      <li><a href="../request-sample.html">Request for Sample</a></li>
+      <li><a href="../orders.html">Orders</a></li>
+    </ul>
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </span>
+      </form>
     </div>
+  </nav>
 
-    <!-- CONTENT -->
-    <div class="box-content">
-
-      <span class="meta-chip">Product overview</span>
-
-      <p class="lead">
-        5-Hydroxymethylfurfural (5-HMF, CAS No.: 67-47-0) is a key biomass-derived
-        platform chemical used for producing fuels, polymers, resins, and a wide
-        range of specialty and fine chemicals. Its renewable origin and high
-        reactivity make it central to green-chemistry and bio-based innovation.
-      </p>
-
-      <h3>Chemical & Materials Uses</h3>
-      <ul>
-        <li>Precursor to 2,5-furandicarboxylic acid (FDCA) for producing PEF bioplastics</li>
-        <li>Conversion into bio-based solvents and fuel components such as
-            2,5-dimethylfuran (DMF)</li>
-        <li>Building block for fine chemicals, functional materials, and nanomaterials</li>
-      </ul>
-
-      <h3>Resins, Coatings & Construction</h3>
-      <ul>
-        <li>Alternative to formaldehyde in resins, adhesives, and coatings</li>
-        <li>Used in wood adhesives and foundry binders from bio-derived sources</li>
-        <li>Industrial-scale plants under development for construction and electronics uses</li>
-      </ul>
-
-      <h3>Biofuels & Energy</h3>
-      <ul>
-        <li>Intermediate in advanced biofuel production from sugars and cellulose</li>
-        <li>Precursor to energy-dense blending components improving gasoline quality</li>
-        <li>Supports renewable diesel- and jet-fuel pathways</li>
-      </ul>
-
-      <h3>Food & Analytical Uses</h3>
-      <ul>
-        <li>Naturally formed in heat-processed foods such as coffee and baked goods</li>
-        <li>Used as an indicator of heat treatment and potential adulteration</li>
-        <li>Investigated for antioxidant and nutraceutical properties (regulatory limits apply)</li>
-      </ul>
-
-      <h3>Biomedical & Pharmaceutical Research</h3>
-      <ul>
-        <li>Active component (Aes-103) studied as an antisickling agent in sickle-cell disease</li>
-        <li>Explored for antioxidant, anti-inflammatory, cytoprotective, and anti-ischemic effects</li>
-        <li>Most applications remain at preclinical or early clinical research stages</li>
-      </ul>
-
-      <!-- ACTIONS -->
-      <div class="actions">
-        <a href="../shop.html#5-hmf" class="btn-primary">🛒 Go to Shop</a>
-        <a href="../products.html" class="btn-outline">← Back to Products</a>
+  <div class="main-wrapper" id="mainWrapper">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Biomass-derived platform chemical</div>
+        <h1 class="hero-title">5-Hydroxymethylfurfural (5-HMF)</h1>
+        <p class="hero-subtitle">
+          High-value intermediate from biomass enabling next-generation fuels, polymers, resins, and advanced research applications.
+        </p>
       </div>
+    </section>
 
-    </div>
+    <!-- MAIN CONTENT -->
+    <main>
+      <div class="product-card">
+        <!-- ENHANCED IMAGE SECTION -->
+        <div class="product-image">
+          <img src="../assets/1ai.JPEG" alt="5-HMF – biomass-derived platform chemical">
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content-section">
+          <span class="meta-chip">Product overview</span>
+          
+          <p class="lead">
+            5-Hydroxymethylfurfural (5-HMF, CAS No.: 67-47-0) is a key biomass-derived platform chemical used for producing fuels, polymers, resins, and a wide range of specialty and fine chemicals. Its renewable origin and high reactivity make it central to green-chemistry and bio-based innovation.
+          </p>
+
+          <div class="section-group">
+            <h3 class="section-title">Chemical & Materials Uses</h3>
+            <ul class="features-list">
+              <li>Precursor to 2,5-furandicarboxylic acid (FDCA) for producing PEF bioplastics</li>
+              <li>Conversion into bio-based solvents and fuel components such as 2,5-dimethylfuran (DMF)</li>
+              <li>Building block for fine chemicals, functional materials, and nanomaterials</li>
+            </ul>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Resins, Coatings & Construction</h3>
+            <ul class="features-list">
+              <li>Alternative to formaldehyde in resins, adhesives, and coatings</li>
+              <li>Used in wood adhesives and foundry binders from bio-derived sources</li>
+              <li>Industrial-scale plants under development for construction and electronics uses</li>
+            </ul>
+          </div>
+
+          <div class="section-group">
+            <h3 class="section-title">Biofuels & Energy</h3>
+            <ul class="features-list">
+              <li>Intermediate in advanced biofuel production from sugars and cellulose</li>
+              <li>Precursor to energy-dense blending components improving gasoline quality</li>
+              <li>Supports renewable diesel- and jet-fuel pathways</li>
+            </ul>
+          </div>
+
+          <!-- ACTIONS -->
+          <div class="actions">
+            <a href="../shop.html#5-hmf" class="btn-primary">🛒 Buy 5-HMF Now</a>
+            <a href="../products.html" class="btn-secondary">← All Products</a>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
   </div>
-</main>
 
-<!-- WHATSAPP -->
-<a
-  href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%27m%20interested%20in%205-HMF%20(5-Hydroxymethylfurfural)."
-  class="whatsapp-float"
-  target="_blank"
-  aria-label="Chat with us on WhatsApp about 5-HMF"
->
-  <svg viewBox="0 0 32 32">
-    <path d="M16.04 3C9.4 3 4 8.25 4 14.73c0 2.48.82 4.79 2.23 6.68L4 29l7.86-2.07a12.2 12.2 0 0 0 4.18.7h.01c6.64 0 12.04-5.25 12.04-11.73C28.09 8.25 22.68 3 16.04 3z"/>
-  </svg>
-</a>
+  <!-- WHATSAPP BUTTON -->
+  <a href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I'm%20interested%20in%205-HMF%20(5-Hydroxymethylfurfural)." 
+     class="whatsapp-float" target="_blank" aria-label="Chat about 5-HMF">
+    <svg viewBox="0 0 32 32">
+      <path d="M16.04 3C9.4 3 4 8.25 4 14.73c0 2.48.82 4.79 2.23 6.68L4 29l7.86-2.07a12.2 12.2 0 0 0 4.18.7h.01c6.64 0 12.04-5.25 12.04-11.73C28.09 8.25 22.68 3 16.04 3z"/>
+    </svg>
+  </a>
 
+  <script>
+    // Enhanced sidebar toggle with overlay
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('sidebarOverlay');
+      const mainWrapper = document.getElementById('mainWrapper');
+      
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+      mainWrapper.classList.toggle('sidebar-open');
+    }
+
+    // Close sidebar when clicking overlay
+    document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+
+    // Cart badge updater
+    (function() {
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById('cart-count');
+      if (badge) badge.textContent = count;
+    })();
+
+    // Site search
+    document.getElementById('siteSearchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
+      if (query.includes('shop') || query.includes('buy')) window.location.href = '../shop.html';
+      else if (query.includes('product')) window.location.href = '../products.html';
+      else window.location.href = '../index.html';
+    });
+
+    // Expose globally
+    window.toggleSidebar = toggleSidebar;
+  </script>
 </body>
 </html>
