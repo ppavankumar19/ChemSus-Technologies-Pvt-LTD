@@ -247,6 +247,11 @@
       color: #111827;
     }
 
+    .btn-secondary:hover {
+      background: #d1d5db;
+      transform: translateY(-1px);
+    }
+
     .login-error {
       color: #ef4444;
       font-size: 13px;
@@ -391,6 +396,15 @@
       font-size: 12px;
     }
 
+    .btn-danger {
+      background: #ef4444;
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+    }
+
     /* MODAL */
     .modal {
       display: none;
@@ -415,6 +429,35 @@
       overflow-y: auto;
       box-shadow: 0 25px 50px rgba(0,0,0,0.25);
     }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .modal-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6b7280;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover { background: #f3f4f6; border-radius: 50%; }
 
     .form-row { 
       display: grid; 
@@ -479,7 +522,6 @@
     </a>
 
     <ul class="nav-menu">
-      <li><a href="adminshop.html">Admin Shop</a></li>
       <li><a href="adminorders.html" class="active">Admin Orders</a></li>
     </ul>
   </nav>
@@ -495,7 +537,7 @@
 
     <main>
       <!-- LOGIN SECTION -->
-      <section class="section" id="loginSection">
+      <section class="section" id="loginSection" style="display: none;">
         <div class="section-header">
           <h2>Admin Login</h2>
           <p class="section-subtitle">Enter your admin credentials to manage orders</p>
@@ -515,13 +557,13 @@
       </section>
 
       <!-- DASHBOARD SECTION -->
-      <section class="section admin-layout" id="adminSection">
-        <div class="flex-between" style="margin-bottom:20px">
+      <section class="section admin-layout active" id="adminSection">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #e5e7eb;">
           <div>
             <h2 style="font-family:Montserrat,sans-serif;font-size:22px;color:var(--primary-dark);margin:0">Orders Management</h2>
             <span class="section-subtitle">Real-time order tracking and management</span>
           </div>
-          <button class="btn btn-secondary btn-sm" id="logoutBtn" style="display:none">Logout</button>
+          <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
         </div>
 
         <!-- STATS -->
@@ -593,9 +635,7 @@
                 <th style="width:120px">Actions</th>
               </tr>
             </thead>
-            <tbody id="ordersTable">
-              <tr><td colspan="11" style="text-align:center;padding:40px;color:#6b7280">Loading orders...</td></tr>
-            </tbody>
+            <tbody id="ordersTable"><tr><td colspan="11" style="text-align:center;padding:40px;color:#6b7280">No orders match your filters</td></tr></tbody>
           </table>
         </div>
       </section>
@@ -611,21 +651,21 @@
     <div class="modal-content">
       <div class="modal-header">
         <div class="modal-title">Update Order</div>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
+        <button class="modal-close" onclick="closeModal()">×</button>
       </div>
       <form id="editForm">
         <input type="hidden" id="editOrderId">
         <div class="form-row">
           <div class="form-group">
             <label>Payment Status</label>
-            <select id="editPaymentMode" class="form-select">
+            <select id="editPaymentMode" class="filter-select">
               <option value="PENDING">Pending</option>
               <option value="PAID">Paid</option>
             </select>
           </div>
           <div class="form-group">
             <label>Order Status</label>
-            <select id="editStatus" class="form-select">
+            <select id="editStatus" class="filter-select">
               <option value="PLACED">Placed</option>
               <option value="SHIPPED">Shipped</option>
               <option value="DELIVERED">Delivered</option>
@@ -663,11 +703,13 @@
         document.getElementById('loginSection').style.display = 'none';
         document.getElementById('adminSection').classList.add('active');
         localStorage.setItem('chemsusAdminOrdersLoggedIn', 'true');
-        loadOrders(); // Load orders on login
+        document.getElementById('logoutBtn').style.display = 'inline-flex';
+        loadOrders();
       } else {
         document.getElementById('loginSection').style.display = 'block';
         document.getElementById('adminSection').classList.remove('active');
         localStorage.removeItem('chemsusAdminOrdersLoggedIn');
+        document.getElementById('logoutBtn').style.display = 'none';
         document.getElementById('ordersTable').innerHTML = 
           '<tr><td colspan="11" style="text-align:center;padding:40px;color:#6b7280">Please login to view orders</td></tr>';
       }

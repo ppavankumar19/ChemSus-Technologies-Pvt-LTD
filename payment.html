@@ -246,6 +246,12 @@
       font-size:13px;
       font-weight:600;
       cursor:pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-label:hover {
+      filter: brightness(1.05);
+      transform: translateY(-1px);
     }
 
     .preview-img{
@@ -290,6 +296,11 @@
       font-family:inherit;
       font-size:13px;
       min-height:80px;
+      outline: none;
+    }
+
+    .feedback-textarea:focus {
+      border-color: var(--primary);
     }
 
     .actions-row{
@@ -309,6 +320,12 @@
       font-weight:600;
       font-family:"Montserrat",sans-serif;
       cursor:pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
     }
 
     .btn-secondary{
@@ -321,6 +338,12 @@
       font-family:"Montserrat",sans-serif;
       border:1px solid #cbd5e1;
       cursor:pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: var(--primary);
     }
 
     footer{
@@ -332,6 +355,40 @@
       margin-top:22px;
     }
 
+    .empty-cart-message {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7280;
+    }
+
+    .empty-cart-message h2 {
+      font-family: "Montserrat", sans-serif;
+      margin-bottom: 12px;
+      color: #374151;
+      font-size: 24px;
+    }
+
+    .empty-cart-message p {
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    .empty-cart-message a {
+      display: inline-block;
+      padding: 11px 22px;
+      background: linear-gradient(135deg, var(--accent), #00d4cc);
+      color: white;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    .empty-cart-message a:hover {
+      transform: translateY(-2px);
+      filter: brightness(1.05);
+    }
+
     @media(max-width:900px){
       .sidebar{display:none;}
       .main-wrapper{margin-left:0;}
@@ -341,6 +398,9 @@
       .qr-box img{
         width:190px;
         height:190px;
+      }
+      main {
+        padding: 24px 16px 32px 16px;
       }
     }
   </style>
@@ -374,12 +434,11 @@
   </section>
 
   <main>
-    <div class="payment-card">
+    <div class="payment-card" id="paymentForm">
       <div class="payment-grid">
         <!-- LEFT: QR + amount -->
         <div class="qr-box">
           <h3>Scan to Pay</h3>
-          <!-- Replace with your real QR image -->
           <img src="assets/payment-qr.png" alt="Payment QR Code">
           <p class="qr-note">
             Use any UPI / banking app to scan this QR and pay the exact order amount shown in your order summary.
@@ -421,25 +480,63 @@
         </div>
       </div>
     </div>
+
+    <!-- Empty cart message -->
+    <div class="empty-cart-message" id="emptyMessage" style="display: none;">
+      <h2>No items in cart</h2>
+      <p>Your cart is empty. Add items from the shop to proceed with payment.</p>
+      <a href="shop.html">Go to Shop →</a>
+    </div>
   </main>
 
   <footer>
-    © 2025 ChemSus Technologies Pvt Ltd.
+    © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
   </footer>
-</div>
-
-<script>
-  // Cart badge updater
-  (function () {
-    const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+</div>  <script>
+  // Initialize payment and amount
+  function initializePayment() {
     const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = count;
+    
+    // PRIORITY 1: Get total from sessionStorage (set by orders.html BEFORE redirect)
+    let total = parseFloat(sessionStorage.getItem('orderTotal')) || 0;
+    
+    console.log('💰 SessionStorage orderTotal:', total);
+    
+    // PRIORITY 2: If sessionStorage empty, calculate from cart (direct page load)
+    if (total === 0) {
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      if (badge) badge.textContent = count;
+      
+      if (cart && cart.length > 0) {
+        total = cart.reduce((sum, item) => {
+          const price = item.price || item.productPrice || item.pricePerKg || 0;
+          const qty = item.quantity || 1;
+          return sum + (price * qty);
+        }, 0);
+        console.log('📦 Cart total calculated:', total);
+      }
+    } else {
+      // If we got sessionStorage total, cart is already cleared
+      if (badge) badge.textContent = '0';
+      console.log('✅ Using sessionStorage total:', total);
+    }
 
-    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    document.getElementById('orderTotalText').textContent =
-      '₹' + total.toLocaleString('en-IN');
-  })();
+    // No amount found at all
+    if (total === 0) {
+      document.getElementById('paymentForm').style.display = 'none';
+      document.getElementById('emptyMessage').style.display = 'block';
+      console.log('❌ No total found - showing empty message');
+      return;
+    }
+    
+    // Display the amount
+    const totalElement = document.getElementById('orderTotalText');
+    if (totalElement) {
+      totalElement.textContent = '₹' + total.toLocaleString('en-IN');
+      console.log('💳 Amount displayed:', '₹' + total.toLocaleString('en-IN'));
+    }
+  }
 
   // Receipt preview
   const receiptInput = document.getElementById('receiptInput');
@@ -467,7 +564,6 @@
       receiptPreview.src = url;
       receiptPreview.style.display = 'block';
     } else {
-      // Simple placeholder for PDF
       receiptPreview.style.display = 'none';
     }
   });
@@ -506,7 +602,7 @@
 
     const feedback = document.getElementById('feedbackInput').value.trim();
 
-    // Store simple confirmation data in localStorage (you can read this in orders.html)
+    // Store payment confirmation data
     const paymentInfo = {
       hasReceipt: !!file,
       rating: selectedRating,
@@ -515,9 +611,16 @@
     };
     localStorage.setItem('chemsusPaymentInfo', JSON.stringify(paymentInfo));
 
-    alert('Thank you! Your payment details and feedback have been recorded.');
+    alert('✅ Thank you! Your payment details and feedback have been recorded.');
+    
+    // Clear cart after successful payment
+    localStorage.removeItem('chemsusCart');
+    
     window.location.href = 'orders.html';
   }
+
+  // Initialize on page load
+  window.addEventListener('load', initializePayment);
 </script>
 
 </body>
