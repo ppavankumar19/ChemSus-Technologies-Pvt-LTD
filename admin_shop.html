@@ -252,7 +252,8 @@
     input[type="text"],
     input[type="password"],
     input[type="url"],
-    input[type="number"] {
+    input[type="number"],
+    select {
       width: 100%;
       padding: 8px 10px;
       border-radius: 6px;
@@ -368,6 +369,16 @@
       margin-left: 6px;
     }
 
+    .stock-badge {
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .stock-in { background: #d1fae5; color: #065f46; }
+    .stock-out { background: #fee2e2; color: #991b1b; }
+
     footer {
       background: #06121f;
       color: #cbd5f5;
@@ -414,14 +425,12 @@
 </head>
 <body>
 
-  <!-- Mobile Toggle Button -->
   <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
     <svg viewBox="0 0 24 24" fill="currentColor">
       <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"></path>
     </svg>
   </button>
 
-  <!-- SIDEBAR NAVBAR -->
   <nav class="sidebar" id="sidebar">
     <a href="index.html" class="nav-logo">
       <img src="assets/logo.jpg" class="nav-logo-img" alt="ChemSus Logo">
@@ -455,21 +464,17 @@
     </div>
   </nav>
 
-  <!-- MAIN CONTENT -->
   <div class="main-wrapper">
     <section class="hero">
       <div class="hero-content">
         <div class="hero-kicker">Admin Panel</div>
         <h1 class="hero-title">Manage Shop Items</h1>
-        <p class="hero-subtitle">
-          Secure dashboard to add, edit and remove items displayed on the public shop page.
-        </p>
+        <p class="hero-subtitle">Secure dashboard to add, edit and remove items displayed on the public shop page.</p>
       </div>
     </section>
 
     <main>
 
-      <!-- LOGIN SECTION -->
       <section class="section" id="loginSection">
         <div class="section-header">
           <h2>Admin Login</h2>
@@ -490,28 +495,20 @@
         </div>
       </section>
 
-      <!-- ADMIN SHOP SECTION -->
       <section class="section admin-layout" id="adminSection">
         <div class="flex-between">
           <div>
             <h2 style="font-family:'Montserrat',sans-serif;font-size:22px;color:var(--primary-dark);">
               Shop Items <span class="badge" id="itemCountBadge">0 items</span>
             </h2>
-            <p class="section-subtitle">
-              Items managed here are instantly reflected on the public shop page.
-            </p>
+            <p class="section-subtitle">Items managed here are instantly reflected on the public shop page.</p>
           </div>
           <button class="btn btn-secondary btn-sm" id="logoutBtn">Logout</button>
         </div>
 
-        <!-- Form -->
         <div class="mt-4">
-          <h3 style="font-family:'Montserrat',sans-serif;font-size:18px;color:var(--primary-dark);margin-bottom:8px;">
-            Add / Edit Item
-          </h3>
-          <p class="section-subtitle">
-            Define pricing, subtitle, badge text and links. Use emoji for the card icon.
-          </p>
+          <h3 style="font-family:'Montserrat',sans-serif;font-size:18px;color:var(--primary-dark);margin-bottom:8px;">Add / Edit Item</h3>
+          <p class="section-subtitle">Define pricing, subtitle, badge text, stock status and links. Use emoji for the card icon.</p>
 
           <form id="shopItemForm" class="mt-3">
             <input type="hidden" id="itemId">
@@ -556,18 +553,23 @@
               <label for="itemShowBadge" style="margin-bottom:0;">Show badge on card</label>
             </div>
 
+            <div class="form-group">
+              <label for="itemStockStatus">Stock Status</label>
+              <select id="itemStockStatus" required>
+                <option value="in-stock">In Stock</option>
+                <option value="out-of-stock">Out of Stock</option>
+              </select>
+            </div>
+
             <button type="submit" class="btn btn-primary" id="saveItemBtn">Save item</button>
             <button type="button" class="btn btn-secondary" id="resetFormBtn" style="margin-left:8px;">Clear form</button>
             <div class="status-msg" id="statusMsg" style="display:none;"></div>
           </form>
         </div>
 
-        <!-- Products table -->
         <div class="mt-4">
           <div class="flex-between">
-            <h3 style="font-family:'Montserrat',sans-serif;font-size:18px;color:var(--primary-dark);">
-              Existing Shop Items
-            </h3>
+            <h3 style="font-family:'Montserrat',sans-serif;font-size:18px;color:var(--primary-dark);">Existing Shop Items</h3>
             <span class="link-btn" onclick="window.location.href='shop.html'">View public shop page</span>
           </div>
           <div class="table-wrapper">
@@ -580,6 +582,7 @@
                   <th>Subtitle</th>
                   <th>Price (₹)</th>
                   <th>Badge</th>
+                  <th>Stock</th>
                   <th>More link</th>
                   <th class="actions-col">Actions</th>
                 </tr>
@@ -606,12 +609,12 @@
 
     function getDefaultShopItems() {
       return [
-        { id: 1, name: 'Calcium Levulinate', subtitle: 'Pharma-grade nutritional supplement', emoji: '🧪', features: ['99.5% purity, GMP certified', 'Calcium bioavailability enhancer', 'Tablet & capsule formulation ready'], price: 2500, badge: '', showBadge: false, moreLink: 'products/calcium-levulinate.html' },
-        { id: 2, name: 'Sodium Levulinate', subtitle: 'Natural preservative & stabilizer', emoji: '💧', features: ['Food-grade antimicrobial', 'ECOCERT approved cosmetic preservative', 'Stable in pH 7–9 range'], price: 1800, badge: 'Free sample available', showBadge: true, moreLink: 'products/sodium-levulinate.html' },
-        { id: 3, name: 'Levulinic Acid', subtitle: 'Versatile platform chemical', emoji: '🔬', features: ['98%+ purity', 'Key building block for derivatives', 'Low color & odor'], price: 1200, badge: 'Free sample available', showBadge: true, moreLink: 'products/levulinic-acid.html' },
-        { id: 4, name: '5-Hydroxymethylfurfural (5-HMF)', subtitle: 'Biomass-derived platform chemical', emoji: '🧬', features: ['Derived from sugars & cellulose', 'Intermediate for fuels & polymers', 'High chemical versatility'], price: 3200, badge: '', showBadge: false, moreLink: 'products/5-hmf.html' },
-        { id: 5, name: 'Ethyl Levulinate', subtitle: 'Green solvent & fuel additive', emoji: '⚗️', features: ['Bio-based ester', 'Used in flavors & fragrances', 'Low toxicity, biodegradable'], price: 2200, badge: '', showBadge: false, moreLink: 'products/ethyl-levulinate.html' },
-        { id: 6, name: 'Methyl Levulinate', subtitle: 'Renewable solvent & intermediate', emoji: '🧪', features: ['Biomass-derived', 'Used in coatings & resins', 'High purity, clean odor'], price: 2000, badge: '', showBadge: false, moreLink: 'products/methyl-levulinate.html' }
+        { id: 1, name: 'Calcium Levulinate', subtitle: 'Pharma-grade nutritional supplement', emoji: '🧪', features: ['99.5% purity, GMP certified', 'Calcium bioavailability enhancer', 'Tablet & capsule formulation ready'], price: 2500, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/calcium-levulinate.html' },
+        { id: 2, name: 'Sodium Levulinate', subtitle: 'Natural preservative & stabilizer', emoji: '💧', features: ['Food-grade antimicrobial', 'ECOCERT approved cosmetic preservative', 'Stable in pH 7–9 range'], price: 1800, badge: 'Free sample available', showBadge: true, stockStatus: 'in-stock', moreLink: 'products/sodium-levulinate.html' },
+        { id: 3, name: 'Levulinic Acid', subtitle: 'Versatile platform chemical', emoji: '🔬', features: ['98%+ purity', 'Key building block for derivatives', 'Low color & odor'], price: 1200, badge: 'Free sample available', showBadge: true, stockStatus: 'in-stock', moreLink: 'products/levulinic-acid.html' },
+        { id: 4, name: '5-Hydroxymethylfurfural (5-HMF)', subtitle: 'Biomass-derived platform chemical', emoji: '🧬', features: ['Derived from sugars & cellulose', 'Intermediate for fuels & polymers', 'High chemical versatility'], price: 3200, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/5-hmf.html' },
+        { id: 5, name: 'Ethyl Levulinate', subtitle: 'Green solvent & fuel additive', emoji: '⚗️', features: ['Bio-based ester', 'Used in flavors & fragrances', 'Low toxicity, biodegradable'], price: 2200, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/ethyl-levulinate.html' },
+        { id: 6, name: 'Methyl Levulinate', subtitle: 'Renewable solvent & intermediate', emoji: '🧪', features: ['Biomass-derived', 'Used in coatings & resins', 'High purity, clean odor'], price: 2000, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/methyl-levulinate.html' }
       ];
     }
 
@@ -650,6 +653,7 @@
       const itemPriceField = document.getElementById('itemPrice');
       const itemBadgeField = document.getElementById('itemBadge');
       const itemShowBadgeField = document.getElementById('itemShowBadge');
+      const itemStockStatusField = document.getElementById('itemStockStatus');
       const statusMsg = document.getElementById('statusMsg');
       const resetFormBtn = document.getElementById('resetFormBtn');
       const itemCountBadge = document.getElementById('itemCountBadge');
@@ -684,6 +688,12 @@
           const tdBadge = document.createElement('td');
           tdBadge.textContent = item.showBadge && item.badge ? item.badge : '-';
 
+          const tdStock = document.createElement('td');
+          const stockBadge = document.createElement('span');
+          stockBadge.className = `stock-badge ${item.stockStatus === 'in-stock' ? 'stock-in' : 'stock-out'}`;
+          stockBadge.textContent = item.stockStatus === 'in-stock' ? 'IN STOCK' : 'OUT OF STOCK';
+          tdStock.appendChild(stockBadge);
+
           const tdLink = document.createElement('td');
           tdLink.textContent = item.moreLink || '';
 
@@ -695,7 +705,8 @@
           editBtn.className = 'btn btn-secondary btn-sm';
           editBtn.style.marginRight = '6px';
           editBtn.type = 'button';
-          editBtn.addEventListener('click', function () {
+          editBtn.addEventListener('click', function (e) {
+            e.preventDefault();
             loadItemIntoForm(item.id);
           });
 
@@ -703,7 +714,8 @@
           delBtn.textContent = 'Delete';
           delBtn.className = 'btn btn-danger btn-sm';
           delBtn.type = 'button';
-          delBtn.addEventListener('click', function () {
+          delBtn.addEventListener('click', function (e) {
+            e.preventDefault();
             deleteItem(item.id);
           });
 
@@ -716,6 +728,7 @@
           tr.appendChild(tdSubtitle);
           tr.appendChild(tdPrice);
           tr.appendChild(tdBadge);
+          tr.appendChild(tdStock);
           tr.appendChild(tdLink);
           tr.appendChild(tdActions);
 
@@ -736,6 +749,7 @@
         itemPriceField.value = item.price || '';
         itemBadgeField.value = item.badge || '';
         itemShowBadgeField.checked = !!item.showBadge;
+        itemStockStatusField.value = item.stockStatus || 'in-stock';
         statusMsg.style.display = 'none';
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
@@ -762,9 +776,11 @@
         itemPriceField.value = '';
         itemBadgeField.value = '';
         itemShowBadgeField.checked = false;
+        itemStockStatusField.value = 'in-stock';
       }
 
-      resetFormBtn.addEventListener('click', function () {
+      resetFormBtn.addEventListener('click', function (e) {
+        e.preventDefault();
         clearForm();
         statusMsg.style.display = 'none';
       });
@@ -787,6 +803,7 @@
         const moreLink = itemMoreLinkField.value.trim();
         const badge = itemBadgeField.value.trim();
         const showBadge = itemShowBadgeField.checked;
+        const stockStatus = itemStockStatusField.value;
         const featuresStr = itemFeaturesField.value.trim();
         const features = featuresStr ? featuresStr.split(',').map(f => f.trim()).filter(Boolean) : [];
 
@@ -796,11 +813,11 @@
         }
 
         if (idValue) {
-          items = items.map(i => i.id === idValue ? { ...i, name, subtitle, emoji, price, moreLink, badge, showBadge, features } : i);
+          items = items.map(i => i.id === idValue ? { ...i, name, subtitle, emoji, price, moreLink, badge, showBadge, stockStatus, features } : i);
           statusMsg.textContent = 'Item updated successfully.';
         } else {
           const newId = getNextItemId(items);
-          items.push({ id: newId, name, subtitle, emoji, price, moreLink, badge, showBadge, features });
+          items.push({ id: newId, name, subtitle, emoji, price, moreLink, badge, showBadge, stockStatus, features });
           statusMsg.textContent = 'Item added successfully.';
         }
 

@@ -231,6 +231,7 @@
     .btn-submit:disabled {
       opacity: 0.6;
       cursor: not-allowed;
+      transform: none;
     }
     .order-summary {
       background: #f9fbff;
@@ -400,7 +401,7 @@
               <input type="tel" id="mobile" class="form-input" placeholder="10-digit mobile number" pattern="[0-9]{10}" maxlength="10" required>
             </div>
             <div class="form-group">
-              <label class="form-label required">Company Name (Optional)</label>
+              <label class="form-label">Company Name (Optional)</label>
               <input type="text" id="companyName" class="form-input" placeholder="Your company name">
             </div>
           </div>
@@ -428,7 +429,7 @@
               <input type="text" id="country" class="form-input" placeholder="India" value="India" required>
             </div>
           </div>
-          <button type="submit" class="btn-submit" id="submitBtn">Verify Mobile & Proceed to Payment</button>
+          <button type="submit" class="btn-submit" id="submitBtn">Place Order & Proceed to Payment</button>
         </form>
       </section>
     </main>
@@ -452,6 +453,7 @@
       if (!buyNowData) {
         orderItems.innerHTML = '<p style="color: #d32f2f; font-weight: 600;">⚠️ No product selected. <a href="shop.html" style="color: var(--accent);">Go to Shop</a></p>';
         totalAmount.textContent = '₹0';
+        document.getElementById('checkoutForm').style.display = 'none';
         return;
       }
 
@@ -484,10 +486,81 @@
       
       // Store total in sessionStorage for payment page
       sessionStorage.setItem('orderTotal', totalPrice);
+      sessionStorage.setItem('buyNowProduct', JSON.stringify({productName, quantity, unitPrice}));
+    }
+
+    // ✅ BACKEND INTEGRATION: Place Buy-Now Order
+    async function placeBuyNowOrderAndProceed() {
+      const submitBtn = document.getElementById('submitBtn');
+      const errorMsg = document.getElementById('errorMessage');
+      const successMsg = document.getElementById('successMessage');
+      
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Placing Order...';
+
+        // Get form data
+        const customername = document.getElementById('fullName').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const phone = document.getElementById('mobile').value.trim();
+
+        // Get buy-now product data
+        const buyNowData = JSON.parse(sessionStorage.getItem('buyNowData'));
+        const totalprice = parseFloat(sessionStorage.getItem('orderTotal')) || 0;
+
+        const orderData = {
+          customername,
+          email,
+          phone,
+          productname: buyNowData.productName,
+          quantity: parseFloat(buyNowData.quantity),
+          totalprice,
+          paymentmode: "PENDING"
+        };
+
+        console.log('Sending order to backend:', orderData);
+
+        const response = await fetch('http://localhost:3000/api/orders', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(orderData)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log('Order created:', result);
+
+        // Show success
+        errorMsg.style.display = 'none';
+        successMsg.textContent = `✅ Order #${result.orderId} placed successfully! Redirecting to payment...`;
+        successMsg.style.display = 'block';
+
+        // Clear buy-now data
+        sessionStorage.removeItem('buyNowData');
+
+        // Proceed to payment after 2 seconds
+        setTimeout(() => {
+          window.location.href = 'payment2.html';
+        }, 2000);
+
+      } catch (error) {
+        console.error('Order error:', error);
+        errorMsg.textContent = `❌ Order failed: ${error.message}. Please check if backend is running on http://localhost:3000`;
+        errorMsg.style.display = 'block';
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Place Order & Proceed to Payment';
+      }
     }
 
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      
+      // Validate form
       const fullName = document.getElementById('fullName').value.trim();
       const email = document.getElementById('email').value.trim();
       const mobile = document.getElementById('mobile').value.trim();
@@ -496,7 +569,6 @@
       const region = document.getElementById('region').value.trim();
       const pincode = document.getElementById('pincode').value.trim();
       const country = document.getElementById('country').value.trim();
-      const companyName = document.getElementById('companyName').value.trim();
 
       if (!fullName || !email || !mobile || !address || !city || !region || !pincode || !country) {
         document.getElementById('errorMessage').textContent = '❌ Please fill in all required fields.';
@@ -516,6 +588,7 @@
         return;
       }
 
+      // Store order details for payment page
       const orderDetails = {
         fullName,
         email,
@@ -525,21 +598,13 @@
         region,
         pincode,
         country,
-        companyName,
+        companyName: document.getElementById('companyName').value.trim(),
         timestamp: new Date().toISOString()
       };
-
-      console.log('Storing orderDetails:', orderDetails);
       sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
 
-      document.getElementById('errorMessage').style.display = 'none';
-      document.getElementById('successMessage').textContent = '✓ Details verified! Redirecting to payment...';
-      document.getElementById('successMessage').style.display = 'block';
-      document.getElementById('submitBtn').disabled = true;
-
-      setTimeout(() => {
-        window.location.href = 'payment2.html';
-      }, 1500);
+      // Place order via backend
+      placeBuyNowOrderAndProceed();
     });
 
     function updateCartBadge() {

@@ -265,6 +265,12 @@
       box-shadow: 0 8px 20px rgba(0,184,176,0.3);
     }
 
+    .btn-submit:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
     .order-summary {
       background: #f9fbff;
       padding: 20px;
@@ -308,6 +314,17 @@
 
     .otp-section.show {
       display: block;
+    }
+
+    .success-message {
+      background: #d1fae5;
+      border: 2px solid #10b981;
+      color: #065f46;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin-top: 20px;
+      display: none;
     }
 
     footer {
@@ -465,10 +482,15 @@
           </div>
 
           <!-- SUBMIT BUTTON -->
-          <button type="submit" class="btn-submit">Verify Mobile & Proceed to Payment</button>
+          <button type="submit" class="btn-submit" id="submitBtn">Verify Mobile & Place Order</button>
         </form>
 
-        <!-- OTP VERIFICATION SECTION (Hidden - for future OTP implementation) -->
+        <!-- SUCCESS MESSAGE -->
+        <div class="success-message" id="successMessage">
+          ✅ Order placed successfully! Proceeding to payment...
+        </div>
+
+        <!-- OTP VERIFICATION SECTION (Hidden initially) -->
         <div class="otp-section" id="otpSection">
           <h3 style="font-family: Montserrat; margin-bottom: 16px; color: var(--primary-dark);">Verify Mobile Number</h3>
           <div class="form-group">
@@ -499,6 +521,7 @@
       if (cart.length === 0) {
         orderItems.innerHTML = '<p style="color: #666;">No items in cart</p>';
         totalAmount.textContent = '₹0';
+        document.getElementById('checkoutForm').style.display = 'none';
         return;
       }
 
@@ -523,14 +546,90 @@
       sessionStorage.setItem('orderTotal', grandTotal);
     }
 
-    // Form submission
+    // BACKEND INTEGRATION: Place Order Function
+    async function placeOrderAndProceed() {
+      const submitBtn = document.getElementById('submitBtn');
+      const successMsg = document.getElementById('successMessage');
+      
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Placing Order...';
+
+        // Get form data
+        const customername = document.getElementById('fullName').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('mobile').value;
+
+        // Get cart items
+        const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+        const totalprice = parseFloat(sessionStorage.getItem('orderTotal')) || 0;
+
+        // Send EACH cart item as separate order row to backend
+        for (const item of cart) {
+          const orderData = {
+            customername,
+            email,
+            phone,
+            productname: item.name,
+            quantity: item.quantity,
+            totalprice: item.price * item.quantity,
+            paymentmode: "PENDING"
+          };
+
+          const response = await fetch('http://localhost:3000/api/orders', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData)
+          });
+
+          if (!response.ok) {
+            throw new Error(`Order failed: ${response.status}`);
+          }
+        }
+
+        // Show success
+        successMsg.style.display = 'block';
+        
+        // Clear cart
+        localStorage.removeItem('chemsusCart');
+        
+        // Update cart badge
+        document.getElementById('cart-count').textContent = '0';
+
+        // Proceed to payment after 2 seconds
+        setTimeout(() => {
+          const referrer = sessionStorage.getItem('checkoutSource') || 'buy';
+          if (referrer === 'buynow') {
+            window.location.href = 'payment2.html';
+          } else {
+            window.location.href = 'payment.html';
+          }
+        }, 2000);
+
+      } catch (error) {
+        console.error('Order error:', error);
+        alert('Order failed. Please check if backend is running on http://localhost:3000 and try again.');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Verify Mobile & Place Order';
+      }
+    }
+
+    // Form submission - Skip OTP for now, direct backend call
     document.getElementById('checkoutForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      
+      // Validate required fields
+      const requiredFields = ['fullName', 'email', 'mobile', 'pincode', 'address', 'city', 'region'];
+      for (const fieldId of requiredFields) {
+        if (!document.getElementById(fieldId).value.trim()) {
+          alert('Please fill all required fields');
+          return;
+        }
+      }
 
-      const mobile = document.getElementById('mobile').value;
-      const otpDisplay = '+91 ' + mobile.slice(0, 2) + 'XXXX' + mobile.slice(-2);
-
-      // Store order details
+      // Store order details for payment page
       const orderDetails = {
         fullName: document.getElementById('fullName').value,
         email: document.getElementById('email').value,
@@ -540,33 +639,20 @@
         region: document.getElementById('region').value,
         pincode: document.getElementById('pincode').value
       };
-
       sessionStorage.setItem('orderDetails', JSON.stringify(orderDetails));
 
-      // Show OTP section (remove display: none to enable OTP flow)
-      // For now, directly proceed to payment
-      proceedToPayment();
+      // Place order via backend
+      placeOrderAndProceed();
     });
 
-    // OTP Verification (placeholder - not implemented)
+    // OTP Verification (placeholder - not used now)
     function verifyOTPAndProceed() {
       const otp = document.getElementById('otpInput').value;
       if (otp.length !== 6) {
         alert('Please enter valid 6-digit OTP');
         return;
       }
-      proceedToPayment();
-    }
-
-    // Proceed to payment based on referrer
-    function proceedToPayment() {
-      const referrer = sessionStorage.getItem('checkoutSource') || 'buy'; // 'buy' or 'buynow'
-      
-      if (referrer === 'buynow') {
-        window.location.href = 'payment2.html';
-      } else {
-        window.location.href = 'payment.html';
-      }
+      placeOrderAndProceed();
     }
 
     // Cart badge update
@@ -588,7 +674,7 @@
     });
 
     // Initialize on page load
-    loadOrderData();
+    window.addEventListener('DOMContentLoaded', loadOrderData);
 
     // Set checkout source (called from cart.html or buynow.html)
     function setCheckoutSource(source) {
