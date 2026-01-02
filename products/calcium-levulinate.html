@@ -295,27 +295,25 @@
       .product-image { height: 240px; }
       .btn-buy, .btn-all-products { width: 100%; justify-content: center; }
     }
-    /* ===== WhatsApp QR Chat Widget ===== */
+   
+    /* === WhatsApp QR Floating Widget === */
     #ib-wa {
       position: fixed;
       bottom: 20px;
       right: 20px;
-      z-index: 999999;
+      z-index: 99999;
       font-family: Arial, sans-serif;
     }
     
     #ib-wa-btn {
       background: #25d366;
       color: #fff;
-      border-radius: 30px;
-      padding: 10px 18px;
-      font-size: 16px;
       border: none;
+      border-radius: 30px;
+      padding: 12px 18px;
+      font-size: 15px;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
     }
     
     #ib-wa-popup {
@@ -323,33 +321,36 @@
       position: absolute;
       bottom: 60px;
       right: 0;
-      width: 280px;
+      width: 300px;
       background: #fff;
       border-radius: 12px;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
       overflow: hidden;
     }
     
     #ib-wa-popup header {
+      background: #075e54;
+      color: #fff;
       padding: 10px;
-      font-weight: bold;
-      border-bottom: 1px solid #eee;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
     }
     
-    #ib-wa-popup header span {
+    #ib-wa-popup header span:last-child {
       cursor: pointer;
+      font-weight: bold;
     }
     
     #ib-wa-popup .body {
-      padding: 14px;
+      padding: 12px;
       text-align: center;
     }
     
     #ib-wa-popup .body img {
-      width: 200px;
-      margin: 12px auto;
+      width: 220px;
+      margin: 10px 0;
     }
     
     #ib-wa-popup .body a {
@@ -361,8 +362,9 @@
       text-decoration: none;
       font-size: 14px;
     }
-    
-  </style>
+    </style>
+   
+  
   
 </head>
 <body>
@@ -504,26 +506,27 @@
   }
   </script>
   
-
-<!-- WhatsApp QR Chat -->
+<!-- WhatsApp QR Chat Widget -->
 <div id="ib-wa">
   <div id="ib-wa-popup">
     <header>
-      <span>Chat with us</span>
+      <span>Chat with ChemSus</span>
       <span onclick="ibToggleWA()">✕</span>
     </header>
 
     <div class="body">
       <p>Scan this QR code on your smartphone to chat with us</p>
 
-      <!-- QR for +91 8486877575 -->
+      <!-- QR CODE WITH PRE-FILLED MESSAGE -->
       <img
-        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/918486877575"
+        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
         alt="WhatsApp QR"
       >
 
+      <p style="margin:8px 0;font-weight:bold;color:#666;">OR</p>
+
       <a
-        href="https://wa.me/918486877575"
+        href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
         target="_blank"
       >
         Chat with us on WhatsApp Web
@@ -531,9 +534,8 @@
     </div>
   </div>
 
-  <button id="ib-wa-btn" onclick="ibToggleWA()">
-    🟢 Chat
-  </button>
+  <button id="ib-wa-btn" onclick="ibToggleWA()">🟢 Chat</button>
 </div>
+>
 
 </body></html>
