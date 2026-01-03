@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Request for Sample | ChemSus Technologies Pvt Ltd</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="assets/logo.png">
+  <link rel="icon" type="image/png" href="assets/logo.png" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
@@ -19,9 +19,6 @@
       --bg: #F3F7FB;
       --ink: #1f2933;
     }
-
-
-
     #cart-count {
       background: var(--accent);
       color: white;
@@ -31,14 +28,7 @@
       font-weight: bold;
       margin-left: 8px;
     }
-
-
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       font-family: "Open Sans", Arial, sans-serif;
       line-height: 1.6;
@@ -47,11 +37,7 @@
       display: flex;
       min-height: 100vh;
     }
-
-    a {
-      text-decoration: none;
-      color: inherit;
-    }
+    a { text-decoration: none; color: inherit; }
 
     /* COMPACT SIDEBAR NAVBAR */
     .sidebar {
@@ -67,7 +53,6 @@
       top: 0;
       z-index: 1000;
     }
-
     .nav-logo {
       display: inline-flex;
       align-items: center;
@@ -81,19 +66,13 @@
       padding: 16px 20px;
       border-bottom: 1px solid rgba(255,255,255,0.1);
     }
-
-    .nav-logo-img {
-      height: 24px;
-      width: auto;
-    }
-
+    .nav-logo-img { height: 24px; width: auto; }
     .nav-menu {
       list-style: none;
       padding: 8px 0;
       flex: 1;
       overflow-y: auto;
     }
-
     .nav-menu li a {
       display: block;
       color: #ffffff;
@@ -102,7 +81,6 @@
       border-left: 3px solid transparent;
       transition: all 0.2s ease;
     }
-
     .nav-menu li a.active,
     .nav-menu li a:hover {
       background: rgba(255,255,255,0.1);
@@ -114,11 +92,7 @@
       padding: 12px 20px 16px;
       border-top: 1px solid rgba(255,255,255,0.1);
     }
-
-    .search-form {
-      position: relative;
-    }
-
+    .search-form { position: relative; }
     .search-input {
       width: 100%;
       padding: 8px 32px 8px 12px;
@@ -130,12 +104,7 @@
       outline: none;
       backdrop-filter: blur(10px);
     }
-
-    .search-input::placeholder {
-      color: #d1d5db;
-      font-size: 11.5px;
-    }
-
+    .search-input::placeholder { color: #d1d5db; font-size: 11.5px; }
     .search-icon {
       position: absolute;
       right: 12px;
@@ -156,7 +125,7 @@
       flex-direction: column;
     }
 
-    /* HERO – match home hero bg */
+    /* HERO */
     .hero {
       position: relative;
       overflow: hidden;
@@ -169,7 +138,6 @@
       color: #ffffff;
       border-top: 3px solid var(--accent);
     }
-
     .hero::before {
       content: "";
       position: absolute;
@@ -181,14 +149,12 @@
       opacity: 0.7;
       pointer-events: none;
     }
-
     .hero-content {
       position: relative;
       z-index: 1;
       max-width: 720px;
       padding: 0 18px;
     }
-
     .hero-kicker {
       font-size: 13px;
       letter-spacing: 0.18em;
@@ -196,43 +162,33 @@
       margin-bottom: 8px;
       color: #b9e6ff;
     }
-
     .hero-title {
       font-family: "Montserrat", sans-serif;
       font-size: 40px;
       font-weight: 700;
       margin-bottom: 10px;
     }
+    .hero-subtitle { font-size: 16px; color: #e2f3ff; }
 
-    .hero-subtitle {
-      font-size: 16px;
-      color: #e2f3ff;
-    }
-
-    /* MAIN */
     main {
       max-width: 1150px;
       margin: 0 auto;
       padding: 34px 18px 42px 18px;
       width: 100%;
-      box-sizing: border-box;
       flex: 1;
     }
-
     .section-header {
       display: flex;
       align-items: center;
       gap: 10px;
       margin-bottom: 10px;
     }
-
     .section-header h2 {
       font-family: "Montserrat", sans-serif;
       font-size: 24px;
       font-weight: 700;
       color: #123559;
     }
-
     .section-chip {
       font-size: 11px;
       text-transform: uppercase;
@@ -242,7 +198,6 @@
       padding: 4px 8px;
       border-radius: 999px;
     }
-
     .section-intro {
       font-size: 15px;
       margin-bottom: 26px;
@@ -250,7 +205,7 @@
       max-width: 760px;
     }
 
-    /* FORM CONTAINER */
+    /* FORM */
     .form-container {
       background-color: #ffffff;
       padding: 36px;
@@ -260,22 +215,14 @@
       max-width: 700px;
       margin: 0 auto;
     }
-
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
       margin-bottom: 20px;
     }
-
-    .form-group {
-      margin-bottom: 20px;
-    }
-
-    .form-group.full-width {
-      grid-column: 1 / -1;
-    }
-
+    .form-group { margin-bottom: 20px; }
+    .form-group.full-width { grid-column: 1 / -1; }
     .form-label {
       display: block;
       font-size: 14px;
@@ -283,7 +230,6 @@
       color: var(--primary-dark);
       margin-bottom: 6px;
     }
-
     .form-input, .form-select {
       width: 100%;
       padding: 12px 14px;
@@ -294,13 +240,11 @@
       transition: all 0.2s ease;
       background: #ffffff;
     }
-
     .form-input:focus, .form-select:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(0,184,176,0.1);
     }
-
     .form-textarea {
       width: 100%;
       padding: 12px 14px;
@@ -313,13 +257,11 @@
       transition: all 0.2s ease;
       background: #ffffff;
     }
-
     .form-textarea:focus {
       outline: none;
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(0,184,176,0.1);
     }
-
     .form-submit {
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
       color: #ffffff;
@@ -334,12 +276,10 @@
       width: 100%;
       margin-top: 10px;
     }
-
     .form-submit:hover {
       transform: translateY(-1px);
       box-shadow: 0 8px 20px rgba(0,116,199,0.3);
     }
-
     .success-message {
       background: #dcfce7;
       color: #166534;
@@ -361,19 +301,9 @@
 
     /* RESPONSIVE */
     @media (max-width: 1050px) {
-      .sidebar {
-        transform: translateX(-100%);
-        transition: transform 0.3s ease;
-      }
-
-      .sidebar.open {
-        transform: translateX(0);
-      }
-
-      .main-wrapper {
-        margin-left: 0;
-      }
-
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+      .sidebar.open { transform: translateX(0); }
+      .main-wrapper { margin-left: 0; }
       .mobile-toggle {
         display: block;
         position: fixed;
@@ -387,115 +317,80 @@
         border-radius: 8px;
         cursor: pointer;
       }
-
-      .mobile-toggle svg {
-        width: 20px;
-        height: 20px;
-      }
+      .mobile-toggle svg { width: 20px; height: 20px; }
     }
-
-    @media (min-width: 1051px) {
-      .mobile-toggle {
-        display: none;
-      }
-    }
-
+    @media (min-width: 1051px) { .mobile-toggle { display: none; } }
     @media (max-width: 768px) {
-      .form-row {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-
-      .form-container {
-        padding: 24px 20px;
-      }
-
-      .hero {
-        height: 230px;
-      }
-
-      .hero-title {
-        font-size: 32px;
-      }
+      .form-row { grid-template-columns: 1fr; gap: 16px; }
+      .form-container { padding: 24px 20px; }
+      .hero { height: 230px; }
+      .hero-title { font-size: 32px; }
     }
+    @media (max-width: 580px) { .hero-title { font-size: 28px; } }
 
-    @media (max-width: 580px) {
-      .hero-title {
-        font-size: 28px;
-      }
+    /* === WhatsApp QR Floating Widget === */
+    #ib-wa {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 99999;
+      font-family: Arial, sans-serif;
     }
-   
-  /* === WhatsApp QR Floating Widget === */
-  #ib-wa {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 99999;
-    font-family: Arial, sans-serif;
-  }
-  
-  #ib-wa-btn {
-    background: #25d366;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 12px 18px;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  }
-  
-  #ib-wa-popup {
-    display: none;
-    position: absolute;
-    bottom: 60px;
-    right: 0;
-    width: 300px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
-    overflow: hidden;
-  }
-  
-  #ib-wa-popup header {
-    background: #075e54;
-    color: #fff;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-  }
-  
-  #ib-wa-popup header span:last-child {
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  #ib-wa-popup .body {
-    padding: 12px;
-    text-align: center;
-  }
-  
-  #ib-wa-popup .body img {
-    width: 220px;
-    margin: 10px 0;
-  }
-  
-  #ib-wa-popup .body a {
-    display: block;
-    background: #25d366;
-    color: #fff;
-    padding: 10px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 14px;
-  }
+    #ib-wa-btn {
+      background: #25d366;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    #ib-wa-popup {
+      display: none;
+      position: absolute;
+      bottom: 60px;
+      right: 0;
+      width: 300px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+    #ib-wa-popup header {
+      background: #075e54;
+      color: #fff;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    #ib-wa-popup header span:last-child {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #ib-wa-popup .body {
+      padding: 12px;
+      text-align: center;
+    }
+    #ib-wa-popup .body img {
+      width: 220px;
+      margin: 10px 0;
+    }
+    #ib-wa-popup .body a {
+      display: block;
+      background: #25d366;
+      color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+    }
   </style>
-  
 </head>
-<body>
 
+<body>
   <!-- Mobile Toggle Button -->
   <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
     <svg viewBox="0 0 24 24" fill="currentColor">
@@ -518,7 +413,7 @@
       <li><a href="collaboration.html">Collaboration</a></li>
       <li><a href="recognitions.html">Recognitions</a></li>
       <li><a href="investors.html">Investors</a></li>
-            <li><a href="cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
       <li><a href="contact.html">Contact us</a></li>
       <li><a href="request-sample.html" class="active">Request for Sample</a></li>
       <li><a href="orders.html">Orders</a></li>
@@ -556,13 +451,13 @@
         <span class="section-chip">Evaluation Samples</span>
       </div>
       <p class="section-intro">
-        Fill out the form below to request evaluation samples of our product. 
+        Fill out the form below to request evaluation samples of our product.
         Our team will review and discuss with you and dispatch the sample.
       </p>
 
       <div class="form-container">
         <div class="success-message" id="successMessage">
-          ✓ Thank you! Your sample request has been submitted successfully. Our team will contact you within 24 hours.
+          ✓ Thank you! Your sample request has been prepared on WhatsApp. Please tap <b>Send</b> to submit.
         </div>
 
         <form id="sampleRequestForm">
@@ -590,7 +485,9 @@
 
           <div class="form-group full-width">
             <label class="form-label" for="intendedUse">Intended use of the product</label>
-            <textarea id="intendedUse" class="form-textarea" name="intendedUse" placeholder="Please describe how you plan to use our products (e.g., R&D testing, product formulation, quality evaluation, etc.)" required></textarea>
+            <textarea id="intendedUse" class="form-textarea" name="intendedUse"
+              placeholder="Please describe how you plan to use our products (e.g., R&D testing, product formulation, quality evaluation, etc.)"
+              required></textarea>
           </div>
 
           <div class="form-row">
@@ -623,6 +520,39 @@
     <footer>
       &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
     </footer>
+  </div>
+
+  <!-- WhatsApp QR Chat Widget -->
+  <div id="ib-wa">
+    <div id="ib-wa-popup">
+      <header>
+        <span>Chat with ChemSus</span>
+        <span onclick="ibToggleWA()">✕</span>
+      </header>
+      <div class="body">
+        <p>Scan this QR code on your smartphone to chat with us</p>
+        <img
+          id="ibWaQr"
+          src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
+          alt="WhatsApp QR"
+        >
+        <div style="display:flex;align-items:center;margin:12px 0;color:#999;font-size:13px;">
+          <span style="flex:1;height:1px;background:#ddd;"></span>
+          <span style="padding:0 10px;font-weight:600;">OR</span>
+          <span style="flex:1;height:1px;background:#ddd;"></span>
+        </div>
+
+        <a
+          id="ibWaLink"
+          href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
+          target="_blank"
+          rel="noopener"
+        >
+          Chat with us on WhatsApp Web
+        </a>
+      </div>
+    </div>
+    <button id="ib-wa-btn" onclick="ibToggleWA()">🟢 Chat</button>
   </div>
 
   <!-- SCRIPTS -->
@@ -660,67 +590,59 @@
       }
     });
 
-    // Form submission handler
-    document.getElementById('sampleRequestForm').addEventListener('submit', function(e) {
+    // Shared cart badge updater – include on all pages
+    (function () {
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const badge = document.getElementById('cart-count');
+      if (badge) badge.textContent = count;
+    })();
+
+    // WhatsApp widget toggle
+    function ibToggleWA() {
+      const popup = document.getElementById("ib-wa-popup");
+      popup.style.display = (popup.style.display === "block") ? "none" : "block";
+    }
+
+    // ✅ Send form details to WhatsApp on submit
+    document.getElementById('sampleRequestForm').addEventListener('submit', function (e) {
       e.preventDefault();
+
+      const waNumber = "918486877575"; // WhatsApp number with country code (no +)
+
+      const companyName    = document.getElementById("companyName").value.trim();
+      const individualName = document.getElementById("individualName").value.trim();
+      const email          = document.getElementById("email").value.trim();
+      const phone          = document.getElementById("phone").value.trim();
+      const intendedUse    = document.getElementById("intendedUse").value.trim();
+      const quantity       = document.getElementById("quantity").value.trim();
+      const timeline       = document.getElementById("timeline").value.trim();
+      const orderFrequency = document.getElementById("orderFrequency").value;
+
+      const message =
+`Hi ChemSus, I would like to request a sample / more details.
+
+*Sample Request Details*
+Company: ${companyName}
+Name: ${individualName}
+Email: ${email}
+Phone: ${phone}
+Intended Use: ${intendedUse}
+Quantity: ${quantity}
+Timeline: ${timeline}
+Order Frequency: ${orderFrequency}
+`;
+
+      const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+
+      // Open WhatsApp (user will tap Send)
+      window.open(waUrl, "_blank");
+
+      // Optional: show success message on the page too
       document.getElementById('successMessage').style.display = 'block';
       document.getElementById('sampleRequestForm').style.opacity = '0.7';
       document.getElementById('successMessage').scrollIntoView({ behavior: 'smooth' });
     });
- 
-
-  // Shared cart badge updater – include on all pages
-  (function () {
-    const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
-    const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const badge = document.getElementById('cart-count');
-    if (badge) badge.textContent = count;
-  })();
-</script>
-<script>
-function ibToggleWA() {
-  const popup = document.getElementById("ib-wa-popup");
-  popup.style.display = popup.style.display === "block" ? "none" : "block";
-}
-</script>
-
-
-<!-- WhatsApp QR Chat Widget -->
-<div id="ib-wa">
-  <div id="ib-wa-popup">
-    <header>
-      <span>Chat with ChemSus</span>
-      <span onclick="ibToggleWA()">✕</span>
-    </header>
-
-    <div class="body">
-      <p>Scan this QR code on your smartphone to chat with us</p>
-
-      <!-- QR CODE WITH PRE-FILLED MESSAGE -->
-      <img
-        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
-        alt="WhatsApp QR"
-      >
-
-      <div style="display:flex;align-items:center;margin:12px 0;color:#999;font-size:13px;">
-        <span style="flex:1;height:1px;background:#ddd;"></span>
-        <span style="padding:0 10px;font-weight:600;">OR</span>
-        <span style="flex:1;height:1px;background:#ddd;"></span>
-      </div>
-      
-
-      <a
-        href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
-        target="_blank"
-      >
-        Chat with us on WhatsApp Web
-      </a>
-    </div>
-  </div>
-
-  <button id="ib-wa-btn" onclick="ibToggleWA()">🟢 Chat</button>
-</div>
-
-
+  </script>
 </body>
 </html>
