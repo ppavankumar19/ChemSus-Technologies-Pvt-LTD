@@ -31,7 +31,6 @@
 
     a { text-decoration:none; color:inherit; }
 
-    /* SIDEBAR (same theme) */
     .sidebar{
       width:240px;
       background:var(--primary);
@@ -83,7 +82,6 @@
       margin-left: 8px;
     }
 
-    /* MAIN WRAPPER */
     .main-wrapper{
       margin-left:240px;
       flex:1;
@@ -92,7 +90,6 @@
       min-height:100vh;
     }
 
-    /* HERO – same dark dotted bg */
     .hero{
       position:relative;
       overflow:hidden;
@@ -148,7 +145,6 @@
       color:#e2f3ff;
     }
 
-    /* MAIN CONTENT */
     main{
       max-width:900px;
       margin:0 auto;
@@ -210,9 +206,9 @@
     .amount-summary span{
       color:var(--primary-dark);
       font-weight:700;
+      font-size:18px;
     }
 
-    /* Receipt upload */
     .section-title{
       font-family:"Montserrat",sans-serif;
       font-size:16px;
@@ -264,7 +260,13 @@
       display:none;
     }
 
-    /* Rating */
+    .success-text{
+      color:#059669;
+      font-size:12px;
+      margin-top:4px;
+      display:none;
+    }
+
     .rating-row{
       margin-top:14px;
     }
@@ -309,7 +311,11 @@
       font-weight:600;
       font-family:"Montserrat",sans-serif;
       cursor:pointer;
+      transition: all 0.2s ease;
     }
+
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,184,176,0.3); }
+    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
     .btn-secondary{
       background:transparent;
@@ -376,20 +382,17 @@
   <main>
     <div class="payment-card">
       <div class="payment-grid">
-        <!-- LEFT: QR + amount -->
         <div class="qr-box">
           <h3>Scan to Pay</h3>
-          <!-- Replace with your real QR image -->
           <img src="assets/payment-qr.png" alt="Payment QR Code">
           <p class="qr-note">
-            Use any UPI / banking app to scan this QR and pay the exact order amount shown in your order summary.
+            Use any UPI / banking app to scan this QR and pay the exact order amount shown below.
           </p>
           <div class="amount-summary">
             Order total: <span id="orderTotalText">₹0</span>
           </div>
         </div>
 
-        <!-- RIGHT: upload + rating -->
         <div>
           <div class="section-title">Upload payment receipt</div>
           <div class="upload-box">
@@ -398,6 +401,7 @@
             <input type="file" id="receiptInput" accept="image/*,.pdf">
             <img id="receiptPreview" class="preview-img" alt="Receipt preview">
             <div id="receiptError" class="error-text">Please upload a valid image or PDF receipt.</div>
+            <div id="receiptSuccess" class="success-text">✓ Receipt uploaded successfully!</div>
           </div>
 
           <div class="section-title">Rate your experience</div>
@@ -415,8 +419,8 @@
           </div>
 
           <div class="actions-row">
-            <button class="btn-primary" onclick="confirmPayment()">Confirm payment &amp; finish</button>
-            <button class="btn-secondary" onclick="window.location.href='orders.html'">← Back to Orders</button>
+            <button class="btn-primary" id="submitBtn" onclick="confirmPayment()">Confirm payment &amp; finish</button>
+            <button class="btn-secondary" onclick="window.location.href='orders2.html'">← Back</button>
           </div>
         </div>
       </div>
@@ -429,7 +433,6 @@
 </div>
 
 <script>
-  // Show cart badge only (optional, you can keep existing cart logic)
   (function () {
     const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
     const count = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -437,35 +440,29 @@
     if (badge) badge.textContent = count;
   })();
 
-  // ----- Read latest order from buynow.html -----
-  const latestOrderRaw = localStorage.getItem('chemsusLatestOrder');
-  let latestOrder = null;
-
-  if (latestOrderRaw) {
-    try {
-      latestOrder = JSON.parse(latestOrderRaw);
-    } catch (e) {
-      latestOrder = null;
+  function loadOrderTotal() {
+    const orderTotal = sessionStorage.getItem('orderTotal');
+    
+    if (orderTotal) {
+      const total = parseFloat(orderTotal);
+      document.getElementById('orderTotalText').textContent = 
+        '₹' + total.toLocaleString('en-IN');
+    } else {
+      document.getElementById('orderTotalText').textContent = '₹0';
     }
   }
 
-  // If nothing to pay for, send user back to shop
-  if (!latestOrder) {
-    document.getElementById('orderTotalText').textContent = '₹0';
-  } else {
-    const total = latestOrder.price * latestOrder.quantity;
-    document.getElementById('orderTotalText').textContent =
-      '₹' + total.toLocaleString('en-IN');
-  }
+  window.addEventListener('DOMContentLoaded', loadOrderTotal);
 
-  // ----- Receipt preview -----
   const receiptInput   = document.getElementById('receiptInput');
   const receiptPreview = document.getElementById('receiptPreview');
   const receiptError   = document.getElementById('receiptError');
+  const receiptSuccess = document.getElementById('receiptSuccess');
 
   receiptInput.addEventListener('change', function (event) {
     const file = event.target.files[0];
     receiptError.style.display = 'none';
+    receiptSuccess.style.display = 'none';
 
     if (!file) {
       receiptPreview.style.display = 'none';
@@ -483,12 +480,13 @@
       const url = URL.createObjectURL(file);
       receiptPreview.src = url;
       receiptPreview.style.display = 'block';
+      receiptSuccess.style.display = 'block';
     } else {
       receiptPreview.style.display = 'none';
+      receiptSuccess.style.display = 'block';
     }
   });
 
-  // ----- Rating stars -----
   const starContainer = document.getElementById('starContainer');
   const ratingError   = document.getElementById('ratingError');
   let selectedRating  = 0;
@@ -503,17 +501,22 @@
     ratingError.style.display = 'none';
   });
 
-  function confirmPayment() {
-    if (!latestOrder) {
+  async function confirmPayment() {
+    const submitBtn = document.getElementById('submitBtn');
+    const orderTotal = sessionStorage.getItem('orderTotal');
+    const buyNowProductRaw = sessionStorage.getItem('buyNowProduct');
+    const orderDetailsRaw = sessionStorage.getItem('orderDetails');
+    const receiptFile = receiptInput.files[0];
+
+    if (!orderTotal || !buyNowProductRaw || !orderDetailsRaw) {
       alert('No order found. Please place an order first.');
       window.location.href = 'shop.html';
       return;
     }
 
-    const file = receiptInput.files[0];
     let hasError = false;
 
-    if (!file) {
+    if (!receiptFile) {
       receiptError.textContent = 'Please upload your payment receipt.';
       receiptError.style.display = 'block';
       hasError = true;
@@ -526,41 +529,69 @@
 
     if (hasError) return;
 
-    const feedback = document.getElementById('feedbackInput').value.trim();
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing...';
 
-    // Append this order into permanent orders history
-    const orders = JSON.parse(localStorage.getItem('chemsusOrders') || '[]');
-    const total  = latestOrder.price * latestOrder.quantity;
+      const orderDetails = JSON.parse(orderDetailsRaw);
+      const buyNowProduct = JSON.parse(buyNowProductRaw);
+      const feedback = document.getElementById('feedbackInput').value.trim();
+      const total = parseFloat(orderTotal);
 
-    orders.push({
-      ...latestOrder,
-      total,
-      paidAt: new Date().toISOString(),
-      rating: selectedRating,
-      feedback
-    });
+      const formData = new FormData();
+      formData.append('orderid', 1);
+      formData.append('customername', orderDetails.fullName);
+      formData.append('email', orderDetails.email);
+      formData.append('phone', orderDetails.mobile);
+      formData.append('amount', total);
+      formData.append('rating', selectedRating);
+      formData.append('feedback', feedback || null);
+      formData.append('receiptimage', receiptFile);
 
-    localStorage.setItem('chemsusOrders', JSON.stringify(orders));
+      const receiptResponse = await fetch('http://localhost:3000/api/receipts', {
+        method: 'POST',
+        body: formData,
+      });
 
-    // Optional: clear latestOrder so it is not reused accidentally
-    localStorage.removeItem('chemsusLatestOrder');
+      if (!receiptResponse.ok) {
+        throw new Error('Failed to upload receipt to backend');
+      }
 
-    // Store payment meta separately if you want
-    const paymentInfo = {
-      hasReceipt: !!file,
-      rating: selectedRating,
-      feedback,
-      confirmedAt: new Date().toISOString()
-    };
-    localStorage.setItem('chemsusPaymentInfo', JSON.stringify(paymentInfo));
+      const receiptResult = await receiptResponse.json();
+      console.log('Receipt uploaded:', receiptResult);
 
-    alert('Thank you! Your payment has been recorded.');
-    window.location.href = 'orders.html';
+      const orders = JSON.parse(localStorage.getItem('chemsusOrders') || '[]');
+      orders.push({
+        ...buyNowProduct,
+        total,
+        paidAt: new Date().toISOString(),
+        rating: selectedRating,
+        feedback,
+        receiptId: receiptResult.receiptId,
+      });
+
+      localStorage.setItem('chemsusOrders', JSON.stringify(orders));
+
+      sessionStorage.removeItem('buyNowData');
+      sessionStorage.removeItem('buyNowProduct');
+      sessionStorage.removeItem('orderDetails');
+      sessionStorage.removeItem('orderTotal');
+      localStorage.removeItem('chemsusLatestOrder');
+
+      alert('✅ Thank you! Your payment has been recorded and receipt uploaded.');
+      window.location.href = 'orders.html';
+
+    } catch (error) {
+      console.error('Payment error:', error);
+      receiptError.textContent = '❌ Error: ' + error.message;
+      receiptError.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Confirm payment & finish';
+    }
   }
 
   window.confirmPayment = confirmPayment;
 </script>
-
 
 </body>
 </html>

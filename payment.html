@@ -210,6 +210,7 @@
     .amount-summary span{
       color:var(--primary-dark);
       font-weight:700;
+      font-size:18px;
     }
 
     /* Receipt upload */
@@ -270,6 +271,13 @@
       display:none;
     }
 
+    .success-text{
+      color:#059669;
+      font-size:12px;
+      margin-top:4px;
+      display:none;
+    }
+
     /* Rating */
     .rating-row{
       margin-top:14px;
@@ -301,6 +309,7 @@
 
     .feedback-textarea:focus {
       border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,116,199,0.1);
     }
 
     .actions-row{
@@ -326,6 +335,13 @@
     .btn-primary:hover {
       transform: translateY(-2px);
       filter: brightness(1.05);
+      box-shadow: 0 8px 20px rgba(0,184,176,0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
     }
 
     .btn-secondary{
@@ -344,6 +360,7 @@
     .btn-secondary:hover {
       background: #f1f5f9;
       border-color: var(--primary);
+      transform: translateY(-1px);
     }
 
     footer{
@@ -441,7 +458,7 @@
           <h3>Scan to Pay</h3>
           <img src="assets/payment-qr.png" alt="Payment QR Code">
           <p class="qr-note">
-            Use any UPI / banking app to scan this QR and pay the exact order amount shown in your order summary.
+            Use any UPI / banking app to scan this QR and pay the exact order amount shown below.
           </p>
           <div class="amount-summary">
             Order total: <span id="orderTotalText">₹0</span>
@@ -457,6 +474,7 @@
             <input type="file" id="receiptInput" accept="image/*,.pdf">
             <img id="receiptPreview" class="preview-img" alt="Receipt preview">
             <div id="receiptError" class="error-text">Please upload a valid image or PDF receipt.</div>
+            <div id="receiptSuccess" class="success-text">✓ Receipt uploaded successfully!</div>
           </div>
 
           <div class="section-title">Rate your experience</div>
@@ -474,8 +492,8 @@
           </div>
 
           <div class="actions-row">
-            <button class="btn-primary" onclick="confirmPayment()">Confirm payment &amp; finish</button>
-            <button class="btn-secondary" onclick="window.location.href='orders.html'">← Back to Orders</button>
+            <button class="btn-primary" id="submitBtn" onclick="confirmPayment()">Confirm payment &amp; finish</button>
+            <button class="btn-secondary" onclick="window.location.href='cart.html'">← Back to Cart</button>
           </div>
         </div>
       </div>
@@ -492,7 +510,9 @@
   <footer>
     © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
   </footer>
-</div>  <script>
+</div>
+
+<script>
   // Initialize payment and amount
   function initializePayment() {
     const badge = document.getElementById('cart-count');
@@ -542,10 +562,12 @@
   const receiptInput = document.getElementById('receiptInput');
   const receiptPreview = document.getElementById('receiptPreview');
   const receiptError = document.getElementById('receiptError');
+  const receiptSuccess = document.getElementById('receiptSuccess');
 
   receiptInput.addEventListener('change', function (event) {
     const file = event.target.files[0];
     receiptError.style.display = 'none';
+    receiptSuccess.style.display = 'none';
 
     if (!file) {
       receiptPreview.style.display = 'none';
@@ -563,8 +585,10 @@
       const url = URL.createObjectURL(file);
       receiptPreview.src = url;
       receiptPreview.style.display = 'block';
+      receiptSuccess.style.display = 'block';
     } else {
       receiptPreview.style.display = 'none';
+      receiptSuccess.style.display = 'block';
     }
   });
 
@@ -583,8 +607,10 @@
     ratingError.style.display = 'none';
   });
 
-  function confirmPayment() {
+  async function confirmPayment() {
+    const submitBtn = document.getElementById('submitBtn');
     const file = receiptInput.files[0];
+    const cartTotal = parseFloat(sessionStorage.getItem('orderTotal')) || 0;
     let hasError = false;
 
     if (!file) {
@@ -600,23 +626,102 @@
 
     if (hasError) return;
 
-    const feedback = document.getElementById('feedbackInput').value.trim();
+    try {
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Processing...';
 
-    // Store payment confirmation data
-    const paymentInfo = {
-      hasReceipt: !!file,
-      rating: selectedRating,
-      feedback: feedback,
-      confirmedAt: new Date().toISOString()
-    };
-    localStorage.setItem('chemsusPaymentInfo', JSON.stringify(paymentInfo));
+      const feedback = document.getElementById('feedbackInput').value.trim();
+      const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
 
-    alert('✅ Thank you! Your payment details and feedback have been recorded.');
-    
-    // Clear cart after successful payment
-    localStorage.removeItem('chemsusCart');
-    
-    window.location.href = 'orders.html';
+      // Get order ID from sessionStorage or use 1 as default
+      const orderId = sessionStorage.getItem('orderId') || 1;
+      
+      // Get customer info from cart order details or use defaults
+      let customerName = 'Customer';
+      let customerEmail = 'customer@example.com';
+      let customerPhone = '0000000000';
+      let orderAmount = cartTotal;
+
+      const orderDetails = sessionStorage.getItem('orderDetails');
+      if (orderDetails) {
+        try {
+          const details = JSON.parse(orderDetails);
+          customerName = details.fullName || customerName;
+          customerEmail = details.email || customerEmail;
+          customerPhone = details.mobile || customerPhone;
+        } catch (e) {
+          console.log('Could not parse order details');
+        }
+      }
+
+      // Calculate total if not available
+      if (orderAmount === 0 && cart.length > 0) {
+        orderAmount = cart.reduce((sum, item) => {
+          const price = item.price || item.productPrice || item.pricePerKg || 0;
+          const qty = item.quantity || 1;
+          return sum + (price * qty);
+        }, 0);
+      }
+
+      // ✅ Upload receipt to backend
+      const formData = new FormData();
+      formData.append('orderid', orderId);
+      formData.append('customername', customerName);
+      formData.append('email', customerEmail);
+      formData.append('phone', customerPhone);
+      formData.append('amount', orderAmount);
+      formData.append('rating', selectedRating);
+      formData.append('feedback', feedback || null);
+      formData.append('receiptimage', file);
+
+      console.log('📤 Uploading receipt with:', {
+        orderid: orderId,
+        customername: customerName,
+        email: customerEmail,
+        phone: customerPhone,
+        amount: orderAmount,
+        rating: selectedRating
+      });
+
+      const receiptResponse = await fetch('http://localhost:3000/api/receipts', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!receiptResponse.ok) {
+        throw new Error('Failed to upload receipt to backend');
+      }
+
+      const receiptResult = await receiptResponse.json();
+      console.log('✅ Receipt uploaded successfully:', receiptResult);
+
+      // Store payment confirmation data
+      const paymentInfo = {
+        hasReceipt: !!file,
+        rating: selectedRating,
+        feedback: feedback,
+        receiptId: receiptResult.receiptId,
+        confirmedAt: new Date().toISOString()
+      };
+      localStorage.setItem('chemsusPaymentInfo', JSON.stringify(paymentInfo));
+
+      alert('✅ Thank you! Your payment receipt has been uploaded and feedback recorded.');
+      
+      // Clear cart after successful payment
+      localStorage.removeItem('chemsusCart');
+      sessionStorage.removeItem('orderTotal');
+      sessionStorage.removeItem('orderDetails');
+      sessionStorage.removeItem('orderId');
+      
+      window.location.href = 'orders.html';
+
+    } catch (error) {
+      console.error('❌ Payment error:', error);
+      receiptError.textContent = '❌ Error: ' + error.message + '. Check if backend is running.';
+      receiptError.style.display = 'block';
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Confirm payment & finish';
+    }
   }
 
   // Initialize on page load

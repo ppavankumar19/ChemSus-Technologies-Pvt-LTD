@@ -1,9 +1,11 @@
-<html lang="en"><head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
   <meta charset="UTF-8">
   <title>Sodium Levulinate | ChemSus Technologies Pvt Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="../assets/logo.png">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&amp;family=Open+Sans:wght@400;600&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   
   <style>
     :root {
@@ -236,6 +238,14 @@
       transform: scale(1.05);
     }
 
+    .product-image::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 30%, rgba(0,184,176,0.08), transparent 50%);
+      pointer-events: none;
+    }
+
     .content-section {
       display: flex;
       flex-direction: column;
@@ -345,25 +355,6 @@
       margin-top: auto;
     }
 
-    /* WHATSAPP BUTTON */
-    .whatsapp-float {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(135deg, #25d366, #20ba5f);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 12px 28px rgba(37, 211, 102, 0.4);
-      z-index: 1000;
-      transition: all 0.2s ease;
-    }
-
-    .whatsapp-float svg { width: 32px; height: 32px; fill: #ffffff; }
-
     /* MOBILE TOGGLE */
     .mobile-toggle {
       display: block;
@@ -381,6 +372,7 @@
 
     .mobile-toggle svg { width: 20px; height: 20px; }
 
+    /* OVERLAY FOR MOBILE SIDEBAR */
     .sidebar-overlay {
       display: none;
       position: fixed;
@@ -389,99 +381,180 @@
       z-index: 999;
     }
 
-    .sidebar-overlay.active { display: block; }
+    .sidebar-overlay.active {
+      display: block;
+    }
 
+    /* DESKTOP: Sidebar always visible */
     @media (min-width: 1051px) {
-      .sidebar { transform: translateX(0); }
-      .main-wrapper { margin-left: 240px; }
-      .mobile-toggle { display: none; }
+      .sidebar {
+        transform: translateX(0);
+      }
+      .main-wrapper {
+        margin-left: 240px;
+      }
+      .mobile-toggle {
+        display: none;
+      }
     }
 
-    @media (max-width: 900px) {
-      .product-card { grid-template-columns: 1fr; padding: 28px 20px; }
-      .product-image { height: 280px; }
-      .hero-title { font-size: 28px; }
+    /* TABLET & MOBILE */
+    @media (max-width: 1050px) {
+      .main-wrapper {
+        margin-left: 0;
+      }
+      .main-wrapper.sidebar-open {
+        margin-left: 0;
+      }
     }
-   
-  /* === WhatsApp QR Floating Widget === */
-  #ib-wa {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 99999;
-    font-family: Arial, sans-serif;
-  }
-  
-  #ib-wa-btn {
-    background: #25d366;
-    color: #fff;
-    border: none;
-    border-radius: 30px;
-    padding: 12px 18px;
-    font-size: 15px;
-    cursor: pointer;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  }
-  
-  #ib-wa-popup {
-    display: none;
-    position: absolute;
-    bottom: 60px;
-    right: 0;
-    width: 300px;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
-    overflow: hidden;
-  }
-  
-  #ib-wa-popup header {
-    background: #075e54;
-    color: #fff;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 14px;
-  }
-  
-  #ib-wa-popup header span:last-child {
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  #ib-wa-popup .body {
-    padding: 12px;
-    text-align: center;
-  }
-  
-  #ib-wa-popup .body img {
-    width: 220px;
-    margin: 10px 0;
-  }
-  
-  #ib-wa-popup .body a {
-    display: block;
-    background: #25d366;
-    color: #fff;
-    padding: 10px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 14px;
-  }
+
+    /* MOBILE: Single column layout */
+    @media (max-width: 900px) {
+      .product-card {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        padding: 28px 20px;
+      }
+      .product-image {
+        height: 280px;
+        width: 100%;
+      }
+      .hero {
+        height: 200px;
+      }
+      .hero-title {
+        font-size: 28px;
+      }
+      main {
+        padding: 24px 16px 32px;
+      }
+    }
+
+    /* SMALL MOBILE */
+    @media (max-width: 580px) {
+      .hero-title {
+        font-size: 24px;
+      }
+      .hero-subtitle {
+        font-size: 13px;
+      }
+      .product-card {
+        padding: 24px 16px;
+      }
+      .product-image {
+        height: 240px;
+      }
+      .btn-primary, .btn-secondary {
+        padding: 12px 20px;
+        font-size: 13px;
+        min-width: 140px;
+      }
+      .actions {
+        flex-direction: column;
+      }
+      main {
+        padding: 20px 12px 24px;
+      }
+    }
+
+    /* EXTRA SMALL */
+    @media (max-width: 400px) {
+      .hero {
+        height: 180px;
+        padding: 0 16px;
+      }
+      .hero-title {
+        font-size: 22px;
+      }
+      .lead {
+        font-size: 14px;
+      }
+      .section-title {
+        font-size: 16px;
+      }
+    }
+
+    /* === WhatsApp QR Floating Widget === */
+    #ib-wa {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 99999;
+      font-family: Arial, sans-serif;
+    }
+    
+    #ib-wa-btn {
+      background: #25d366;
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 18px;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+    
+    #ib-wa-popup {
+      display: none;
+      position: absolute;
+      bottom: 60px;
+      right: 0;
+      width: 300px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+    
+    #ib-wa-popup header {
+      background: #075e54;
+      color: #fff;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+    }
+    
+    #ib-wa-popup header span:last-child {
+      cursor: pointer;
+      font-weight: bold;
+    }
+    
+    #ib-wa-popup .body {
+      padding: 12px;
+      text-align: center;
+    }
+    
+    #ib-wa-popup .body img {
+      width: 220px;
+      margin: 10px 0;
+    }
+    
+    #ib-wa-popup .body a {
+      display: block;
+      background: #25d366;
+      color: #fff;
+      padding: 10px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+    }
   </style>
-  
 </head>
 <body>
 
+  <!-- MOBILE SIDEBAR OVERLAY -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
 
+  <!-- Mobile Toggle -->
   <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
     <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"></path>
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
     </svg>
   </button>
 
+  <!-- SIDEBAR -->
   <nav class="sidebar" id="sidebar">
     <a href="../index.html" class="nav-logo">
       <img src="../assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
@@ -513,58 +586,63 @@
   </nav>
 
   <div class="main-wrapper" id="mainWrapper">
+    <!-- HERO -->
     <section class="hero">
       <div class="hero-content">
         <div class="hero-kicker">Cosmetic-grade preservative</div>
         <h1 class="hero-title">Sodium Levulinate</h1>
         <p class="hero-subtitle">
-          Mild, bio-based preservative and skin-/hair-conditioning agent for clean and natural formulations.
+          Mild, bio-based preservative and conditioning agent for clean, natural skin- and hair-care formulations.
         </p>
       </div>
     </section>
 
+    <!-- MAIN CONTENT -->
     <main>
       <div class="product-card">
+        <!-- IMAGE -->
         <div class="product-image">
           <img src="../assets/3ai.JPEG" alt="Sodium Levulinate – cosmetic applications">
         </div>
 
+        <!-- CONTENT -->
         <div class="content-section">
           <span class="meta-chip">Product overview</span>
           
           <p class="lead">
-            Sodium Levulinate (CAS No.: 539-88-8) is a water-soluble, white crystalline solid widely used in cosmetics and personal-care products. It functions as a mild preservative and conditioning agent, making it essential for modern clean-label and organic formulations.
+            Sodium Levulinate (CAS No.: 539-88-8) is the sodium salt of levulinic acid, used as a natural-origin preservative and skin-conditioning agent in modern cosmetics and personal-care products. [web:21][web:22]
           </p>
 
           <div class="section-group">
             <h3 class="section-title">Main Applications</h3>
             <ul class="features-list">
-              <li>Inhibits bacteria, yeasts, and molds in water-based products</li>
-              <li>Improves skin softness, smoothness, and hydration</li>
-              <li>Enhances hair softness and shine in shampoos and conditioners</li>
-              <li>Extends shelf life of serums, gels, and emulsions</li>
+              <li>Broad-spectrum control of bacteria, yeasts, and molds in water-based formulations such as serums, gels, shampoos, and cleansers. [web:22][web:28]</li>
+              <li>Improves skin softness, smoothness, and hydration while supporting a healthy skin microbiome. [web:22][web:24]</li>
+              <li>Enhances hair feel and shine in shampoos, conditioners, and leave-on treatments. [web:23][web:31]</li>
+              <li>Often used in blends with Sodium Anisate for robust, globally acceptable preservation systems. [web:27][web:31][web:38]</li>
             </ul>
           </div>
 
           <div class="section-group">
             <h3 class="section-title">Formulation Advantages</h3>
             <ul class="features-list">
-              <li>100% bio-based alternative to harsh synthetic preservatives</li>
-              <li>Highly effective in slightly acidic formulations (pH 4.0–6.0)</li>
-              <li>Excellent synergy with Sodium Anisate for broad-spectrum protection</li>
-              <li>Supports blemish-prone and sensitive skin formulations</li>
+              <li>100% plant-derived, vegan-friendly alternative to benzoic and sorbic acid preservatives. [web:22][web:37]</li>
+              <li>Highly effective in mildly acidic systems, typically between pH 4.0 and 6.0. [web:36][web:38]</li>
+              <li>Water-soluble and easy to incorporate into the aqueous phase without affecting product color or fragrance. [web:27][web:31]</li>
+              <li>Synergistic in blends such as glycerin–water–Sodium Levulinate–Sodium Anisate, enabling “preservative-free” marketing claims. [web:27][web:36][web:38]</li>
             </ul>
           </div>
 
           <div class="section-group">
-            <h3 class="section-title">Safety &amp; Regulatory</h3>
+            <h3 class="section-title">Safety & Regulatory</h3>
             <ul class="features-list">
-              <li>Generally safe (GRAS) and well-tolerated by all skin types</li>
-              <li>Accepted under INCI nomenclature for global compliance</li>
-              <li>Approved for use in ECOCERT and COSMOS certified products</li>
+              <li>INCI-listed as Sodium Levulinate and widely accepted in cosmetic regulations worldwide. [web:21][web:28]</li>
+              <li>Used in ECOCERT, COSMOS, and other natural/organic certified formulations as part of approved preservative systems. [web:26][web:29][web:38]</li>
+              <li>Clinically well tolerated, suitable for sensitive and blemish-prone skin products when used within recommended levels. [web:22][web:37]</li>
             </ul>
           </div>
 
+          <!-- ACTIONS -->
           <div class="actions">
             <a href="../shop.html#sodium-levulinate" class="btn-primary">🛒 Buy Sodium Levulinate</a>
             <a href="../products.html" class="btn-secondary">← All Products</a>
@@ -574,22 +652,26 @@
     </main>
 
     <footer>
-      © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
     </footer>
   </div>
 
-  
-
   <script>
+    // Enhanced sidebar toggle with overlay
     function toggleSidebar() {
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('sidebarOverlay');
       const mainWrapper = document.getElementById('mainWrapper');
+      
       sidebar.classList.toggle('open');
       overlay.classList.toggle('active');
       mainWrapper.classList.toggle('sidebar-open');
     }
 
+    // Close sidebar when clicking overlay
+    document.getElementById('sidebarOverlay').addEventListener('click', toggleSidebar);
+
+    // Cart badge updater
     (function() {
       const cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
       const count = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -597,56 +679,60 @@
       if (badge) badge.textContent = count;
     })();
 
+    // Site search
     document.getElementById('siteSearchForm').addEventListener('submit', function(e) {
       e.preventDefault();
       const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
-      if (query.includes('shop')) window.location.href = '../shop.html';
+      if (query.includes('shop') || query.includes('buy')) window.location.href = '../shop.html';
       else if (query.includes('product')) window.location.href = '../products.html';
       else window.location.href = '../index.html';
     });
+
+    // Expose globally
+    window.toggleSidebar = toggleSidebar;
   </script>
+
   <script>
-  function ibToggleWA() {
-    const popup = document.getElementById("ib-wa-popup");
-    popup.style.display = popup.style.display === "block" ? "none" : "block";
-  }
+    function ibToggleWA() {
+      const popup = document.getElementById("ib-wa-popup");
+      popup.style.display = popup.style.display === "block" ? "none" : "block";
+    }
   </script>
-<!-- WhatsApp QR Chat Widget -->
-<div id="ib-wa">
-  <div id="ib-wa-popup">
-    <header>
-      <span>Chat with ChemSus</span>
-      <span onclick="ibToggleWA()">✕</span>
-    </header>
 
-    <div class="body">
-      <p>Scan this QR code on your smartphone to chat with us</p>
+  <!-- WhatsApp QR Chat Widget -->
+  <div id="ib-wa">
+    <div id="ib-wa-popup">
+      <header>
+        <span>Chat with ChemSus</span>
+        <span onclick="ibToggleWA()">✕</span>
+      </header>
 
-      <!-- QR CODE WITH PRE-FILLED MESSAGE -->
-      <img
-        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
-        alt="WhatsApp QR"
-      >
+      <div class="body">
+        <p>Scan this QR code on your smartphone to chat with us</p>
 
-      <div style="display:flex;align-items:center;margin:12px 0;color:#999;font-size:13px;">
-        <span style="flex:1;height:1px;background:#ddd;"></span>
-        <span style="padding:0 10px;font-weight:600;">OR</span>
-        <span style="flex:1;height:1px;background:#ddd;"></span>
+        <!-- QR CODE WITH PRE-FILLED MESSAGE -->
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
+          alt="WhatsApp QR"
+        >
+
+        <div style="display:flex;align-items:center;margin:12px 0;color:#999;font-size:13px;">
+          <span style="flex:1;height:1px;background:#ddd;"></span>
+          <span style="padding:0 10px;font-weight:600;">OR</span>
+          <span style="flex:1;height:1px;background:#ddd;"></span>
+        </div>
+        
+        <a
+          href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
+          target="_blank"
+        >
+          Chat with us on WhatsApp Web
+        </a>
       </div>
-      
-
-      <a
-        href="https://wa.me/918486877575?text=Hi%20ChemSus%2C%20I%20would%20like%20to%20request%20a%20sample%20or%20get%20more%20details."
-        target="_blank"
-      >
-        Chat with us on WhatsApp Web
-      </a>
     </div>
+
+    <button id="ib-wa-btn" onclick="ibToggleWA()">🟢 Chat</button>
   </div>
 
-  <button id="ib-wa-btn" onclick="ibToggleWA()">🟢 Chat</button>
-</div>
-
-
-
-</body></html>
+</body>
+</html>
