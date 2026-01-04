@@ -372,6 +372,30 @@
     text-decoration: none;
     font-size: 14px;
   }
+  /* === Brochure Download Button === */
+  .download-section {
+    text-align: center;
+    margin: 25px 0 10px;
+  }
+  
+  .download-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: #ffffff;
+    padding: 12px 24px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .download-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.35);
+  }
+  
   </style>
   
 </head>
@@ -442,6 +466,16 @@
         </div>
       </section>
     </main>
+    <div class="download-section">
+      <a
+        href="assets/broucher.PNG"
+        download
+        class="download-btn"
+      >
+        ⬇ Download Company Brochure (PDF)
+      </a>
+    </div>
+    
 
     <footer>
       © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
