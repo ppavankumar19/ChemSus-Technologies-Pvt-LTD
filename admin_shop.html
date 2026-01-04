@@ -253,6 +253,7 @@
     input[type="password"],
     input[type="url"],
     input[type="number"],
+    input[type="file"],
     select {
       width: 100%;
       padding: 8px 10px;
@@ -421,6 +422,53 @@
       font-weight: bold;
       margin-left: 8px;
     }
+
+    small {
+      display: block;
+      margin-top: 4px;
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .tab-btn {
+      padding: 6px 12px;
+      background: transparent;
+      border: none;
+      border-bottom: 2px solid transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: #6b7280;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .image-preview {
+      margin-top: 8px;
+      max-width: 120px;
+      border-radius: 6px;
+      border: 1px solid #e5e7eb;
+    }
   </style>
 </head>
 <body>
@@ -508,7 +556,7 @@
 
         <div class="mt-4">
           <h3 style="font-family:'Montserrat',sans-serif;font-size:18px;color:var(--primary-dark);margin-bottom:8px;">Add / Edit Item</h3>
-          <p class="section-subtitle">Define pricing, subtitle, badge text, stock status and links. Use emoji for the card icon.</p>
+          <p class="section-subtitle">Define pricing, subtitle, badge text, stock status, image, and links.</p>
 
           <form id="shopItemForm" class="mt-3">
             <input type="hidden" id="itemId">
@@ -523,9 +571,34 @@
               <input type="text" id="itemSubtitle" placeholder="e.g. Pharma-grade nutritional supplement" required>
             </div>
 
+            <!-- Image Input Section -->
             <div class="form-group">
-              <label for="itemEmoji">Icon emoji</label>
-              <input type="text" id="itemEmoji" placeholder="e.g. 🧪" maxlength="4">
+              <label>Product Image</label>
+              <div class="tabs">
+                <button type="button" class="tab-btn active" onclick="switchImageTab('upload')">Upload</button>
+                <button type="button" class="tab-btn" onclick="switchImageTab('url')">Image URL</button>
+                <button type="button" class="tab-btn" onclick="switchImageTab('filename')">Filename</button>
+              </div>
+
+              <!-- Upload Tab -->
+              <div id="uploadTab" class="tab-content active">
+                <input type="file" id="itemImageUpload" accept="image/*">
+                <small>Upload image from your computer (JPG, PNG, GIF, etc.)</small>
+                <img id="uploadPreview" class="image-preview" style="display:none;">
+              </div>
+
+              <!-- URL Tab -->
+              <div id="urlTab" class="tab-content">
+                <input type="url" id="itemImageUrl" placeholder="e.g. https://example.com/image.jpg">
+                <small>Enter full image URL</small>
+                <img id="urlPreview" class="image-preview" style="display:none;">
+              </div>
+
+              <!-- Filename Tab -->
+              <div id="filenameTab" class="tab-content">
+                <input type="text" id="itemImageFilename" placeholder="e.g. product.jpeg">
+                <small>Filename stored in assets/ folder (e.g., cl.jpeg)</small>
+              </div>
             </div>
 
             <div class="form-group">
@@ -577,7 +650,7 @@
               <thead>
                 <tr>
                   <th style="width:50px;">ID</th>
-                  <th style="width:60px;">Icon</th>
+                  <th style="width:140px;">Image</th>
                   <th>Name</th>
                   <th>Subtitle</th>
                   <th>Price (₹)</th>
@@ -607,14 +680,38 @@
     }
     window.toggleSidebar = toggleSidebar;
 
+    function switchImageTab(tabName) {
+      // Hide all tabs
+      document.getElementById('uploadTab').classList.remove('active');
+      document.getElementById('urlTab').classList.remove('active');
+      document.getElementById('filenameTab').classList.remove('active');
+
+      // Deactivate all buttons
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(btn => btn.classList.remove('active'));
+
+      // Show selected tab
+      if (tabName === 'upload') {
+        document.getElementById('uploadTab').classList.add('active');
+        buttons[0].classList.add('active');
+      } else if (tabName === 'url') {
+        document.getElementById('urlTab').classList.add('active');
+        buttons[1].classList.add('active');
+      } else if (tabName === 'filename') {
+        document.getElementById('filenameTab').classList.add('active');
+        buttons[2].classList.add('active');
+      }
+    }
+    window.switchImageTab = switchImageTab;
+
     function getDefaultShopItems() {
       return [
-        { id: 1, name: 'Calcium Levulinate', subtitle: 'Pharma-grade nutritional supplement', emoji: '🧪', features: ['99.5% purity, GMP certified', 'Calcium bioavailability enhancer', 'Tablet & capsule formulation ready'], price: 2500, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/calcium-levulinate.html' },
-        { id: 2, name: 'Sodium Levulinate', subtitle: 'Natural preservative & stabilizer', emoji: '💧', features: ['Food-grade antimicrobial', 'ECOCERT approved cosmetic preservative', 'Stable in pH 7–9 range'], price: 1800, badge: 'Free sample available', showBadge: true, stockStatus: 'in-stock', moreLink: 'products/sodium-levulinate.html' },
-        { id: 3, name: 'Levulinic Acid', subtitle: 'Versatile platform chemical', emoji: '🔬', features: ['98%+ purity', 'Key building block for derivatives', 'Low color & odor'], price: 1200, badge: 'Free sample available', showBadge: true, stockStatus: 'in-stock', moreLink: 'products/levulinic-acid.html' },
-        { id: 4, name: '5-Hydroxymethylfurfural (5-HMF)', subtitle: 'Biomass-derived platform chemical', emoji: '🧬', features: ['Derived from sugars & cellulose', 'Intermediate for fuels & polymers', 'High chemical versatility'], price: 3200, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/5-hmf.html' },
-        { id: 5, name: 'Ethyl Levulinate', subtitle: 'Green solvent & fuel additive', emoji: '⚗️', features: ['Bio-based ester', 'Used in flavors & fragrances', 'Low toxicity, biodegradable'], price: 2200, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/ethyl-levulinate.html' },
-        { id: 6, name: 'Methyl Levulinate', subtitle: 'Renewable solvent & intermediate', emoji: '🧪', features: ['Biomass-derived', 'Used in coatings & resins', 'High purity, clean odor'], price: 2000, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/methyl-levulinate.html' }
+        { id: 1, name: 'Calcium Levulinate', subtitle: 'Pharma-grade nutritional supplement', image: 'cl.jpeg', imageType: 'filename', features: ['99.5% purity, GMP certified', 'Calcium bioavailability enhancer', 'Tablet & capsule formulation ready'], price: 2500, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/calcium-levulinate.html' },
+        { id: 2, name: 'Sodium Levulinate', subtitle: 'Natural preservative & stabilizer', image: 'sl.jpeg', imageType: 'filename', features: ['Food-grade antimicrobial', 'ECOCERT approved cosmetic preservative', 'Stable in pH 7–9 range'], price: 1800, badge: 'Free sample available', showBadge: true, stockStatus: 'in-stock', moreLink: 'products/sodium-levulinate.html' },
+        { id: 3, name: 'Levulinic Acid', subtitle: 'Versatile platform chemical', image: 'la.jpeg', imageType: 'filename', features: ['98%+ purity', 'Key building block for derivatives', 'Low color & odor'], price: 1200, badge: 'Free sample available', showBadge: true, stockStatus: 'in-stock', moreLink: 'products/levulinic-acid.html' },
+        { id: 4, name: '5-Hydroxymethylfurfural (5-HMF)', subtitle: 'Biomass-derived platform chemical', image: '5hmf.jpeg', imageType: 'filename', features: ['Derived from sugars & cellulose', 'Intermediate for fuels & polymers', 'High chemical versatility'], price: 3200, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/5-hmf.html' },
+        { id: 5, name: 'Ethyl Levulinate', subtitle: 'Green solvent & fuel additive', image: 'el.jpeg', imageType: 'filename', features: ['Bio-based ester', 'Used in flavors & fragrances', 'Low toxicity, biodegradable'], price: 2200, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/ethyl-levulinate.html' },
+        { id: 6, name: 'Methyl Levulinate', subtitle: 'Renewable solvent & intermediate', image: 'ml.jpeg', imageType: 'filename', features: ['Biomass-derived', 'Used in coatings & resins', 'High purity, clean odor'], price: 2000, badge: '', showBadge: false, stockStatus: 'in-stock', moreLink: 'products/methyl-levulinate.html' }
       ];
     }
 
@@ -647,7 +744,11 @@
       const itemIdField = document.getElementById('itemId');
       const itemNameField = document.getElementById('itemName');
       const itemSubtitleField = document.getElementById('itemSubtitle');
-      const itemEmojiField = document.getElementById('itemEmoji');
+      const itemImageUpload = document.getElementById('itemImageUpload');
+      const itemImageUrl = document.getElementById('itemImageUrl');
+      const itemImageFilename = document.getElementById('itemImageFilename');
+      const uploadPreview = document.getElementById('uploadPreview');
+      const urlPreview = document.getElementById('urlPreview');
       const itemFeaturesField = document.getElementById('itemFeatures');
       const itemMoreLinkField = document.getElementById('itemMoreLink');
       const itemPriceField = document.getElementById('itemPrice');
@@ -658,9 +759,49 @@
       const resetFormBtn = document.getElementById('resetFormBtn');
       const itemCountBadge = document.getElementById('itemCountBadge');
 
+      // Image upload preview
+      itemImageUpload.addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            uploadPreview.src = event.target.result;
+            uploadPreview.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Image URL preview
+      itemImageUrl.addEventListener('input', function () {
+        if (this.value) {
+          urlPreview.src = this.value;
+          urlPreview.onerror = function () {
+            urlPreview.style.display = 'none';
+          };
+          urlPreview.onload = function () {
+            urlPreview.style.display = 'block';
+          };
+        } else {
+          urlPreview.style.display = 'none';
+        }
+      });
+
       function updateItemCount() {
         const items = loadShopItems();
         itemCountBadge.textContent = items.length + ' items';
+      }
+
+      function getImageSource(item) {
+        if (!item.image) return null;
+        if (item.imageType === 'upload' || item.imageType === 'base64') {
+          return item.image; // base64 data
+        } else if (item.imageType === 'url') {
+          return item.image; // full URL
+        } else if (item.imageType === 'filename') {
+          return 'assets/' + item.image; // filename
+        }
+        return item.image;
       }
 
       function renderItemsTable() {
@@ -673,8 +814,34 @@
           const tdId = document.createElement('td');
           tdId.textContent = item.id;
 
-          const tdIcon = document.createElement('td');
-          tdIcon.textContent = item.emoji || '🧪';
+          const tdImage = document.createElement('td');
+          if (item.image) {
+            const imgContainer = document.createElement('div');
+            imgContainer.style.textAlign = 'center';
+            
+            const img = document.createElement('img');
+            img.src = getImageSource(item);
+            img.alt = item.name;
+            img.style.width = '60px';
+            img.style.height = '60px';
+            img.style.objectFit = 'contain';
+            img.style.borderRadius = '6px';
+            img.style.border = '1px solid #e5e7eb';
+            img.style.marginBottom = '6px';
+            img.style.display = 'block';
+            
+            const filename = document.createElement('div');
+            filename.textContent = item.image;
+            filename.style.fontSize = '11px';
+            filename.style.color = '#6b7280';
+            filename.style.wordBreak = 'break-word';
+            
+            imgContainer.appendChild(img);
+            imgContainer.appendChild(filename);
+            tdImage.appendChild(imgContainer);
+          } else {
+            tdImage.textContent = '-';
+          }
 
           const tdName = document.createElement('td');
           tdName.textContent = item.name;
@@ -723,7 +890,7 @@
           tdActions.appendChild(delBtn);
 
           tr.appendChild(tdId);
-          tr.appendChild(tdIcon);
+          tr.appendChild(tdImage);
           tr.appendChild(tdName);
           tr.appendChild(tdSubtitle);
           tr.appendChild(tdPrice);
@@ -743,7 +910,22 @@
         itemIdField.value = item.id;
         itemNameField.value = item.name || '';
         itemSubtitleField.value = item.subtitle || '';
-        itemEmojiField.value = item.emoji || '';
+        
+        // Load image based on type
+        if (item.imageType === 'filename') {
+          switchImageTab('filename');
+          itemImageFilename.value = item.image || '';
+        } else if (item.imageType === 'url') {
+          switchImageTab('url');
+          itemImageUrl.value = item.image || '';
+          urlPreview.src = item.image || '';
+          if (item.image) urlPreview.style.display = 'block';
+        } else if (item.imageType === 'upload' || item.imageType === 'base64') {
+          switchImageTab('upload');
+          uploadPreview.src = item.image || '';
+          if (item.image) uploadPreview.style.display = 'block';
+        }
+
         itemFeaturesField.value = (item.features || []).join(', ');
         itemMoreLinkField.value = item.moreLink || '';
         itemPriceField.value = item.price || '';
@@ -770,13 +952,18 @@
         itemIdField.value = '';
         itemNameField.value = '';
         itemSubtitleField.value = '';
-        itemEmojiField.value = '';
+        itemImageUpload.value = '';
+        itemImageUrl.value = '';
+        itemImageFilename.value = '';
+        uploadPreview.style.display = 'none';
+        urlPreview.style.display = 'none';
         itemFeaturesField.value = '';
         itemMoreLinkField.value = '';
         itemPriceField.value = '';
         itemBadgeField.value = '';
         itemShowBadgeField.checked = false;
         itemStockStatusField.value = 'in-stock';
+        switchImageTab('filename');
       }
 
       resetFormBtn.addEventListener('click', function (e) {
@@ -798,7 +985,6 @@
         const idValue = itemIdField.value ? parseInt(itemIdField.value, 10) : null;
         const name = itemNameField.value.trim();
         const subtitle = itemSubtitleField.value.trim();
-        const emoji = itemEmojiField.value.trim() || '🧪';
         const price = parseFloat(itemPriceField.value);
         const moreLink = itemMoreLinkField.value.trim();
         const badge = itemBadgeField.value.trim();
@@ -807,26 +993,62 @@
         const featuresStr = itemFeaturesField.value.trim();
         const features = featuresStr ? featuresStr.split(',').map(f => f.trim()).filter(Boolean) : [];
 
-        if (!name || !subtitle || isNaN(price)) {
-          alert('Please fill in product name, subtitle and price.');
-          return;
+        // Determine which image input is active
+        let image = '';
+        let imageType = 'filename';
+
+        // Check which tab is active and get the image data
+        const uploadTab = document.getElementById('uploadTab').classList.contains('active');
+        const urlTab = document.getElementById('urlTab').classList.contains('active');
+        const filenameTab = document.getElementById('filenameTab').classList.contains('active');
+
+        if (uploadTab) {
+          if (itemImageUpload.files.length > 0) {
+            // Convert to base64
+            const reader = new FileReader();
+            reader.onload = function (event) {
+              image = event.target.result;
+              imageType = 'upload';
+              saveItem(image, imageType);
+            };
+            reader.readAsDataURL(itemImageUpload.files[0]);
+            return; // Wait for async operation
+          }
+        } else if (urlTab) {
+          image = itemImageUrl.value.trim();
+          imageType = 'url';
+        } else if (filenameTab) {
+          image = itemImageFilename.value.trim();
+          imageType = 'filename';
         }
 
-        if (idValue) {
-          items = items.map(i => i.id === idValue ? { ...i, name, subtitle, emoji, price, moreLink, badge, showBadge, stockStatus, features } : i);
-          statusMsg.textContent = 'Item updated successfully.';
-        } else {
-          const newId = getNextItemId(items);
-          items.push({ id: newId, name, subtitle, emoji, price, moreLink, badge, showBadge, stockStatus, features });
-          statusMsg.textContent = 'Item added successfully.';
+        function saveItem(image, imageType) {
+          if (!name || !subtitle || isNaN(price)) {
+            alert('Please fill in product name, subtitle and price.');
+            return;
+          }
+
+          if (idValue) {
+            items = items.map(i => i.id === idValue ? { ...i, name, subtitle, image, imageType, price, moreLink, badge, showBadge, stockStatus, features } : i);
+            statusMsg.textContent = 'Item updated successfully.';
+          } else {
+            const newId = getNextItemId(items);
+            items.push({ id: newId, name, subtitle, image, imageType, price, moreLink, badge, showBadge, stockStatus, features });
+            statusMsg.textContent = 'Item added successfully.';
+          }
+
+          saveShopItems(items);
+          renderItemsTable();
+          updateItemCount();
+          statusMsg.style.display = 'block';
+          statusMsg.style.color = '#059669';
+          clearForm();
         }
 
-        saveShopItems(items);
-        renderItemsTable();
-        updateItemCount();
-        statusMsg.style.display = 'block';
-        statusMsg.style.color = '#059669';
-        clearForm();
+        // If no file upload, save directly
+        if (!uploadTab || itemImageUpload.files.length === 0) {
+          saveItem(image, imageType);
+        }
       });
 
       function setLoggedInState(isLoggedIn) {
