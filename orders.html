@@ -92,8 +92,13 @@
       transition: all 0.2s ease;
     }
     
-    .nav-menu li a.active,
     .nav-menu li a:hover {
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
+    }
+
+    /* Active link styling - only highlight if href matches current page */
+    .nav-menu li a.active {
       background: rgba(255,255,255,0.1);
       border-left-color: var(--accent);
     }
@@ -375,9 +380,10 @@
       <li><a href="collaboration.html">Collaboration</a></li>
       <li><a href="recognitions.html">Recognitions</a></li>
       <li><a href="investors.html">Investors</a></li>
-      <li><a href="cart.html" class="active">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
       <li><a href="contact.html">Contact us</a></li>
       <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="checkout.html">Checkout</a></li>
       <li><a href="orders.html">Orders</a></li>
     </ul>
     <div class="search-section">
@@ -523,6 +529,21 @@
         }
       });
     });
+
+    // ✅ NEW: Set active nav link based on current page
+    function setActiveNavLink() {
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      
+      navLinks.forEach(link => {
+        const href = link.getAttribute('href');
+        // Only set active if the href matches current page exactly
+        if (href === currentPage) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
 
     function loadOrderData() {
       const buyNowData = sessionStorage.getItem('buyNowData');
@@ -687,11 +708,15 @@
     });
 
     window.addEventListener('DOMContentLoaded', async function() {
-      console.log('orders.html loaded ✅');
+      console.log('checkout.html loaded ✅');
       await initBackend();
+      setActiveNavLink();
       loadOrderData();
       updateCartBadge();
     });
+
+    // ✅ Update active link on page resize too
+    window.addEventListener('resize', setActiveNavLink);
   </script>
 </body>
 </html>

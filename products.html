@@ -517,7 +517,7 @@
         </div>
 
         <div class="product-grid" id="productGrid">
-          </div>
+        </div>
       </section>
     </main>
     <div class="download-section">
@@ -598,7 +598,7 @@
       });
     });
 
-    // Default Products Data
+    // Default Products Data (UNCHANGED)
     function getDefaultProducts() {
       return [
         {
@@ -646,30 +646,39 @@
       ];
     }
 
-    // Load Products Function
-    function loadProducts() {
-      const products = JSON.parse(localStorage.getItem('chemsusProducts')) || getDefaultProducts();
+    // Render (same UI)
+    function renderProducts(products) {
       const grid = document.getElementById('productGrid');
       grid.innerHTML = '';
 
       products.forEach(product => {
         const card = document.createElement('a');
-        card.href = product.link;
+        card.href = product.link || '#';
         card.className = 'product-card';
         card.innerHTML = `
-          <img src="${product.image}" alt="${product.name}" onerror="this.src='assets/logo.png'">
+          <img src="${product.image || 'assets/logo.png'}" alt="${product.name}" onerror="this.src='assets/logo.png'">
           <h3>${product.name}</h3>
-          <p>${product.description}</p>
+          <p>${product.description || ''}</p>
         `;
         grid.appendChild(card);
       });
     }
 
+    // Fetch from backend; fallback to defaults if DB empty/unavailable
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/products-page', { cache: 'no-store' });
+        if (!res.ok) throw new Error('API failed');
+        const products = await res.json();
+        if (!Array.isArray(products) || products.length === 0) throw new Error('Empty DB');
+        renderProducts(products);
+      } catch (e) {
+        renderProducts(getDefaultProducts());
+      }
+    }
+
     // Initial Load
     loadProducts();
-
-    // Auto-reload check (optional, if you have an admin panel updating local storage)
-    setInterval(loadProducts, 2000);
 
     // Cart badge updater
     (function () {
@@ -689,7 +698,7 @@
       }
     }
 
-    // Search Redirect Logic (Updated)
+    // Search Redirect Logic (unchanged)
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();

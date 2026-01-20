@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChemSus Admin Dashboard</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --primary:#0074c7;
+      --primary-dark:#00508a;
+      --accent:#00b8b0;
+      --bg:#F3F7FB;
+      --ink:#1f2933;
+      --card:#ffffff;
+      --muted:#64748b;
+      --danger:#ef4444;
+      --ok:#16a34a;
+      --shadow:0 14px 30px rgba(15,23,42,0.12);
+      --radius:14px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:"Open Sans",Arial,sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      min-height:100vh;
+    }
+    a{color:inherit;text-decoration:none}
+    button,input,select,textarea{font-family:inherit}
+
+    .topbar{
+      position:sticky;top:0;z-index:50;
+      background:linear-gradient(135deg, rgba(0,116,199,0.96), rgba(0,184,176,0.92));
+      color:#fff;
+      border-bottom:3px solid rgba(255,255,255,0.18);
+      backdrop-filter: blur(8px);
+    }
+    .topbar-inner{
+      max-width:1200px;margin:0 auto;
+      padding:14px 16px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      font-family:"Montserrat",sans-serif;font-weight:800;letter-spacing:.02em;
+    }
+    .brand-badge{
+      width:34px;height:34px;border-radius:10px;
+      background:rgba(255,255,255,0.18);
+      display:flex;align-items:center;justify-content:center;
+      font-weight:900;
+    }
+    .topbar-actions{
+      display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+    }
+    .pill{
+      border:1px solid rgba(255,255,255,0.28);
+      background:rgba(255,255,255,0.16);
+      color:#fff;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:13px;
+      cursor:pointer;
+      transition:.15s ease;
+      white-space:nowrap;
+    }
+    .pill:hover{filter:brightness(1.05);transform:translateY(-1px)}
+    .pill.secondary{
+      background:rgba(0,0,0,0.14);
+      border-color:rgba(255,255,255,0.18);
+    }
+
+    .container{
+      max-width:1200px;margin:0 auto;padding:18px 16px 40px;
+      display:grid;
+      grid-template-columns: 260px 1fr;
+      gap:16px;
+    }
+
+    .sidebar{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border-top:4px solid var(--accent);
+      overflow:hidden;
+      position:sticky;
+      top:74px;
+      height:fit-content;
+    }
+    .nav{
+      list-style:none;
+      padding:10px;
+      display:flex;flex-direction:column;gap:6px;
+    }
+    .nav a{
+      display:flex;align-items:center;gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      font-size:13.5px;
+      color:#0f172a;
+      border:1px solid transparent;
+      cursor:pointer;
+      transition:.15s ease;
+      user-select:none;
+      white-space:nowrap;
+    }
+    .nav a.active{
+      background:rgba(0,184,176,0.10);
+      border-color:rgba(0,184,176,0.25);
+      color:var(--primary-dark);
+      font-weight:700;
+    }
+    .nav a:hover{background:#f3f7ff}
+
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      border-top:4px solid var(--accent);
+      padding:18px;
+    }
+    .card h2{
+      font-family:"Montserrat",sans-serif;
+      font-size:18px;color:var(--primary-dark);
+      margin-bottom:12px;
+    }
+    .hint{color:var(--muted);font-size:13px;margin-bottom:12px;line-height:1.4}
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .field{display:flex;flex-direction:column;gap:6px}
+    .field label{font-size:12.5px;font-weight:700;color:#123559}
+    .field input,.field select,.field textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #dbe4f0;
+      outline:none;
+      background:#fff;
+      font-size:14px;
+    }
+    .field textarea{min-height:90px;resize:vertical}
+
+    .inline{
+      display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    }
+    .btn{
+      border:none;
+      border-radius:10px;
+      padding:10px 14px;
+      font-weight:800;
+      font-size:13px;
+      cursor:pointer;
+      transition:.15s ease;
+      white-space:nowrap;
+    }
+    .btn.primary{
+      background:linear-gradient(135deg, var(--accent), #00d4cc);
+      color:#fff;
+    }
+    .btn.primary:hover{transform:translateY(-1px);filter:brightness(1.03)}
+    .btn.ghost{
+      background:#eef6ff;color:var(--primary-dark);
+      border:1px solid #cfe7ff;
+    }
+    .btn.ghost:hover{filter:brightness(1.03)}
+    .btn.danger{
+      background:#fee2e2;color:#991b1b;border:1px solid #fecaca;
+    }
+    .btn.small{padding:8px 10px;font-size:12px;border-radius:9px}
+
+    .status{
+      margin-top:10px;
+      font-size:13px;
+      padding:10px 12px;
+      border-radius:12px;
+      display:none;
+      word-break:break-word;
+    }
+    .status.ok{display:block;background:#dcfce7;color:#14532d;border-left:4px solid var(--ok)}
+    .status.err{display:block;background:#fee2e2;color:#7f1d1d;border-left:4px solid var(--danger)}
+    .divider{height:1px;background:#e5edf8;margin:14px 0}
+
+    .table-wrap{overflow:auto;border-radius:12px;border:1px solid #e5edf8}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:760px;
+      background:#fff;
+    }
+    th,td{
+      padding:10px 12px;
+      border-bottom:1px solid #eef2f7;
+      text-align:left;
+      font-size:13px;
+      vertical-align:top;
+    }
+    th{
+      background:#f8fbff;
+      font-family:"Montserrat",sans-serif;
+      font-size:12px;
+      color:#123559;
+      position:sticky;top:0;
+      z-index:1;
+    }
+
+    .tag{
+      display:inline-block;
+      padding:4px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.02em;
+      border:1px solid transparent;
+      white-space:nowrap;
+    }
+    .tag.pending{background:#fff7ed;color:#9a3412;border-color:#fed7aa}
+    .tag.verify{background:#eef6ff;color:#1e3a8a;border-color:#cfe7ff}
+    .tag.paid{background:#dcfce7;color:#14532d;border-color:#bbf7d0}
+    .tag.failed{background:#fee2e2;color:#7f1d1d;border-color:#fecaca}
+
+    .login-wrap{max-width:480px;margin:40px auto;padding:0 16px;}
+    .login-card{
+      background:#fff;border-radius:18px;box-shadow:var(--shadow);
+      border-top:4px solid var(--accent);padding:22px;
+    }
+    .login-card h2{margin-bottom:8px}
+    .login-card .row{grid-template-columns:1fr}
+    .muted{color:var(--muted);font-size:13px}
+
+    /* ✅ Mobile */
+    @media (max-width: 980px){
+      .container{grid-template-columns:1fr}
+      .sidebar{position:relative;top:0}
+      .row{grid-template-columns:1fr}
+      table{min-width:980px}
+    }
+
+    @media (max-width: 720px){
+      .sidebar{position:relative;top:0;padding:8px}
+      .nav{
+        flex-direction:row;
+        overflow:auto;
+        gap:8px;
+        padding:8px;
+        -webkit-overflow-scrolling: touch;
+      }
+      .nav li{flex:0 0 auto}
+      .nav a{
+        border:1px solid #e6f0ff;
+        background:#f8fbff;
+      }
+      .nav a.active{
+        background:rgba(0,184,176,0.12);
+        border-color:rgba(0,184,176,0.35);
+      }
+      .topbar-inner{flex-direction:column;align-items:flex-start}
+      .topbar-actions{width:100%}
+    }
+
+    /* Action buttons group inside table */
+    .actions-cell{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-badge">CS</div>
+        <div>
+          <div style="font-size:14px;line-height:1.1;">ChemSus Admin</div>
+          <div style="font-size:12px;opacity:.9;line-height:1.1;">Products • Shop • Orders • Payments</div>
+        </div>
+      </div>
+      <div class="topbar-actions" id="topActions" style="display:none;">
+        <button class="pill" onclick="openPage('products.html')">Open products.html</button>
+        <button class="pill" onclick="openPage('shop.html')">Open shop.html</button>
+        <button class="pill secondary" onclick="logout()">Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOGIN -->
+  <div id="loginView" class="login-wrap" style="display:none;">
+    <div class="login-card">
+      <h2 style="font-family:'Montserrat',sans-serif;color:var(--primary-dark);">Admin Login</h2>
+      <p class="muted" style="margin-bottom:14px;">Use your ChemSus admin credentials to continue.</p>
+
+      <div class="row">
+        <div class="field">
+          <label>Username</label>
+          <input id="loginUser" placeholder="admin" />
+        </div>
+        <div class="field">
+          <label>Password</label>
+          <input id="loginPass" placeholder="chemsus123" type="password" />
+        </div>
+      </div>
+
+      <div class="inline">
+        <button class="btn primary" onclick="login()">Login</button>
+        <span class="muted">Default: admin / chemsus123</span>
+      </div>
+
+      <div id="loginStatus" class="status err"></div>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="appView" style="display:none;">
+    <div class="container">
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <ul class="nav" id="nav">
+          <li><a class="active" data-view="view-products" onclick="switchView('view-products')">🧪 Products</a></li>
+          <li><a data-view="view-shop" onclick="switchView('view-shop')">🛒 Shop</a></li>
+          <li><a data-view="view-orders" onclick="switchView('view-orders')">📦 Orders</a></li>
+          <li><a data-view="view-payments" onclick="switchView('view-payments')">🧾 Payments</a></li>
+          <li><a data-view="view-settings" onclick="switchView('view-settings')">⚙️ Settings</a></li>
+        </ul>
+      </aside>
+
+      <!-- Main -->
+      <main>
+        <!-- PRODUCTS -->
+        <section id="view-products" class="card">
+          <h2>Products Page CRUD</h2>
+          <p class="hint">Fields used by <b>products.html</b> cards. Save updates → page updates immediately.</p>
+
+          <div class="inline">
+            <button class="btn ghost" onclick="clearProductsForm()">Clear</button>
+            <button class="btn ghost" onclick="refreshProducts()">Refresh</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>Edit ID (blank = new)</label>
+              <input id="p_id" placeholder="e.g. 1" />
+            </div>
+
+            <div class="field">
+              <label>Active</label>
+              <select id="p_active">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Name</label>
+              <input id="p_name" placeholder="Product name" />
+            </div>
+            <div class="field">
+              <label>Page link</label>
+              <input id="p_link" placeholder="products/levulinic-acid.html" />
+            </div>
+          </div>
+
+          <div class="field" style="margin-bottom:12px;">
+            <label>Description</label>
+            <textarea id="p_desc" placeholder="Short card description"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Image (assets/...)</label>
+              <input id="p_image" placeholder="assets/chemical1.avif" />
+              <div class="inline" style="margin-top:8px;">
+                <input type="file" id="p_image_file" accept="image/*" />
+                <button class="btn ghost small" type="button" onclick="uploadFor('p_image_file','p_image','p_upload_status')">Upload</button>
+              </div>
+              <div class="muted" id="p_upload_status"></div>
+            </div>
+            <div class="field">
+              <label>Sort order</label>
+              <input id="p_sort" type="number" value="0" />
+              <div class="muted">Tip: sort order controls display order.</div>
+            </div>
+          </div>
+
+          <div class="inline">
+            <button class="btn primary" onclick="saveProduct()">Save</button>
+            <button class="btn danger" onclick="deleteProduct()">Delete</button>
+          </div>
+
+          <div id="p_status" class="status"></div>
+
+          <div class="divider"></div>
+
+          <h2 style="font-size:16px;margin-bottom:10px;">Existing Products</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Active</th>
+                  <th>Name</th>
+                  <th>Link</th>
+                  <th>Image</th>
+                  <th>Sort</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="p_table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SHOP -->
+        <section id="view-shop" class="card" style="display:none;">
+          <h2>Shop Page CRUD</h2>
+          <p class="hint">Fields used by <b>shop.html</b> cards. Save updates → page updates immediately.</p>
+
+          <div class="inline">
+            <button class="btn ghost" onclick="clearShopForm()">Clear</button>
+            <button class="btn ghost" onclick="refreshShop()">Refresh</button>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>Edit ID (blank = new)</label>
+              <input id="s_id" placeholder="e.g. 1" />
+            </div>
+            <div class="field">
+              <label>Active</label>
+              <select id="s_active">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Name</label>
+              <input id="s_name" placeholder="Calcium Levulinate" />
+            </div>
+            <div class="field">
+              <label>Subtitle</label>
+              <input id="s_subtitle" placeholder="Pharma-grade nutritional supplement" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Features (one per line)</label>
+              <textarea id="s_features" placeholder="High bioavailability&#10;Pharma &amp; nutraceutical use"></textarea>
+            </div>
+            <div class="field">
+              <label>Price (₹/kg)</label>
+              <input id="s_price" type="number" step="0.01" placeholder="1800" />
+              <div class="muted">Set 0 for “Contact for Price”.</div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Stock</label>
+              <select id="s_stock">
+                <option value="in-stock">IN STOCK</option>
+                <option value="out-of-stock">OUT OF STOCK</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Show badge?</label>
+              <select id="s_show_badge">
+                <option value="0">No</option>
+                <option value="1">Yes</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Badge text</label>
+              <input id="s_badge" placeholder="Free sample available" />
+            </div>
+            <div class="field">
+              <label>More details link</label>
+              <input id="s_more" placeholder="products/calcium-levulinate.html" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Image (assets/...)</label>
+              <input id="s_image" placeholder="assets/cl.jpeg" />
+              <div class="inline" style="margin-top:8px;">
+                <input type="file" id="s_image_file" accept="image/*" />
+                <button class="btn ghost small" type="button" onclick="uploadFor('s_image_file','s_image','s_upload_status')">Upload</button>
+              </div>
+              <div class="muted" id="s_upload_status"></div>
+            </div>
+            <div class="field">
+              <label>Sort order</label>
+              <input id="s_sort" type="number" value="0" />
+              <div class="muted">Tip: sort order controls display order.</div>
+            </div>
+          </div>
+
+          <div class="inline">
+            <button class="btn primary" onclick="saveShop()">Save</button>
+            <button class="btn danger" onclick="deleteShop()">Delete</button>
+          </div>
+
+          <div id="s_status" class="status"></div>
+
+          <div class="divider"></div>
+
+          <h2 style="font-size:16px;margin-bottom:10px;">Existing Shop Items</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Active</th>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Image</th>
+                  <th>Sort</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="s_table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ORDERS -->
+        <section id="view-orders" class="card" style="display:none;">
+          <h2>Orders</h2>
+          <p class="hint">Orders created from <b>orders.html</b>. Filter & delete if needed.</p>
+
+          <div class="row">
+            <div class="field">
+              <label>Search</label>
+              <input id="orderSearch" placeholder="name, phone, product, city, id..." oninput="applyOrderFilters()" />
+            </div>
+            <div class="field">
+              <label>Status</label>
+              <select id="orderStatusFilter" onchange="applyOrderFilters()">
+                <option value="">All</option>
+                <option value="PENDING">PENDING</option>
+                <option value="VERIFYING">VERIFYING</option>
+                <option value="PAID">PAID</option>
+                <option value="FAILED">FAILED</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="inline">
+            <button class="btn ghost" onclick="clearOrderFilters()">Clear</button>
+            <button class="btn ghost" onclick="refreshOrders()">Refresh</button>
+          </div>
+
+          <div id="o_status" class="status"></div>
+          <div class="divider"></div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Status</th>
+                  <th>Customer</th>
+                  <th>Product</th>
+                  <th>Qty</th>
+                  <th>Total</th>
+                  <th>Phone</th>
+                  <th>City</th>
+                  <th>Created</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="o_table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- PAYMENTS -->
+        <section id="view-payments" class="card" style="display:none;">
+          <h2>Payments / Receipts</h2>
+          <p class="hint">Receipts uploaded from <b>payment.html</b> / <b>payment2.html</b>. Filter, mark, delete.</p>
+
+          <div class="row">
+            <div class="field">
+              <label>Search</label>
+              <input id="paySearch" placeholder="order id, name, phone..." oninput="applyPaymentFilters()" />
+            </div>
+            <div class="field">
+              <label>Receipt</label>
+              <select id="receiptFilter" onchange="applyPaymentFilters()">
+                <option value="">All</option>
+                <option value="has">Has receipt</option>
+                <option value="none">No receipt</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Status</label>
+              <select id="payStatusFilter" onchange="applyPaymentFilters()">
+                <option value="">All</option>
+                <option value="PENDING">PENDING</option>
+                <option value="SUCCESS">SUCCESS</option>
+                <option value="FAILED">FAILED</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <div class="inline">
+                <button class="btn ghost" onclick="clearPaymentFilters()">Clear</button>
+                <button class="btn ghost" onclick="refreshPayments()">Refresh</button>
+              </div>
+            </div>
+          </div>
+
+          <div id="pay_status" class="status"></div>
+          <div class="divider"></div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Payment ID</th>
+                  <th>Order ID</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                  <th>Rating</th>
+                  <th>Receipt</th>
+                  <th>Feedback</th>
+                  <th>Actions</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="pay_table"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section id="view-settings" class="card" style="display:none;">
+          <h2>Site Settings</h2>
+          <p class="hint">Upload brochure PDF and update download link used on products page.</p>
+
+          <div class="row">
+            <div class="field">
+              <label>Current brochure URL</label>
+              <input id="brochure_url" placeholder="assets/broucher.pdf" />
+              <div class="muted">Use path like <b>assets/uploads/xxx.pdf</b></div>
+            </div>
+            <div class="field">
+              <label>Upload brochure PDF</label>
+              <div class="inline">
+                <input type="file" id="brochure_file" accept=".pdf" />
+                <button class="btn ghost" type="button" onclick="uploadBrochure()">Upload PDF</button>
+                <button class="btn primary" type="button" onclick="saveBrochure()">Save URL</button>
+              </div>
+              <div class="muted" id="brochure_upload_status"></div>
+            </div>
+          </div>
+
+          <div id="set_status" class="status"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+<script>
+  let API_BASE = "/api";
+  let ORDERS_CACHE = [];
+  let PAY_CACHE = [];
+
+  function showStatus(id, type, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.className = "status " + (type === "ok" ? "ok" : "err");
+    el.textContent = msg;
+    el.style.display = "block";
+    setTimeout(() => { el.style.display = "none"; }, 4200);
+  }
+
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  function tagHTML(orderStatus) {
+    const s = (orderStatus || "").toUpperCase();
+    if (s === "PAID") return '<span class="tag paid">PAID</span>';
+    if (s === "FAILED") return '<span class="tag failed">FAILED</span>';
+    if (s === "VERIFYING") return '<span class="tag verify">VERIFYING</span>';
+    return '<span class="tag pending">PENDING</span>';
+  }
+
+  function openPage(p) { window.open("/" + p, "_blank"); }
+
+  async function initBackend() {
+    try {
+      const r = await fetch("/api/test");
+      if (r.ok) {
+        const cfg = await r.json();
+        API_BASE = cfg.apiBase || "/api";
+      }
+    } catch {}
+  }
+
+  async function api(url, opts = {}) {
+    const r = await fetch(API_BASE + url, { credentials: "include", ...opts });
+    if (!r.ok) {
+      const t = await r.text();
+      throw new Error(t || ("HTTP " + r.status));
+    }
+    const ct = r.headers.get("content-type") || "";
+    if (ct.includes("application/json")) return r.json();
+    return r.text();
+  }
+
+  async function login() {
+    const username = document.getElementById("loginUser").value.trim();
+    const password = document.getElementById("loginPass").value.trim();
+    const st = document.getElementById("loginStatus");
+
+    st.style.display = "none";
+    try {
+      await api("/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      await boot();
+    } catch (e) {
+      st.textContent = "Login failed: " + (e.message || e);
+      st.style.display = "block";
+    }
+  }
+
+  async function logout() {
+    try { await api("/admin/logout", { method: "POST" }); } catch {}
+    document.getElementById("topActions").style.display = "none";
+    document.getElementById("appView").style.display = "none";
+    document.getElementById("loginView").style.display = "block";
+  }
+
+  function switchView(id) {
+    document.querySelectorAll("main section").forEach(s => s.style.display = "none");
+    document.getElementById(id).style.display = "block";
+
+    document.querySelectorAll("#nav a").forEach(a => a.classList.remove("active"));
+    const active = document.querySelector(`#nav a[data-view="${id}"]`);
+    if (active) active.classList.add("active");
+
+    if (id === "view-products") refreshProducts();
+    if (id === "view-shop") refreshShop();
+    if (id === "view-orders") refreshOrders();
+    if (id === "view-payments") refreshPayments();
+    if (id === "view-settings") loadBrochure();
+  }
+
+  // --------------- Upload helpers ---------------
+  async function uploadFor(fileInputId, targetInputId, statusId) {
+    const fileInput = document.getElementById(fileInputId);
+    const target = document.getElementById(targetInputId);
+    const statusEl = document.getElementById(statusId);
+
+    if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      if (statusEl) statusEl.textContent = "Choose a file first.";
+      return;
+    }
+
+    try {
+      if (statusEl) statusEl.textContent = "Uploading...";
+      const fd = new FormData();
+      fd.append("file", fileInput.files[0]);
+      const res = await fetch(API_BASE + "/admin/upload", {
+        method: "POST",
+        credentials: "include",
+        body: fd
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      target.value = data.path;
+      if (statusEl) statusEl.textContent = "Uploaded: " + data.path;
+    } catch (e) {
+      if (statusEl) statusEl.textContent = "Upload failed: " + (e.message || e);
+    }
+  }
+  async function uploadBrochure() { await uploadFor("brochure_file", "brochure_url", "brochure_upload_status"); }
+
+  // --------------- Products CRUD ---------------
+  function clearProductsForm() {
+    ["p_id","p_name","p_desc","p_image","p_link","p_sort"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("p_active").value = "1";
+    document.getElementById("p_sort").value = "0";
+    document.getElementById("p_upload_status").textContent = "";
+  }
+
+  function fillProductsForm(r) {
+    document.getElementById("p_id").value = r.id ?? "";
+    document.getElementById("p_active").value = String(r.is_active ?? 1);
+    document.getElementById("p_name").value = r.name ?? "";
+    document.getElementById("p_desc").value = r.description ?? "";
+    document.getElementById("p_image").value = r.image ?? "";
+    document.getElementById("p_link").value = r.link ?? "";
+    document.getElementById("p_sort").value = r.sort_order ?? 0;
+    switchView("view-products");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function refreshProducts() {
+    try {
+      const rows = await api("/admin/products-page");
+      const tb = document.getElementById("p_table");
+      tb.innerHTML = "";
+      (rows || []).forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.id}</td>
+          <td>${r.is_active ? "Yes" : "No"}</td>
+          <td>${escapeHtml(r.name)}</td>
+          <td>${escapeHtml(r.link || "")}</td>
+          <td>${r.image ? `<a href="/${r.image}" target="_blank">open</a>` : ""}</td>
+          <td>${r.sort_order ?? 0}</td>
+          <td><button class="btn ghost small" onclick='fillProductsForm(${JSON.stringify(r)})'>Edit</button></td>
+        `;
+        tb.appendChild(tr);
+      });
+    } catch (e) {
+      showStatus("p_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  async function saveProduct() {
+    try {
+      const id = document.getElementById("p_id").value.trim();
+      const payload = {
+        is_active: Number(document.getElementById("p_active").value),
+        name: document.getElementById("p_name").value.trim(),
+        description: document.getElementById("p_desc").value.trim(),
+        image: document.getElementById("p_image").value.trim(),
+        link: document.getElementById("p_link").value.trim(),
+        sort_order: Number(document.getElementById("p_sort").value || 0),
+      };
+      if (!payload.name) return showStatus("p_status", "err", "Name is required");
+
+      if (id) {
+        await api(`/admin/products-page/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showStatus("p_status", "ok", "Updated product #" + id);
+      } else {
+        await api(`/admin/products-page`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showStatus("p_status", "ok", "Created product");
+      }
+      await refreshProducts();
+    } catch (e) {
+      showStatus("p_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  async function deleteProduct() {
+    const id = document.getElementById("p_id").value.trim();
+    if (!id) return showStatus("p_status", "err", "Enter ID to delete.");
+    if (!confirm("Delete product #" + id + "?")) return;
+    try {
+      await api(`/admin/products-page/${id}`, { method: "DELETE" });
+      showStatus("p_status", "ok", "Deleted product #" + id);
+      clearProductsForm();
+      await refreshProducts();
+    } catch (e) {
+      showStatus("p_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  // --------------- Shop CRUD ---------------
+  function clearShopForm() {
+    ["s_id","s_name","s_subtitle","s_features","s_price","s_badge","s_more","s_image","s_sort"].forEach(id => document.getElementById(id).value = "");
+    document.getElementById("s_active").value = "1";
+    document.getElementById("s_stock").value = "in-stock";
+    document.getElementById("s_show_badge").value = "0";
+    document.getElementById("s_sort").value = "0";
+    document.getElementById("s_upload_status").textContent = "";
+  }
+
+  function fillShopForm(r) {
+    document.getElementById("s_id").value = r.id ?? "";
+    document.getElementById("s_active").value = String(r.is_active ?? 1);
+    document.getElementById("s_name").value = r.name ?? "";
+    document.getElementById("s_subtitle").value = r.subtitle ?? "";
+    const feats = (() => {
+      try {
+        const arr = Array.isArray(r.features) ? r.features : JSON.parse(r.features_json || "[]");
+        return (arr || []).join("\n");
+      } catch { return ""; }
+    })();
+    document.getElementById("s_features").value = feats;
+    document.getElementById("s_price").value = r.price ?? 0;
+    document.getElementById("s_stock").value = r.stockStatus || r.stock_status || "in-stock";
+    document.getElementById("s_show_badge").value = String(r.showBadge ?? r.show_badge ?? 0);
+    document.getElementById("s_badge").value = r.badge ?? r.badge_text ?? "";
+    document.getElementById("s_more").value = r.moreLink ?? r.moreLink ?? "";
+    document.getElementById("s_image").value = r.image ?? r.shop_image_url ?? "";
+    document.getElementById("s_sort").value = r.sort_order ?? 0;
+    switchView("view-shop");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function refreshShop() {
+    try {
+      const rows = await api("/admin/shop-items");
+      const tb = document.getElementById("s_table");
+      tb.innerHTML = "";
+      (rows || []).forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${r.id}</td>
+          <td>${r.is_active ? "Yes" : "No"}</td>
+          <td>${escapeHtml(r.name)}</td>
+          <td>₹${Number(r.price||0).toLocaleString('en-IN')}</td>
+          <td>${escapeHtml(r.stockStatus || r.stock_status || "")}</td>
+          <td>${(r.image || r.shop_image_url) ? `<a href="/${r.image || r.shop_image_url}" target="_blank">open</a>` : ""}</td>
+          <td>${r.sort_order ?? 0}</td>
+          <td><button class="btn ghost small" onclick='fillShopForm(${JSON.stringify(r)})'>Edit</button></td>
+        `;
+        tb.appendChild(tr);
+      });
+    } catch (e) {
+      showStatus("s_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  async function saveShop() {
+    try {
+      const id = document.getElementById("s_id").value.trim();
+      const features = document.getElementById("s_features").value.split("\n").map(x => x.trim()).filter(Boolean);
+
+      const payload = {
+        is_active: Number(document.getElementById("s_active").value),
+        name: document.getElementById("s_name").value.trim(),
+        subtitle: document.getElementById("s_subtitle").value.trim(),
+        features,
+        price: Number(document.getElementById("s_price").value || 0),
+        stockStatus: document.getElementById("s_stock").value,
+        showBadge: Number(document.getElementById("s_show_badge").value),
+        badge: document.getElementById("s_badge").value.trim(),
+        moreLink: document.getElementById("s_more").value.trim(),
+        image: document.getElementById("s_image").value.trim(),
+        sort_order: Number(document.getElementById("s_sort").value || 0),
+      };
+
+      if (!payload.name) return showStatus("s_status", "err", "Name is required");
+
+      if (id) {
+        await api(`/admin/shop-items/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showStatus("s_status", "ok", "Updated shop item #" + id);
+      } else {
+        await api(`/admin/shop-items`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        showStatus("s_status", "ok", "Created shop item");
+      }
+      await refreshShop();
+    } catch (e) {
+      showStatus("s_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  async function deleteShop() {
+    const id = document.getElementById("s_id").value.trim();
+    if (!id) return showStatus("s_status", "err", "Enter ID to delete.");
+    if (!confirm("Delete shop item #" + id + "?")) return;
+    try {
+      await api(`/admin/shop-items/${id}`, { method: "DELETE" });
+      showStatus("s_status", "ok", "Deleted shop item #" + id);
+      clearShopForm();
+      await refreshShop();
+    } catch (e) {
+      showStatus("s_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  // --------------- Orders: refresh + filter + delete ---------------
+  async function refreshOrders() {
+    try {
+      ORDERS_CACHE = await api("/admin/orders");
+      applyOrderFilters();
+    } catch (e) {
+      showStatus("o_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  function applyOrderFilters(){
+    const q = (document.getElementById("orderSearch").value || "").trim().toLowerCase();
+    const st = (document.getElementById("orderStatusFilter").value || "").trim().toUpperCase();
+
+    const rows = (ORDERS_CACHE || []).filter(o => {
+      const hay = [
+        o.id, o.customername, o.email, o.phone,
+        o.productname, o.city, o.region, o.pincode,
+        o.payment_status, o.paymentmode
+      ].join(" ").toLowerCase();
+
+      const okQ = !q || hay.includes(q);
+      const okSt = !st || String(o.payment_status||"").toUpperCase() === st;
+      return okQ && okSt;
+    });
+
+    const tb = document.getElementById("o_table");
+    tb.innerHTML = "";
+    rows.forEach(o => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td><b>#${o.id}</b></td>
+        <td>${tagHTML(o.payment_status)}</td>
+        <td>${escapeHtml(o.customername)}<div class="muted">${escapeHtml(o.email||"")}</div></td>
+        <td>${escapeHtml(o.productname||"")}</td>
+        <td>${Number(o.quantity||0)}</td>
+        <td>₹${Number(o.totalprice||0).toLocaleString('en-IN')}</td>
+        <td>${escapeHtml(o.phone||"")}</td>
+        <td>${escapeHtml(o.city||"")}</td>
+        <td class="muted">${escapeHtml(o.created_at||"")}</td>
+        <td>
+          <div class="actions-cell">
+            <button class="btn danger small" onclick="deleteOrder(${o.id})">Delete</button>
+          </div>
+        </td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  function clearOrderFilters(){
+    document.getElementById("orderSearch").value = "";
+    document.getElementById("orderStatusFilter").value = "";
+    applyOrderFilters();
+  }
+
+  async function deleteOrder(orderId){
+    if (!confirm("Delete order #" + orderId + " ?")) return;
+    try{
+      await api("/admin/orders/" + orderId, { method:"DELETE" });
+      showStatus("o_status","ok","Deleted order #" + orderId);
+      await refreshOrders();
+      await refreshPayments(); // because payments may be deleted too
+    }catch(e){
+      showStatus("o_status","err","Delete failed: " + (e.message||e));
+    }
+  }
+
+  // --------------- Payments: refresh + filter + delete + mark ---------------
+  async function refreshPayments() {
+    try {
+      PAY_CACHE = await api("/admin/payments");
+      applyPaymentFilters();
+    } catch (e) {
+      showStatus("pay_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  function applyPaymentFilters(){
+    const q = (document.getElementById("paySearch").value || "").trim().toLowerCase();
+    const st = (document.getElementById("payStatusFilter").value || "").trim().toUpperCase();
+    const rf = (document.getElementById("receiptFilter").value || "");
+
+    const rows = (PAY_CACHE || []).filter(p => {
+      const hay = [
+        p.id, p.order_id, p.customername, p.email, p.phone,
+        p.status, p.amount, p.rating, p.feedback, p.receipt_path
+      ].join(" ").toLowerCase();
+
+      const okQ = !q || hay.includes(q);
+      const okSt = !st || String(p.status||"").toUpperCase() === st;
+
+      const hasReceipt = !!(p.receipt_path && String(p.receipt_path).trim());
+      const okR =
+        !rf ||
+        (rf === "has" && hasReceipt) ||
+        (rf === "none" && !hasReceipt);
+
+      return okQ && okSt && okR;
+    });
+
+    const tb = document.getElementById("pay_table");
+    tb.innerHTML = "";
+    rows.forEach(p => {
+      const receipt = p.receipt_path ? `<a href="/${p.receipt_path}" target="_blank">open</a>` : "";
+      const statusTag = (() => {
+        const s = (p.status || "").toUpperCase();
+        if (s === "SUCCESS") return '<span class="tag paid">SUCCESS</span>';
+        if (s === "FAILED") return '<span class="tag failed">FAILED</span>';
+        return '<span class="tag verify">PENDING</span>';
+      })();
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${p.id}</td>
+        <td><b>#${p.order_id}</b></td>
+        <td>${statusTag}</td>
+        <td>₹${Number(p.amount||0).toLocaleString('en-IN')}</td>
+        <td>${Number(p.rating||0) || "-"}</td>
+        <td>${receipt}</td>
+        <td style="max-width:320px;">${escapeHtml(p.feedback||"")}</td>
+        <td>
+          <div class="actions-cell">
+            <button class="btn primary small" onclick="setPaymentStatus(${p.id},'SUCCESS')">SUCCESS</button>
+            <button class="btn danger small" onclick="setPaymentStatus(${p.id},'FAILED')">FAILED</button>
+            <button class="btn ghost small" onclick="deletePayment(${p.id})">Delete</button>
+          </div>
+        </td>
+        <td class="muted">${escapeHtml(p.created_at||"")}</td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  function clearPaymentFilters(){
+    document.getElementById("paySearch").value = "";
+    document.getElementById("payStatusFilter").value = "";
+    document.getElementById("receiptFilter").value = "";
+    applyPaymentFilters();
+  }
+
+  async function setPaymentStatus(paymentId, status) {
+    try {
+      await api("/admin/payment-status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentId, status })
+      });
+      showStatus("pay_status", "ok", `Payment #${paymentId} marked ${status}.`);
+      await refreshPayments();
+      await refreshOrders();
+    } catch (e) {
+      showStatus("pay_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  async function deletePayment(paymentId){
+    if (!confirm("Delete payment/receipt #" + paymentId + " ?")) return;
+    try{
+      await api("/admin/payments/" + paymentId, { method:"DELETE" });
+      showStatus("pay_status","ok","Deleted payment #" + paymentId);
+      await refreshPayments();
+    }catch(e){
+      showStatus("pay_status","err","Delete failed: " + (e.message||e));
+    }
+  }
+
+  // --------------- Settings ---------------
+  async function loadBrochure() {
+    try {
+      const r = await api("/site/brochure");
+      document.getElementById("brochure_url").value = r.url || "";
+    } catch (e) {
+      showStatus("set_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  async function saveBrochure() {
+    try {
+      const url = document.getElementById("brochure_url").value.trim();
+      await api("/admin/brochure", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url })
+      });
+      showStatus("set_status", "ok", "Brochure URL saved.");
+    } catch (e) {
+      showStatus("set_status", "err", "Error: " + (e.message || e));
+    }
+  }
+
+  // --------------- Boot ---------------
+  async function boot() {
+    await initBackend();
+    const me = await api("/admin/me");
+    if (!me.loggedIn) {
+      document.getElementById("loginView").style.display = "block";
+      document.getElementById("appView").style.display = "none";
+      document.getElementById("topActions").style.display = "none";
+      return;
+    }
+
+    document.getElementById("loginView").style.display = "none";
+    document.getElementById("appView").style.display = "block";
+    document.getElementById("topActions").style.display = "flex";
+
+    switchView("view-products");
+    refreshProducts();
+    refreshShop();
+    refreshOrders();
+    refreshPayments();
+    loadBrochure();
+  }
+
+  window.addEventListener("load", boot);
+</script>
+
+</body>
+</html>

@@ -454,19 +454,25 @@
       document.body.classList.toggle('no-scroll', shouldOpen);
     }
 
-    function loadShopItems() {
-      const stored = JSON.parse(localStorage.getItem('chemsusShopItems')) || [];
-      if (stored.length > 0) return stored;
-
-      // ✅ fallback so mobile also shows products (localStorage is empty on new device)
-      return [
-        { name: "Calcium Levulinate", subtitle: "Pharma-grade nutritional supplement", features: ["High bioavailability", "Pharma & nutraceutical use", "Clean-label"], price: 1800, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/calcium-levulinate.html" },
-        { name: "Sodium Levulinate", subtitle: "Natural preservative & stabilizer", features: ["COSMOS/ECOCERT friendly", "Skin-conditioning", "Water soluble"], price: 1650, stockStatus: "in-stock", showBadge: true, badge: "Free sample available", moreLink: "products/sodium-levulinate.html" },
-        { name: "Levulinic Acid", subtitle: "Versatile platform chemical", features: ["Green chemistry platform", "Polymers & fuels", "Pharma intermediate"], price: 1400, stockStatus: "in-stock", showBadge: true, badge: "Free sample available", moreLink: "products/levulinic-acid.html" },
-        { name: "5-HMF", subtitle: "Bio-based intermediate", features: ["High reactivity", "Resins & coatings", "Sustainable building block"], price: 0, stockStatus: "out-of-stock", showBadge: false, badge: "", moreLink: "products/5hmf.html" },
-        { name: "Ethyl Levulinate", subtitle: "Green solvent & fuel additive", features: ["Bio-based ester", "Flavors & fragrances", "Low toxicity"], price: 2200, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/ethyl-levulinate.html" },
-        { name: "Methyl Levulinate", subtitle: "Renewable solvent & intermediate", features: ["Biofuel additive", "Performance solvent", "Chemical intermediate"], price: 2000, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/methyl-levulinate.html" }
-      ];
+    // ✅ NEW: Load shop items from backend (SQLite). If empty/fails -> fallback list.
+    async function loadShopItems() {
+      try {
+        const res = await fetch("/api/shop-items");
+        if (!res.ok) throw new Error("API failed");
+        const items = await res.json();
+        if (Array.isArray(items) && items.length > 0) return items;
+        throw new Error("Empty DB");
+      } catch (e) {
+        // ✅ fallback keeps your old behavior
+        return [
+          { name: "Calcium Levulinate", subtitle: "Pharma-grade nutritional supplement", features: ["High bioavailability", "Pharma & nutraceutical use", "Clean-label"], price: 1800, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/calcium-levulinate.html", image: "assets/cl.jpeg" },
+          { name: "Sodium Levulinate", subtitle: "Natural preservative & stabilizer", features: ["COSMOS/ECOCERT friendly", "Skin-conditioning", "Water soluble"], price: 1650, stockStatus: "in-stock", showBadge: true, badge: "Free sample available", moreLink: "products/sodium-levulinate.html", image: "assets/sl.jpeg" },
+          { name: "Levulinic Acid", subtitle: "Versatile platform chemical", features: ["Green chemistry platform", "Polymers & fuels", "Pharma intermediate"], price: 1400, stockStatus: "in-stock", showBadge: true, badge: "Free sample available", moreLink: "products/levulinic-acid.html", image: "assets/la.jpeg" },
+          { name: "5-HMF", subtitle: "Bio-based intermediate", features: ["High reactivity", "Resins & coatings", "Sustainable building block"], price: 0, stockStatus: "out-of-stock", showBadge: false, badge: "", moreLink: "products/5-hmf.html", image: "assets/5hmf.jpeg" },
+          { name: "Ethyl Levulinate", subtitle: "Green solvent & fuel additive", features: ["Bio-based ester", "Flavors & fragrances", "Low toxicity"], price: 2200, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/ethyl-levulinate.html", image: "assets/el.jpeg" },
+          { name: "Methyl Levulinate", subtitle: "Renewable solvent & intermediate", features: ["Biofuel additive", "Performance solvent", "Chemical intermediate"], price: 2000, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/methyl-levulinate.html", image: "assets/ml.jpeg" }
+        ];
+      }
     }
 
     function saveCart() {
@@ -529,8 +535,9 @@
       return Number.isFinite(n) ? n : 0;
     }
 
-    function renderProducts() {
-      const items = loadShopItems();
+    // ✅ NEW: renderProducts is now async (awaits API)
+    async function renderProducts() {
+      const items = await loadShopItems();
       const grid = document.getElementById('productsGrid');
       const intro = document.getElementById('sectionIntro');
 
@@ -538,15 +545,6 @@
         grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#6b7280;">No products available</div>`;
         return;
       }
-
-      const imageList = [
-        'assets/cl.jpeg',
-        'assets/sl.jpeg',
-        'assets/la.jpeg',
-        'assets/5hmf.jpeg',
-        'assets/el.jpeg',
-        'assets/ml.jpeg'
-      ];
 
       let inStockCount = 0;
       grid.innerHTML = '';
@@ -560,13 +558,13 @@
           showBadge: !!rawItem.showBadge,
           badge: rawItem.badge || '',
           moreLink: rawItem.moreLink || '',
-          price: safeNumber(rawItem.price) // ✅ prevents toLocaleString crash
+          price: safeNumber(rawItem.price),
+          image: rawItem.image || '' // ✅ from API/DB, fallback handled below
         };
 
         const isInStock = item.stockStatus === 'in-stock';
         if (isInStock) inStockCount++;
 
-        // ✅ If price is missing/0 -> show contact-for-price (and disable)
         const hasValidPrice = item.price > 0;
 
         const card = document.createElement('div');
@@ -591,7 +589,16 @@
           ? '<div class="out-of-stock-message">Currently Out of Stock</div>'
           : '';
 
-        const imageSrc = imageList[index] || imageList[imageList.length - 1];
+        // ✅ Use DB image if provided, otherwise keep your old image mapping as fallback
+        const fallbackImages = [
+          'assets/cl.jpeg',
+          'assets/sl.jpeg',
+          'assets/la.jpeg',
+          'assets/5hmf.jpeg',
+          'assets/el.jpeg',
+          'assets/ml.jpeg'
+        ];
+        const imageSrc = item.image || fallbackImages[index] || fallbackImages[fallbackImages.length - 1];
 
         const priceHTML = (isInStock && hasValidPrice)
           ? `₹${item.price.toLocaleString()} / kg`
@@ -668,7 +675,7 @@
     window.goToBuyPage = goToBuyPage;
 
     document.addEventListener('DOMContentLoaded', function(){
-      renderProducts();
+      renderProducts();   // ✅ now async-driven from API
       saveCart();
       syncUI();
 
