@@ -317,6 +317,39 @@
     .btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 28px rgba(0,184,176,.35)}
     .btn-secondary:hover{transform:translateY(-2px);background:var(--primary);color:#fff}
 
+    /* NEW PUB CHEM BUTTON */
+    .pubchem-link-container {
+      text-align: center;
+      margin: 40px 0 30px;
+    }
+    .btn-pubchem {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 16px 32px;
+      background: linear-gradient(135deg, #6c8ebf, #4a6fa5);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-family: "Montserrat", sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 20px rgba(106, 142, 191, 0.4);
+    }
+    .btn-pubchem:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 25px rgba(106, 142, 191, 0.5);
+      background: linear-gradient(135deg, #5a7cad, #3a5a8a);
+    }
+    .btn-pubchem svg {
+      width: 20px;
+      height: 20px;
+    }
+
     footer{
       background:#06121f;
       color:#cbd5f5;
@@ -368,6 +401,10 @@
 
       .actions{flex-direction:column}
       .btn-primary,.btn-secondary{min-width:100%}
+      .btn-pubchem {
+        padding: 14px 24px;
+        font-size: 14px;
+      }
     }
   </style>
 </head>
@@ -460,6 +497,16 @@
             <a href="../products.html" class="btn-secondary">← All Products</a>
           </div>
         </div>
+      </div>
+
+      <!-- Added PubChem link button -->
+      <div class="pubchem-link-container">
+        <a href="https://pubchem.ncbi.nlm.nih.gov/compound/10883" target="_blank" class="btn-pubchem">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+          </svg>
+          View Detailed Information 
+        </a>
       </div>
     </main>
 
