@@ -6,416 +6,379 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="assets/logo.png">
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --primary: #0074c7;
-      --primary-dark: #00508a;
-      --accent: #00b8b0;
-      --bg: #F3F7FB;
-      --ink: #1f2933;
+      --primary:#0074c7;
+      --primary-dark:#00508a;
+      --accent:#00b8b0;
+      --bg:#F3F7FB;
+      --ink:#1f2933;
+      --highlight:#f97316;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{
+      font-family:"Open Sans",Arial,sans-serif;
+      background:var(--bg);
+      color:var(--ink);
+      line-height:1.6;
+      display:flex;
+      min-height:100vh;
+    }
+    a{text-decoration:none;color:inherit}
+
+    /* Sidebar */
+    .sidebar{
+      width:240px;
+      background:var(--primary);
+      color:#fff;
+      border-right:3px solid var(--accent);
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
+      position:fixed;
+      left:0;top:0;
+      z-index:1002;
+      transition:transform .3s ease;
+    }
+    .sidebar-overlay{
+      display:none;
+      position:fixed;
+      inset:0;
+      background:rgba(0,0,0,.5);
+      backdrop-filter:blur(2px);
+      z-index:1001;
+      opacity:0;
+      transition:opacity .3s ease;
+    }
+    .sidebar-overlay.active{display:block;opacity:1}
+
+    .nav-logo{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-family:"Montserrat",sans-serif;
+      font-size:16px;
+      font-weight:700;
+      letter-spacing:.02em;
+      padding:16px 20px;
+      border-bottom:1px solid rgba(255,255,255,.1);
+      white-space:nowrap;
+    }
+    .nav-logo-img{height:24px;width:auto}
+    .nav-menu{list-style:none;padding:8px 0;flex:1;overflow-y:auto}
+    .nav-menu li a{
+      display:block;
+      padding:10px 20px;
+      font-size:13.5px;
+      border-left:3px solid transparent;
+      transition:all .2s ease;
+      color:#fff;
+    }
+    .nav-menu li a.active,.nav-menu li a:hover{
+      background:rgba(255,255,255,.1);
+      border-left-color:var(--accent);
+    }
+    #cart-count{
+      background:var(--accent);
+      color:#fff;
+      padding:2px 8px;
+      border-radius:10px;
+      font-size:11px;
+      font-weight:700;
+      margin-left:8px;
+    }
+    .search-section{padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.1)}
+    .search-form{position:relative}
+    .search-input{
+      width:100%;
+      padding:8px 32px 8px 12px;
+      border-radius:6px;
+      border:1px solid rgba(255,255,255,.3);
+      background:rgba(255,255,255,.1);
+      color:#fff;
+      font-size:12.5px;
+      outline:none;
+      backdrop-filter:blur(10px);
+    }
+    .search-input::placeholder{color:#d1d5db;font-size:11.5px}
+    .search-icon{
+      position:absolute;right:12px;top:50%;
+      transform:translateY(-50%);
+      width:14px;height:14px;color:#fff;pointer-events:none;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: "Open Sans", Arial, sans-serif;
-      background: var(--bg);
-      color: var(--ink);
-      line-height: 1.6;
-      display: flex;
-      min-height: 100vh;
+    .mobile-toggle{
+      display:none;
+      position:fixed;
+      top:20px;left:20px;
+      z-index:1003;
+      background:var(--primary);
+      color:#fff;
+      border:none;
+      padding:12px;
+      border-radius:8px;
+      cursor:pointer;
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
     }
+    .mobile-toggle svg{width:20px;height:20px}
 
-    a { text-decoration: none; color: inherit; }
-
-    /* COMPACT SIDEBAR NAVBAR */
-    .sidebar {
-      width: 240px;
-      background: var(--primary);
-      color: #ffffff;
-      border-right: 3px solid var(--accent);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      position: fixed;
-      left: 0;
-      top: 0;
-      z-index: 1002; /* Above overlay */
-      transition: transform 0.3s ease;
+    /* Main */
+    .main-wrapper{
+      margin-left:240px;
+      flex:1;
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      transition:margin-left .3s ease;
     }
-
-    /* Sidebar Overlay (Backdrop) for Mobile */
-    .sidebar-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      z-index: 1001; /* Below sidebar */
-      backdrop-filter: blur(2px);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .sidebar-overlay.active {
-      display: block;
-      opacity: 1;
-    }
-
-    .nav-logo {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      font-family: "Montserrat", sans-serif;
-      font-size: 16px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      color: #ffffff;
-      padding: 16px 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      white-space: nowrap;
-    }
-
-    .nav-logo-img { height: 24px; width: auto; }
-
-    .nav-menu {
-      list-style: none;
-      padding: 8px 0;
-      flex: 1;
-      overflow-y: auto;
-    }
-
-    .nav-menu li a {
-      display: block;
-      color: #ffffff;
-      padding: 10px 20px;
-      font-size: 13.5px;
-      border-left: 3px solid transparent;
-      transition: all 0.2s ease;
-    }
-
-    .nav-menu li a.active,
-    .nav-menu li a:hover {
-      background: rgba(255,255,255,0.1);
-      border-left-color: var(--accent);
-    }
-
-    #cart-count {
-      background: var(--accent);
-      color: white;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-size: 11px;
-      font-weight: bold;
-      margin-left: 8px;
-    }
-
-    /* SEARCH */
-    .search-section {
-      padding: 12px 20px 16px;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .search-form { position: relative; }
-
-    .search-input {
-      width: 100%;
-      padding: 8px 32px 8px 12px;
-      border-radius: 6px;
-      border: 1px solid rgba(255,255,255,0.3);
-      background: rgba(255,255,255,0.1);
-      color: #ffffff;
-      font-size: 12.5px;
-      outline: none;
-      backdrop-filter: blur(10px);
-    }
-
-    .search-input::placeholder { color: #d1d5db; font-size: 11.5px; }
-
-    .search-icon {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 14px;
-      height: 14px;
-      color: #ffffff;
-      pointer-events: none;
-    }
-
-    /* MAIN CONTENT WRAPPER */
-    .main-wrapper {
-      margin-left: 240px;
-      flex: 1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      transition: margin-left 0.3s ease;
-    }
-
-    /* HERO */
-    .hero {
-      position: relative;
-      overflow: hidden;
+    .hero{
+      position:relative;
+      overflow:hidden;
       background:
         radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
         radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
         #041424;
-      color: #ffffff;
-      height: 220px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      border-top: 3px solid var(--accent);
+      color:#fff;
+      height:220px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      border-top:3px solid var(--accent);
     }
-
-    .hero::before {
-      content: "";
-      position: absolute;
-      inset: 0;
+    .hero::before{
+      content:"";
+      position:absolute;inset:0;
       background-image:
         radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
         radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
-      background-size: 140px 140px;
-      opacity: 0.6;
-      pointer-events: none;
+      background-size:140px 140px;
+      opacity:.6;
+      pointer-events:none;
+    }
+    .hero-content{position:relative;z-index:1;max-width:720px;padding:0 18px}
+    .hero-kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;color:#b9e6ff}
+    .hero-title{font-family:"Montserrat",sans-serif;font-size:28px;font-weight:700;margin-bottom:6px}
+    .hero-subtitle{font-size:14px;color:#e2f3ff}
+
+    main{
+      max-width:900px;
+      margin:0 auto;
+      padding:32px 18px 40px;
+      width:100%;
+      flex:1;
     }
 
-    .hero-content {
-      position: relative;
-      z-index: 1;
-      max-width: 720px;
-      padding: 0 18px;
+    .buy-card{
+      background:#fff;
+      padding:26px;
+      border-radius:16px;
+      box-shadow:0 14px 30px rgba(15,23,42,.12);
+      border-top:4px solid var(--accent);
+    }
+    .buy-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:14px;
+    }
+    .buy-title{
+      font-family:"Montserrat",sans-serif;
+      font-size:20px;
+      font-weight:700;
+      color:#123559;
+    }
+    .buy-tag{
+      font-size:11px;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#e0f7f6;
+      color:#04726d;
+      text-transform:uppercase;
+      letter-spacing:.16em;
     }
 
-    .hero-kicker {
-      font-size: 12px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-      color: #b9e6ff;
+    /* Highlighted quantity + BioFM info */
+    .info-banner{
+      margin:8px 0 16px;
+      padding:10px 12px;
+      border-radius:10px;
+      background:rgba(249,115,22,0.05);
+      border:1px solid rgba(249,115,22,0.5);
+      font-size:13px;
+      color:#7c2d12;
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+    }
+    .info-icon{
+      width:18px;height:18px;border-radius:999px;
+      background:var(--highlight);color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;font-weight:700;flex-shrink:0;
     }
 
-    .hero-title {
-      font-family: "Montserrat", sans-serif;
-      font-size: 32px;
-      font-weight: 700;
-      margin-bottom: 6px;
+    .q-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:8px 0 4px;
+    }
+    .q-label{
+      font-size:13px;
+      font-weight:600;
+      color:#1f2937;
+    }
+    .q-pill{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      font-weight:600;
     }
 
-    .hero-subtitle {
-      font-size: 14px;
-      color: #e2f3ff;
+    .qty-pack-select{
+      padding:8px 10px;
+      border-radius:8px;
+      border:2px solid #1d4ed8;
+      background:#e0ecff;
+      color:#1e3a8a;
+      font-size:13px;
+      font-weight:600;
+      min-width:160px;
+      outline:none;
     }
 
-    main {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 32px 18px 40px 18px;
-      width: 100%;
-      flex: 1;
+    .qty-input-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:10px 0 6px;
+    }
+    .qty-input{
+      width:100px;
+      padding:8px 10px;
+      border-radius:8px;
+      border:2px solid #e2e8f0;
+      font-size:14px;
+      font-family:inherit;
+    }
+    .qty-input:focus{border-color:var(--primary)}
+
+    .price-line{
+      margin-top:6px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:#ecfdf5;
+      border:1px solid #34d399;
+      font-size:13px;
+      color:#065f46;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .price-left{
+      font-family:"Montserrat",sans-serif;
+      font-size:15px;
+      font-weight:700;
+      color:#0f766e;
+    }
+    .biofm-compare{
+      font-size:12px;
+      color:#7c2d12;
+    }
+    .biofm-compare span{
+      font-weight:700;
     }
 
-    .buy-card {
-      background: #ffffff;
-      padding: 28px;
-      border-radius: 16px;
-      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
-      border-top: 4px solid var(--accent);
+    .totals-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px dashed #e5e7eb;
+      font-size:14px;
+    }
+    .totals-row strong{
+      font-family:"Montserrat",sans-serif;
+      font-size:18px;
+      color:var(--primary-dark);
     }
 
-    .buy-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 18px;
+    .payment-box{
+      margin-top:16px;
+      padding:14px 12px;
+      border-radius:10px;
+      background:#f1f5f9;
+      font-size:13px;
+      color:#4b5563;
+    }
+    .payment-box ul{margin-left:18px;margin-top:6px}
+
+    .actions-row{
+      margin-top:20px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg,var(--accent),#00d4cc);
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      padding:12px 22px;
+      font-size:14px;
+      font-weight:600;
+      font-family:"Montserrat",sans-serif;
+      cursor:pointer;
+      transition:all .2s ease;
+    }
+    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,184,176,.3)}
+    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
+    .btn-secondary{
+      background:transparent;
+      color:#123559;
+      border-radius:8px;
+      padding:11px 20px;
+      font-size:13px;
+      font-weight:600;
+      font-family:"Montserrat",sans-serif;
+      border:1px solid #cbd5e1;
+      cursor:pointer;
+      transition:all .2s ease;
+    }
+    .btn-secondary:hover{background:#f1f5f9;border-color:var(--primary)}
+
+    footer{
+      background:#06121f;
+      color:#cbd5f5;
+      font-size:13px;
+      text-align:center;
+      padding:14px 0;
+      margin-top:22px;
     }
 
-    .buy-title {
-      font-family: "Montserrat", sans-serif;
-      font-size: 22px;
-      font-weight: 700;
-      color: #123559;
+    @media(max-width:1050px){
+      .sidebar{transform:translateX(-100%)}
+      .sidebar.open{transform:translateX(0)}
+      .main-wrapper{margin-left:0}
+      .mobile-toggle{display:block}
+      body.no-scroll{overflow:hidden}
     }
-
-    .buy-tag {
-      font-size: 11px;
-      padding: 4px 8px;
-      border-radius: 999px;
-      background: #e0f7f6;
-      color: #04726d;
-      text-transform: uppercase;
-      letter-spacing: 0.16em;
-    }
-
-    .buy-price {
-      font-family: "Montserrat", sans-serif;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--primary);
-      margin-bottom: 6px;
-    }
-
-    .buy-note {
-      font-size: 13px;
-      color: #4b5563;
-      margin-bottom: 4px;
-    }
-
-    .qty-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 18px 0;
-    }
-
-    .qty-label {
-      font-size: 14px;
-      font-weight: 600;
-      color: #1f2937;
-    }
-
-    .qty-input {
-      width: 90px;
-      padding: 8px 10px;
-      border-radius: 8px;
-      border: 2px solid #e2e8f0;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    .totals-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 10px;
-      padding-top: 14px;
-      border-top: 1px dashed #e5e7eb;
-      font-size: 14px;
-    }
-
-    .totals-row strong {
-      font-family: "Montserrat", sans-serif;
-      font-size: 18px;
-      color: var(--primary-dark);
-    }
-
-    .payment-box {
-      margin-top: 18px;
-      padding: 14px 12px;
-      border-radius: 10px;
-      background: #f1f5f9;
-      font-size: 13px;
-      color: #4b5563;
-    }
-
-    .payment-box ul {
-      margin-left: 18px;
-      margin-top: 6px;
-    }
-
-    .actions-row {
-      margin-top: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #00d4cc);
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      padding: 12px 22px;
-      font-size: 14px;
-      font-weight: 600;
-      font-family: "Montserrat", sans-serif;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(0,184,176,0.3);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background: transparent;
-      color: #123559;
-      border-radius: 8px;
-      padding: 11px 20px;
-      font-size: 13px;
-      font-weight: 600;
-      font-family: "Montserrat", sans-serif;
-      border: 1px solid #cbd5e1;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .btn-secondary:hover {
-      background: #f1f5f9;
-      border-color: var(--primary);
-    }
-
-    footer {
-      background: #06121f;
-      color: #cbd5f5;
-      font-size: 13px;
-      text-align: center;
-      padding: 14px 0;
-      margin-top: 22px;
-    }
-
-    /* MOBILE TOGGLE */
-    .mobile-toggle {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 20px;
-      z-index: 1003; /* Highest z-index */
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
-
-    .mobile-toggle svg { width: 20px; height: 20px; }
-
-    @media (max-width: 1050px) {
-      .sidebar { transform: translateX(-100%); }
-      .sidebar.open { transform: translateX(0); }
-      .main-wrapper { margin-left: 0; }
-      .mobile-toggle { display: block; }
-    }
-
-    @media (max-width: 768px) {
-      .buy-header {
-        flex-direction: column;
-      }
-      .hero-title {
-        font-size: 24px;
-      }
-      .buy-card {
-        padding: 20px;
-      }
+    @media(max-width:768px){
+      .buy-header{flex-direction:column}
+      .hero-title{font-size:24px}
+      .buy-card{padding:20px}
     }
   </style>
 </head>
 <body>
-
   <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
 
   <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
@@ -447,7 +410,7 @@
       <form class="search-form" id="siteSearchForm">
         <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
         <span class="search-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
             <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
           </svg>
         </span>
@@ -458,11 +421,9 @@
   <div class="main-wrapper">
     <section class="hero">
       <div class="hero-content">
-        <div class="hero-kicker">Checkout</div>
+        <div class="hero-kicker">Buy Now</div>
         <h1 class="hero-title" id="heroProductName">Review Your Order</h1>
-        <p class="hero-subtitle">
-          View net quantity, final amount, and proceed to secure order confirmation.
-        </p>
+        <p class="hero-subtitle">Quantity, BioFM vs our price, and final amount for the selected pack.</p>
       </div>
     </section>
 
@@ -471,239 +432,249 @@
         <div class="buy-header">
           <div>
             <div class="buy-title" id="productNameHeading">Order Summary</div>
-            <div class="buy-tag">Cart checkout</div>
+            <div class="buy-tag" id="packLabelTag">Single product</div>
           </div>
           <div>
-            <div class="buy-price" id="unitPriceText">₹0</div>
-            <div class="buy-note">Total amount (excl. taxes &amp; shipping)</div>
-            <div style="font-size:13px;color:#4b5563;">
-              Net quantity: <span id="cartQtyText">0 kg</span>
+            <div class="price-line" id="priceLineTop">
+              <div class="price-left" id="unitPriceText">₹0</div>
+              <div class="biofm-compare" id="biofmLine">BioFM: – —— Our Price: –</div>
             </div>
           </div>
         </div>
 
-        <div class="payment-box" id="itemsListBox">
+        <div class="info-banner">
+          <div class="info-icon">!</div>
+          <div>
+            <strong>Confirm quantity and pack.</strong> This page reflects the pack size you selected in the shop.
+            Change the quantity below if you need multiple packs.
           </div>
+        </div>
+
+        <div class="q-row" id="packRow">
+          <span class="q-label">Pack size</span>
+          <span class="q-pill">fixed from Shop</span>
+          <span id="packNameText" style="font-weight:700;color:#1d4ed8;">–</span>
+        </div>
+
+        <div class="qty-input-row">
+          <span class="q-label">Number of packs</span>
+          <input type="number" id="quantityInput" class="qty-input" value="1" min="1" step="1">
+        </div>
+
+        <div class="price-line" style="margin-top:8px;">
+          <div class="price-left" id="subtotalText">Subtotal: ₹0</div>
+          <div class="biofm-compare" id="perPackText">Per pack: ₹0</div>
+        </div>
 
         <div class="totals-row">
           <div>Grand total (₹, excl. taxes &amp; shipping)</div>
           <strong id="totalText">₹0</strong>
         </div>
 
-        <div class="payment-box" style="margin-top:16px;">
+        <div class="payment-box">
           <strong>Payment &amp; fulfilment:</strong>
           <ul>
             <li>Online payment or bank transfer (details shared after order placement).</li>
-            <li>Taxes and shipping calculated by sales team before final invoice.</li>
-            <li>Orders are confirmed via email from ChemSus.</li>
+            <li>Taxes and shipping will be added by the sales team before final invoice.</li>
+            <li>Order confirmation and invoice are sent by email from ChemSus.</li>
           </ul>
         </div>
 
         <div class="actions-row">
-          <button class="btn-primary" onclick="confirmAndGoToOrders()">Confirm &amp; Go to Orders</button>
-          <button class="btn-secondary" onclick="window.location.href='cart.html'">← Back to Cart</button>
+          <button class="btn-primary" id="confirmBtn">Confirm &amp; Go to Orders</button>
+          <button class="btn-secondary" onclick="window.history.back()">← Back</button>
         </div>
       </div>
     </main>
 
-    <footer>
-      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
-    </footer>
+    <footer>&copy; 2025 ChemSus Technologies Pvt Ltd.</footer>
   </div>
 
   <script>
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
 
-    // Open Sidebar
-    function toggleSidebar() {
+    function toggleSidebar(){
       sidebar.classList.toggle('open');
       overlay.classList.toggle('active');
+      document.body.classList.toggle('no-scroll');
     }
-
-    // Close Sidebar (Explicit)
-    function closeSidebar() {
+    function closeSidebar(){
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
+      document.body.classList.remove('no-scroll');
     }
 
-    // Close mobile menu automatically when a link inside it is clicked
     const navLinks = document.querySelectorAll('.nav-menu a');
-    navLinks.forEach(link => {
-      link.addEventListener('click', () => {
-        if (window.innerWidth <= 1050) {
-          closeSidebar();
-        }
+    navLinks.forEach(link=>{
+      link.addEventListener('click',()=>{
+        if(window.innerWidth<=1050) closeSidebar();
       });
     });
 
-    // Load cart from localStorage
-    function loadCart() {
+    function loadCart(){
       return JSON.parse(localStorage.getItem('chemsusCart')) || [];
     }
-
-    // Save cart to localStorage and update badge
-    function saveCart(cart) {
-      localStorage.setItem('chemsusCart', JSON.stringify(cart));
-      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    function saveCart(cart){
+      localStorage.setItem('chemsusCart',JSON.stringify(cart));
+      const count = cart.reduce((s,i)=>s+i.quantity,0);
       const span = document.getElementById('cart-count');
-      if (span) span.textContent = count;
+      if(span) span.textContent = count;
     }
 
-    // Render order summary
-    function renderSummary() {
-      const itemsListBox = document.getElementById('itemsListBox');
-      const totalText = document.getElementById('totalText');
-      const unitPriceText = document.getElementById('unitPriceText');
-      const cartQtyText = document.getElementById('cartQtyText');
-      const heroTitle = document.getElementById('heroProductName');
-      const heading = document.getElementById('productNameHeading');
-
-      // Check if we are in "Buy Now" mode (single item from query params)
-      const params = new URLSearchParams(window.location.search);
-      const buyNowName = params.get('name');
-      const buyNowPrice = parseFloat(params.get('price'));
-
-      if (buyNowName && buyNowPrice) {
-        // --- Single Product Buy Mode ---
-        heroTitle.textContent = 'Buy ' + buyNowName;
-        heading.textContent = buyNowName;
-        unitPriceText.textContent = '₹' + buyNowPrice.toLocaleString('en-IN') + ' / kg';
-
-        // Inject quantity input for single buy
-        itemsListBox.innerHTML = `
-           <div class="qty-row">
-            <span class="qty-label">Quantity (kg)</span>
-            <input type="number" id="quantityInput" class="qty-input" value="1" min="1" step="1">
-          </div>
-        `;
-        
-        const qtyInput = document.getElementById('quantityInput');
-        
-        function updateSingleTotal() {
-             const qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
-             qtyInput.value = qty;
-             const total = buyNowPrice * qty;
-             totalText.textContent = '₹' + total.toLocaleString('en-IN');
-             cartQtyText.textContent = qty + ' kg';
-        }
-
-        qtyInput.addEventListener('input', updateSingleTotal);
-        updateSingleTotal(); // Init
-        
-        // Override confirm function for single buy
-        window.confirmAndGoToOrders = function() {
-            const qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
-            const total = buyNowPrice * qty;
-            
-            const buyNowData = {
-                productName: buyNowName,
-                quantity: qty,
-                unitPrice: buyNowPrice
-            };
-            
-            sessionStorage.setItem('buyNowData', JSON.stringify(buyNowData));
-            sessionStorage.setItem('orderTotal', total);
-            
-            window.location.href = 'orders.html'; 
-        };
-
-        return; // Exit here for single buy mode
+    // Pricing table must match shop.html per-pack prices
+    const PRODUCT_PRICING = {
+      "Methyl Levulinate": {
+        "100 g": { biofm: 7077,  our: 4000 },
+        "500 mL": { biofm: 8915,  our: 7000 },
+        "1 L": { biofm: 11535, our: 10000 },
+        "2 L": null,
+        "5 L": null
+      },
+      "Ethyl Levulinate": {
+        "100 g": { biofm: 7077,  our: 4000 },
+        "500 mL": { biofm: 8915,  our: 7000 },
+        "1 L": { biofm: 11535, our: 10000 },
+        "2 L": null,
+        "5 L": null
+      },
+      "DALA": {
+        "5 g":  { biofm: 16774, our: 15000 },
+        "10 g": { biofm: 25156, our: 20000 },
+        "25 g": { biofm: 37748, our: 30000 },
+        "100 g":{ biofm: 85084, our: 70000 }
+      },
+      "5-HMF": {
+        "5 g":  { biofm: 2206, our: 2000 },
+        "25 g": { biofm: 6250, our: 5000 },
+        "100 g":{ biofm: 18290, our: 15000 }
+      },
+      "Sodium Levulinate": {
+        "100 g": { biofm: 2390,  our: 2000 },
+        "500 g": { biofm: 7969,  our: 7000 },
+        "1 kg":  { biofm: 13281, our: 10000 },
+        "2 kg":  { biofm: 24163, our: 18000 },
+        "3 kg":  { biofm: 37168, our: 27000 },
+        "5 kg":  { biofm: 59034, our: 42500 }
+      },
+      "Calcium Levulinate": {
+        "100 g": { biofm: 7336,  our: 2000 },
+        "500 g": { biofm: 10735, our: 7000 },
+        "1 kg":  { biofm: 18658, our: 10000 },
+        "2 kg":  { biofm: 0,     our: 19000 },
+        "5 kg":  { biofm: 0,     our: 42500 }
+      },
+      "Levulinic Acid": {
+        "100 g": { biofm: 7373,  our: 2000 },
+        "500 g": { biofm: 9936,  our: 3000 },
+        "1 kg":  { biofm: 15128, our: 5000 }
       }
+    };
 
-      // --- Cart Mode ---
-      const cart = loadCart();
-      saveCart(cart); // Ensure badge is updated
+    function getPackPriceFromNameWithPack(fullName, unitPrice){
+      // fullName is like "Sodium Levulinate (500 g)"
+      const match = fullName.match(/^(.*)\s+\((.+)\)$/);
+      if(!match){
+        return { baseName: fullName, pack: null, biofm: 0, our: unitPrice };
+      }
+      const baseName = match[1];
+      const pack = match[2];
+      const table = PRODUCT_PRICING[baseName];
+      if(table && table[pack]){
+        return { baseName, pack, biofm: table[pack].biofm || 0, our: table[pack].our || unitPrice };
+      }
+      return { baseName, pack, biofm: 0, our: unitPrice };
+    }
 
-      if (!cart.length) {
-        heroTitle.textContent = 'No items in cart';
-        heading.textContent = 'Order Summary';
+    function renderBuyNow(){
+      const params = new URLSearchParams(window.location.search);
+      const nameParam = params.get('name');
+      const priceParam = parseFloat(params.get('price'));
+
+      const heroNameEl = document.getElementById('heroProductName');
+      const headingEl = document.getElementById('productNameHeading');
+      const packLabelTag = document.getElementById('packLabelTag');
+      const packNameText = document.getElementById('packNameText');
+      const unitPriceText = document.getElementById('unitPriceText');
+      const biofmLine = document.getElementById('biofmLine');
+      const subtotalText = document.getElementById('subtotalText');
+      const perPackText = document.getElementById('perPackText');
+      const totalText = document.getElementById('totalText');
+      const qtyInput = document.getElementById('quantityInput');
+      const confirmBtn = document.getElementById('confirmBtn');
+
+      // update cart badge
+      saveCart(loadCart());
+
+      if(!nameParam || !priceParam){
+        heroNameEl.textContent = 'Invalid Buy Request';
+        headingEl.textContent = 'Order Summary';
         unitPriceText.textContent = '₹0';
         totalText.textContent = '₹0';
-        cartQtyText.textContent = '0 kg';
-        itemsListBox.innerHTML = `
-          <p style="color: #d32f2f; font-weight: 600;">⚠️ Your cart is empty. <a href="shop.html" style="color: var(--accent);">Go to Shop</a></p>
-        `;
-        document.querySelector('.actions-row .btn-primary').disabled = true;
+        qtyInput.value = 0;
+        confirmBtn.disabled = true;
         return;
       }
 
-      let grandTotal = 0;
-      let totalQty = 0;
-      let listHtml = '<strong>Items in your cart:</strong><ul style="margin-left: 18px; margin-top: 6px;">';
+      const { baseName, pack, biofm, our } = getPackPriceFromNameWithPack(nameParam, priceParam);
+      const displayName = baseName + (pack ? ' ('+pack+')' : '');
 
-      cart.forEach(item => {
-        const subtotal = item.price * item.quantity;
-        grandTotal += subtotal;
-        totalQty += item.quantity;
-        listHtml += `
-          <li style="margin-bottom: 6px;">
-            ${item.name} – ${item.quantity} kg × ₹${item.price.toLocaleString('en-IN')}
-            = ₹${subtotal.toLocaleString('en-IN')}
-          </li>`;
-      });
+      heroNameEl.textContent = 'Buy ' + baseName;
+      headingEl.textContent = baseName;
+      packLabelTag.textContent = pack ? `Pack: ${pack}` : 'Single product';
+      packNameText.textContent = pack || 'N/A';
 
-      listHtml += '</ul>';
+      const unit = our || priceParam;
+      unitPriceText.textContent = 'Our Price: ₹' + unit.toLocaleString('en-IN') + ' / pack';
+      biofmLine.innerHTML =
+        'BioFM: <span>₹' + (biofm || 0).toLocaleString('en-IN') +
+        '</span> —— Our Price: <span>₹' + unit.toLocaleString('en-IN') + '</span>';
 
-      heroTitle.textContent = 'Review Your Order';
-      heading.textContent = 'Order Summary';
-      unitPriceText.textContent = '₹' + grandTotal.toLocaleString('en-IN');
-      totalText.textContent = '₹' + grandTotal.toLocaleString('en-IN');
-      cartQtyText.textContent = totalQty + ' kg';
-      itemsListBox.innerHTML = listHtml;
+      function recalc(){
+        let q = parseInt(qtyInput.value,10);
+        if(!Number.isFinite(q) || q <= 0){ q = 1; qtyInput.value = 1; }
+        const sub = unit * q;
+        subtotalText.textContent = 'Subtotal: ₹' + sub.toLocaleString('en-IN');
+        perPackText.textContent = 'Per pack: ₹' + unit.toLocaleString('en-IN');
+        totalText.textContent = '₹' + sub.toLocaleString('en-IN');
+      }
 
-      // Enable confirm button
-      document.querySelector('.actions-row .btn-primary').disabled = false;
-      
-      // Standard cart checkout function
-      window.confirmAndGoToOrders = function() {
-          const totalPrice = cart.reduce((sum, item) => sum + (item.quantity * item.price), 0);
-          const totalQty = cart.reduce((sum, item) => sum + item.quantity, 0);
+      qtyInput.addEventListener('input', recalc);
+      recalc();
 
-          sessionStorage.setItem('buyNowData', JSON.stringify({
-            productName: `${cart.length} product(s) from Cart`,
-            quantity: totalQty,
-            unitPrice: (totalPrice / totalQty).toFixed(2) // Approximate average for display logic downstream
-          }));
+      confirmBtn.onclick = function(){
+        let q = parseInt(qtyInput.value,10);
+        if(!Number.isFinite(q) || q <= 0){ q = 1; }
+        const total = unit * q;
 
-          sessionStorage.setItem('cartItems', JSON.stringify(cart));
-          sessionStorage.setItem('orderTotal', totalPrice);
+        const buyNowData = {
+          productName: displayName,
+          baseName,
+          pack,
+          quantity: q,
+          unitPrice: unit,
+          biofmPrice: biofm || 0
+        };
 
-          window.location.href = 'orders.html';
+        sessionStorage.setItem('buyNowData', JSON.stringify(buyNowData));
+        sessionStorage.setItem('orderTotal', total);
+
+        window.location.href = 'orders.html';
       };
     }
 
-    document.getElementById('siteSearchForm').addEventListener('submit', function(e) {
+    document.getElementById('siteSearchForm').addEventListener('submit', function(e){
       e.preventDefault();
-      const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
-      if (!query) return;
-
-      if (query.includes('product') || query.includes('shop')) {
-        window.location.href = 'products.html';
-      } else if (query.includes('recognition') || query.includes('award')) {
-        window.location.href = 'recognitions.html';
-      } else if (query.includes('investor') || query.includes('funding')) {
-        window.location.href = 'investors.html';
-      } else if (query.includes('contact') || query.includes('address') || query.includes('phone')) {
-        window.location.href = 'contact.html';
-      } else if (query.includes('home') || query.includes('objective') || query.includes('chemsus')) {
-        window.location.href = 'index.html';
-      } else if (query.includes('about') || query.includes('company')) {
-        window.location.href = 'about.html';
-      } else if (query.includes('collab') || query.includes('collaboration') || query.includes('partner')) {
-        window.location.href = 'collaboration.html';
-      } else if (query.includes('sample') || query.includes('request')) {
-        window.location.href = 'request-sample.html';
-      } else if (query.includes('order') || query.includes('orders')) {
-        window.location.href = 'orders.html';
-      } else {
-        alert('No matching page. Try: home, about, products, shop, collaboration, recognitions, investors, contact, sample, orders.');
-      }
+      const q = document.getElementById('siteSearchInput').value.trim().toLowerCase();
+      if(!q) return;
+      if(q.includes('shop')) window.location.href='shop.html';
+      else if(q.includes('product')) window.location.href='products.html';
+      else if(q.includes('order')) window.location.href='orders.html';
+      else if(q.includes('contact')) window.location.href='contact.html';
+      else window.location.href='index.html';
     });
 
-    // Initialize on page load
-    window.addEventListener('DOMContentLoaded', renderSummary);
+    window.addEventListener('DOMContentLoaded', renderBuyNow);
   </script>
-
 </body>
 </html>

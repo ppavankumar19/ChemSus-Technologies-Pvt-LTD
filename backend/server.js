@@ -344,6 +344,92 @@ app.delete("/api/admin/shop-items/:id", requireAdmin, async (req, res) => {
   }
 });
 
+// ---------------- Admin CRUD: Pack Pricing ----------------
+app.get("/api/admin/pack-pricing/:shopItemId", requireAdmin, async (req, res) => {
+  try {
+    const shopItemId = Number(req.params.shopItemId);
+    const rows = await all(
+      `SELECT * FROM pack_pricing WHERE shop_item_id=? ORDER BY sort_order ASC, id ASC`,
+      [shopItemId]
+    );
+    res.json(rows);
+  } catch {
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+app.post("/api/admin/pack-pricing", requireAdmin, async (req, res) => {
+  try {
+    const b = req.body || {};
+    const r = await run(
+      `INSERT INTO pack_pricing
+       (shop_item_id, pack_size, biofm_usd, biofm_inr, our_price, is_active, sort_order, updated_at)
+       VALUES (?,?,?,?,?,?,?,datetime('now'))`,
+      [
+        Number(b.shopItemId || 0),
+        b.packSize || "",
+        Number(b.biofmUsd || 0),
+        Number(b.biofmInr || 0),
+        Number(b.ourPrice || 0),
+        b.isActive ? 1 : 0,
+        Number(b.sortOrder || 0),
+      ]
+    );
+    res.json({ ok: true, id: r.lastID });
+  } catch (e) {
+    res.status(500).json({ error: "DB error", details: String(e) });
+  }
+});
+
+app.put("/api/admin/pack-pricing/:id", requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const b = req.body || {};
+    const r = await run(
+      `UPDATE pack_pricing
+       SET pack_size=?, biofm_usd=?, biofm_inr=?, our_price=?, is_active=?, sort_order=?, updated_at=datetime('now')
+       WHERE id=?`,
+      [
+        b.packSize || "",
+        Number(b.biofmUsd || 0),
+        Number(b.biofmInr || 0),
+        Number(b.ourPrice || 0),
+        b.isActive ? 1 : 0,
+        Number(b.sortOrder || 0),
+        id,
+      ]
+    );
+    res.json({ ok: true, changed: r.changes });
+  } catch (e) {
+    res.status(500).json({ error: "DB error", details: String(e) });
+  }
+});
+
+app.delete("/api/admin/pack-pricing/:id", requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const r = await run(`DELETE FROM pack_pricing WHERE id=?`, [id]);
+    res.json({ ok: true, deleted: r.changes });
+  } catch {
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
+// Public API: Get pack pricing for shop page
+app.get("/api/pack-pricing/:shopItemId", async (req, res) => {
+  try {
+    const shopItemId = Number(req.params.shopItemId);
+    const rows = await all(
+      `SELECT pack_size, biofm_usd, biofm_inr, our_price FROM pack_pricing 
+       WHERE shop_item_id=? AND is_active=1 ORDER BY sort_order ASC, id ASC`,
+      [shopItemId]
+    );
+    res.json(rows);
+  } catch {
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
 // ---------------- Orders API ----------------
 app.get("/api/test", (req, res) =>
   res.json({ ok: true, apiBase: "/api", backendURL: req.headers.host })
@@ -361,7 +447,6 @@ app.post("/api/orders", async (req, res) => {
     const totalprice = Number(b.totalprice || 0);
     const unitprice = quantity > 0 ? totalprice / quantity : 0;
 
-    // ✅ Accept address from multiple possible keys
     const address = (
       b.address ||
       b.fullAddress ||
@@ -486,7 +571,6 @@ app.delete("/api/admin/payments/:id", requireAdmin, async (req, res) => {
 // ---------------- Admin: Orders + Payments ----------------
 app.get("/api/admin/orders", requireAdmin, async (req, res) => {
   try {
-    // ✅ Include all address fields
     const rows = await all(
       `SELECT
          id, payment_status AS paymentstatus, customername, email, phone,
@@ -538,7 +622,7 @@ app.get("/api/admin/payments", requireAdmin, async (req, res) => {
 app.post("/api/admin/payment-status", requireAdmin, async (req, res) => {
   try {
     const paymentId = Number(req.body?.paymentId);
-    const newStatus = (req.body?.status || "").toUpperCase(); // SUCCESS/FAILED
+    const newStatus = (req.body?.status || "").toUpperCase();
 
     if (!paymentId)
       return res.status(400).json({ error: "paymentId required" });

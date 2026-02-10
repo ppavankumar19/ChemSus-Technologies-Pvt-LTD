@@ -14,6 +14,7 @@
       --accent:#00b8b0;
       --bg:#F3F7FB;
       --ink:#1f2933;
+      --warning:#f97316;
     }
     *{box-sizing:border-box;margin:0;padding:0}
     body{
@@ -26,7 +27,6 @@
     }
     a{text-decoration:none;color:inherit}
 
-    /* ===== Sidebar + overlay ===== */
     .sidebar{
       width:240px;
       background:var(--primary);
@@ -37,7 +37,7 @@
       min-height:100vh;
       position:fixed;
       left:0;top:0;
-      z-index:1000;
+      z-index:1002;
       transition:transform .3s ease;
     }
     .sidebar-overlay{
@@ -45,32 +45,34 @@
       position:fixed;
       inset:0;
       background:rgba(0,0,0,.5);
-      z-index:999;
+      backdrop-filter:blur(2px);
+      z-index:1001;
+      opacity:0;
+      transition:opacity .3s ease;
     }
-    .sidebar-overlay.active{display:block}
+    .sidebar-overlay.active{display:block;opacity:1}
 
     .nav-logo{
       display:inline-flex;
       align-items:center;
       gap:8px;
       font-family:"Montserrat",sans-serif;
-      font-weight:700;
       font-size:16px;
+      font-weight:700;
       letter-spacing:.02em;
-      white-space:nowrap;
-      color:#fff;
       padding:16px 20px;
       border-bottom:1px solid rgba(255,255,255,.1);
+      white-space:nowrap;
     }
     .nav-logo-img{height:24px;width:auto}
     .nav-menu{list-style:none;padding:8px 0;flex:1;overflow-y:auto}
     .nav-menu li a{
       display:block;
-      color:#fff;
       padding:10px 20px;
       font-size:13.5px;
       border-left:3px solid transparent;
       transition:all .2s ease;
+      color:#fff;
     }
     .nav-menu li a.active,.nav-menu li a:hover{
       background:rgba(255,255,255,.1);
@@ -85,7 +87,6 @@
       font-weight:bold;
       margin-left:8px;
     }
-
     .search-section{padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.1)}
     .search-form{position:relative}
     .search-input{
@@ -105,32 +106,29 @@
       transform:translateY(-50%);
       width:14px;height:14px;color:#fff;pointer-events:none;
     }
-
     .mobile-toggle{
       display:none;
       position:fixed;
-      top:18px;left:18px;
-      z-index:1001;
+      top:20px;left:20px;
+      z-index:1003;
       background:var(--primary);
       color:#fff;
       border:none;
       padding:12px;
-      border-radius:10px;
+      border-radius:8px;
       cursor:pointer;
-      box-shadow:0 10px 24px rgba(0,116,199,.35);
+      box-shadow:0 4px 12px rgba(0,0,0,.15);
     }
     .mobile-toggle svg{width:20px;height:20px}
 
-    /* ===== Main ===== */
     .main-wrapper{
       margin-left:240px;
       flex:1;
       min-height:100vh;
       display:flex;
       flex-direction:column;
-      width:100%;
+      transition:margin-left .3s ease;
     }
-
     .hero{
       position:relative;
       overflow:hidden;
@@ -144,6 +142,7 @@
       align-items:center;
       justify-content:center;
       text-align:center;
+      border-top:3px solid var(--accent);
     }
     .hero::before{
       content:"";
@@ -167,27 +166,51 @@
       width:100%;
       flex:1;
     }
-    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+    .section-header{display:flex;align-items:center;gap:10px;margin-bottom:6px}
     .section-header h2{font-family:"Montserrat",sans-serif;font-size:24px;font-weight:700;color:#123559}
-    .section-intro{font-size:15px;margin-bottom:26px;color:#4a5568;max-width:760px}
+    .section-intro{font-size:15px;margin-bottom:12px;color:#4a5568;max-width:760px}
+
+    .info-banner{
+      margin-bottom:24px;
+      padding:10px 14px;
+      border-radius:10px;
+      background:rgba(234,88,12,0.05);
+      border:1px solid rgba(234,88,12,0.4);
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+      font-size:13px;
+      color:#7c2d12;
+    }
+    .info-banner-icon{
+      width:18px;height:18px;
+      border-radius:999px;
+      background:#f97316;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:12px;
+      flex-shrink:0;
+    }
 
     .products-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit, minmax(340px, 1fr));
       gap:24px;
-      margin-top:20px;
+      margin-top:10px;
     }
-
     .product-card{
       background:#fff;
-      border-radius:14px;
-      padding:28px;
+      border-radius:16px;
+      padding:26px;
       box-shadow:0 14px 30px rgba(15,23,42,.12);
       border-top:4px solid var(--accent);
       position:relative;
       transition:all .3s ease;
     }
-    .product-card:hover{transform:translateY(-8px);box-shadow:0 24px 40px rgba(15,23,42,.2)}
+    .product-card:hover{transform:translateY(-6px);box-shadow:0 20px 38px rgba(15,23,42,.18)}
     .product-card.out-of-stock{opacity:.7;border-top-color:#ef4444}
     .product-card.out-of-stock:hover{transform:none}
 
@@ -213,7 +236,7 @@
       height:180px;
       background:linear-gradient(135deg,#f0f9ff,#e0f2fe);
       border-radius:10px;
-      margin:38px 0 18px; /* give room for badges */
+      margin:38px 0 18px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -226,72 +249,149 @@
       font-size:20px;
       font-weight:700;
       color:var(--primary-dark);
-      margin-bottom:8px;
+      margin-bottom:4px;
     }
-    .product-subtitle{font-size:14px;color:#64748b;margin-bottom:12px}
+    .product-subtitle{font-size:14px;color:#64748b;margin-bottom:10px}
 
-    .product-features{list-style:none;margin-bottom:16px;font-size:14px}
-    .product-features li{margin:6px 0}
+    .product-features{list-style:none;margin-bottom:12px;font-size:14px}
+    .product-features li{margin:4px 0}
     .product-features li::before{content:"✓ ";color:var(--accent);font-weight:700}
 
     .more-details{
       display:inline-block;
-      margin-top:10px;
+      margin-top:6px;
       background:#007bff;
       color:#fff;
-      padding:10px 14px;
+      padding:9px 12px;
       border-radius:8px;
-      font-size:13px;
+      font-size:12px;
       font-weight:600;
     }
-
-    .product-price{
-      font-family:"Montserrat",sans-serif;
-      font-size:24px;
-      font-weight:700;
-      color:var(--primary);
-      margin:10px 0 16px;
-    }
-    .price-muted{color:#94a3b8;font-weight:700}
 
     .out-of-stock-message{
       background:#fef2f2;
       color:#991b1b;
-      padding:12px;
+      padding:10px;
       border-radius:8px;
       text-align:center;
       font-weight:600;
-      margin-top:38px;
+      margin-top:30px;
       margin-bottom:14px;
       border-left:4px solid #ef4444;
     }
 
+    .pack-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin:8px 0 6px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:rgba(59,130,246,0.04);
+      border:1px dashed rgba(30,64,175,0.45);
+    }
+    .pack-label{
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:#1d4ed8;
+    }
+    .pack-label-badge{
+      font-size:11px;
+      padding:2px 7px;
+      border-radius:999px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      font-weight:600;
+    }
+    .pack-select{
+      padding:7px 10px;
+      border-radius:7px;
+      border:1px solid #1d4ed8;
+      font-size:13px;
+      background:#e0ecff;
+      color:#1e3a8a;
+      font-weight:600;
+      min-width:150px;
+      outline:none;
+    }
+
+    .biofm-price{
+      margin-top:6px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:rgba(249,115,22,0.06);
+      border:1px solid rgba(249,115,22,0.7);
+      font-size:12.5px;
+      color:#7c2d12;
+      font-weight:600;
+    }
+    .biofm-tag{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#c2410c;
+      margin-right:4px;
+      display:block;
+      margin-bottom:3px;
+    }
+    .biofm-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px 14px;
+      align-items:center;
+    }
+    .biofm-label{font-size:12px}
+    .biofm-value{font-weight:700}
+    .biofm-sep{margin:0 4px;color:#9ca3af;font-weight:400}
+
+    .product-price{
+      font-family:"Montserrat",sans-serif;
+      font-size:15px;
+      font-weight:700;
+      color:#0f766e;
+      margin:6px 0 10px;
+      padding:6px 10px;
+      border-radius:8px;
+      background:#ecfdf5;
+      border:1px solid #34d399;
+      display:inline-block;
+    }
+
     .product-actions{
       display:flex;
-      gap:12px;
+      gap:10px;
       align-items:stretch;
+      margin-top:8px;
     }
     .btn-buy{
       flex:1;
       background:linear-gradient(135deg,var(--accent),#00d4cc);
       color:#fff;
-      padding:14px 10px;
-      border:none;border-radius:10px;
-      font-size:14px;font-weight:700;
+      border:none;
+      border-radius:10px;
+      padding:12px 10px;
+      font-size:14px;
+      font-weight:700;
       font-family:"Montserrat",sans-serif;
       cursor:pointer;
       transition:all .2s ease;
-      min-height:50px;
+      min-height:48px;
     }
-    .btn-buy:hover:not(:disabled){transform:translateY(-1px);filter:brightness(1.05)}
-    .btn-buy:disabled{background:#9ca3af;cursor:not-allowed;transform:none}
+    .btn-buy:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 18px rgba(0,184,176,.35)}
+    .btn-buy:disabled{opacity:.6;cursor:not-allowed;transform:none}
 
-    .cart-btn-container{flex:1;min-height:50px;display:flex}
+    .cart-btn-container{flex:1;min-height:48px;display:flex}
     .btn-cart{
       width:100%;height:100%;
       background:var(--primary);
-      color:#fff;border:none;border-radius:10px;
-      font-size:13px;font-weight:700;
+      color:#fff;
+      border:none;
+      border-radius:10px;
+      font-size:13px;
+      font-weight:700;
       font-family:"Montserrat",sans-serif;
       cursor:pointer;
       transition:all .2s ease;
@@ -310,7 +410,7 @@
       overflow:hidden;
     }
     .qty-btn{
-      width:44px;height:100%;
+      width:40px;height:100%;
       background:var(--primary);
       color:#fff;border:none;cursor:pointer;
       font-weight:800;font-size:18px;
@@ -347,32 +447,29 @@
       font-size:12px;font-weight:800;
     }
 
-    /* ===== Responsive ===== */
-    @media (max-width:1050px){
+    @media(max-width:1050px){
       .sidebar{transform:translateX(-100%)}
       .sidebar.open{transform:translateX(0)}
       .main-wrapper{margin-left:0}
       .mobile-toggle{display:block}
       body.no-scroll{overflow:hidden}
     }
-    @media (max-width:768px){
+    @media(max-width:768px){
       .products-grid{grid-template-columns:1fr;gap:20px}
       .hero{height:230px}
       .hero-title{font-size:32px}
-      /* keep buttons side-by-side (same look as laptop) */
       .product-actions{flex-direction:row}
     }
-    @media (max-width:580px){
+    @media(max-width:580px){
       .hero-title{font-size:28px}
       .floating-cart-btn{right:14px;bottom:14px;padding:10px 16px}
-      .product-card{padding:22px}
+      .product-card{padding:20px}
       .product-image{height:170px}
     }
   </style>
 </head>
 
 <body>
-  <!-- Overlay for mobile -->
   <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar(false)"></div>
 
   <button class="mobile-toggle" onclick="toggleSidebar(true)" aria-label="Toggle Menu">
@@ -428,6 +525,13 @@
         High-purity, pharmaceutical-grade chemicals derived from sustainable bamboo biomass. Contact sales for volume pricing and custom specifications.
       </p>
 
+      <div class="info-banner">
+        <div class="info-banner-icon">!</div>
+        <div>
+          <strong>First choose the Quantity.</strong> Prices below update for the selected pack. BioFM price shows both USD and ₹ value, compared clearly with our price.
+        </div>
+      </div>
+
       <div class="products-grid" id="productsGrid">
         <div style="grid-column:1/-1;text-align:center;padding:40px;color:#6b7280;">Loading products...</div>
       </div>
@@ -442,177 +546,199 @@
 
   <script>
     let cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
+    let PRODUCT_PRICING = {}; // Will be loaded from API
 
-    function toggleSidebar(forceOpen) {
+    function toggleSidebar(forceOpen){
       const sidebar = document.getElementById('sidebar');
       const overlay = document.getElementById('sidebarOverlay');
-
       const shouldOpen = (typeof forceOpen === 'boolean') ? forceOpen : !sidebar.classList.contains('open');
-
       sidebar.classList.toggle('open', shouldOpen);
       overlay.classList.toggle('active', shouldOpen);
       document.body.classList.toggle('no-scroll', shouldOpen);
     }
 
-    // ✅ NEW: Load shop items from backend (SQLite). If empty/fails -> fallback list.
-    async function loadShopItems() {
+    async function loadPricingData() {
       try {
-        const res = await fetch("/api/shop-items");
-        if (!res.ok) throw new Error("API failed");
-        const items = await res.json();
-        if (Array.isArray(items) && items.length > 0) return items;
-        throw new Error("Empty DB");
+        const shopRes = await fetch("/api/shop-items");
+        if (!shopRes.ok) throw new Error();
+        const items = await shopRes.json();
+
+        for (const item of items) {
+          const packRes = await fetch(`/api/pack-pricing/${item.id}`);
+          if (!packRes.ok) continue;
+          const packs = await packRes.json();
+
+          PRODUCT_PRICING[item.name] = {};
+          packs.forEach(p => {
+            PRODUCT_PRICING[item.name][p.pack_size] = {
+              biofmUsd: p.biofm_usd || 0,
+              biofmInr: p.biofm_inr || 0,
+              our: p.our_price || 0
+            };
+          });
+        }
       } catch (e) {
-        // ✅ fallback keeps your old behavior
-        return [
-          { name: "Calcium Levulinate", subtitle: "Pharma-grade nutritional supplement", features: ["High bioavailability", "Pharma & nutraceutical use", "Clean-label"], price: 1800, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/calcium-levulinate.html", image: "assets/cl.jpeg" },
-          { name: "Sodium Levulinate", subtitle: "Natural preservative & stabilizer", features: ["COSMOS/ECOCERT friendly", "Skin-conditioning", "Water soluble"], price: 1650, stockStatus: "in-stock", showBadge: true, badge: "Free sample available", moreLink: "products/sodium-levulinate.html", image: "assets/sl.jpeg" },
-          { name: "Levulinic Acid", subtitle: "Versatile platform chemical", features: ["Green chemistry platform", "Polymers & fuels", "Pharma intermediate"], price: 1400, stockStatus: "in-stock", showBadge: true, badge: "Free sample available", moreLink: "products/levulinic-acid.html", image: "assets/la.jpeg" },
-          { name: "5-HMF", subtitle: "Bio-based intermediate", features: ["High reactivity", "Resins & coatings", "Sustainable building block"], price: 0, stockStatus: "out-of-stock", showBadge: false, badge: "", moreLink: "products/5-hmf.html", image: "assets/5hmf.jpeg" },
-          { name: "Ethyl Levulinate", subtitle: "Green solvent & fuel additive", features: ["Bio-based ester", "Flavors & fragrances", "Low toxicity"], price: 2200, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/ethyl-levulinate.html", image: "assets/el.jpeg" },
-          { name: "Methyl Levulinate", subtitle: "Renewable solvent & intermediate", features: ["Biofuel additive", "Performance solvent", "Chemical intermediate"], price: 2000, stockStatus: "in-stock", showBadge: false, badge: "", moreLink: "products/methyl-levulinate.html", image: "assets/ml.jpeg" }
-        ];
+        console.error('Failed to load pricing:', e);
       }
     }
 
-    function saveCart() {
-      localStorage.setItem('chemsusCart', JSON.stringify(cart));
-      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-      const badge = document.getElementById('cart-count');
-      if (badge) badge.textContent = count;
-      updateFloatingCartCount();
+    function getFirstAvailablePack(productName){
+      const t = PRODUCT_PRICING[productName];
+      if(!t) return null;
+      const packs = Object.keys(t);
+      for(const p of packs){
+        if(t[p] && t[p].our>0) return p;
+      }
+      return packs[0] || null;
     }
 
-    function updateFloatingCartCount() {
-      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+    function getPackPrice(productName, packLabel){
+      const t = PRODUCT_PRICING[productName];
+      if(!t) return { biofmUsd:0, biofmInr:0, our:0 };
+      const row = t[packLabel];
+      if(!row) return { biofmUsd:0, biofmInr:0, our:0 };
+      return row;
+    }
+
+    function saveCart(){
+      localStorage.setItem('chemsusCart', JSON.stringify(cart));
+      const count = cart.reduce((s,i)=>s+i.quantity,0);
+      const badge = document.getElementById('cart-count');
+      if(badge) badge.textContent = count;
+      updateFloatingCartCount();
+    }
+    function updateFloatingCartCount(){
+      const count = cart.reduce((s,i)=>s+i.quantity,0);
       document.getElementById('floating-cart-count').textContent = count;
     }
 
-    function updateItem(pName, pPrice, delta) {
-      const existing = cart.find(item => item.name === pName);
-      if (existing) {
+    function updateItem(pName, pPrice, delta, packLabel){
+      const key = pName+' | '+(packLabel||'');
+      const existing = cart.find(i=>i.key===key);
+      if(existing){
         existing.quantity += delta;
-        if (existing.quantity <= 0) cart = cart.filter(item => item.name !== pName);
-      } else if (delta > 0) {
-        cart.push({ name: pName, price: pPrice, quantity: 1 });
+        if(existing.quantity<=0) cart = cart.filter(i=>i.key!==key);
+      }else if(delta>0){
+        cart.push({ key, name:pName+(packLabel?' ('+packLabel+')':''), price:pPrice, quantity:1 });
       }
       saveCart();
       syncUI();
     }
 
-    function goToBuyPage(name, price) {
+    function goToBuyPage(name, price, packLabel){
       const params = new URLSearchParams();
-      params.set('name', name);
+      params.set('name', name + (packLabel ? ' ('+packLabel+')' : ''));
       params.set('price', String(price));
-      window.location.href = 'buynow.html?' + params.toString();
+      window.location.href = 'buy.html?' + params.toString();
     }
 
-    function syncUI() {
-      document.querySelectorAll('.product-card').forEach(card => {
+    function syncUI(){
+      document.querySelectorAll('.product-card').forEach(card=>{
         const pName = card.getAttribute('data-name');
-        const item = cart.find(i => i.name === pName);
+        const select = card.querySelector('.pack-select');
+        const packLabel = select ? select.value : '';
+        const key = pName+' | '+(packLabel||'');
+        const item = cart.find(i=>i.key===key);
         const cartBtn = card.querySelector('.btn-cart');
-        const qtySelector = card.querySelector('.qty-selector');
-        const qtyValue = card.querySelector('.qty-value');
-
-        if (!cartBtn || !qtySelector || !qtyValue) return;
-
-        if (item && item.quantity > 0) {
-          cartBtn.style.display = 'none';
-          qtySelector.style.display = 'flex';
-          qtyValue.textContent = item.quantity;
-        } else {
-          cartBtn.style.display = 'block';
-          qtySelector.style.display = 'none';
+        const qtySel = card.querySelector('.qty-selector');
+        const qtyVal = card.querySelector('.qty-value');
+        if(!cartBtn || !qtySel || !qtyVal) return;
+        if(item && item.quantity>0){
+          cartBtn.style.display='none';
+          qtySel.style.display='flex';
+          qtyVal.textContent=item.quantity;
+        }else{
+          cartBtn.style.display='block';
+          qtySel.style.display='none';
         }
       });
-
       updateFloatingCartCount();
     }
 
-    function safeNumber(val) {
-      const n = Number(val);
+    function safeNumber(v){
+      const n = Number(v);
       return Number.isFinite(n) ? n : 0;
     }
 
-    // ✅ NEW: renderProducts is now async (awaits API)
-    async function renderProducts() {
+    async function loadShopItems(){
+      try{
+        const res = await fetch("/api/shop-items");
+        if(!res.ok) throw new Error();
+        const items = await res.json();
+        if(Array.isArray(items) && items.length>0) return items;
+        throw new Error();
+      }catch(e){
+        return [];
+      }
+    }
+
+    async function renderProducts(){
       const items = await loadShopItems();
       const grid = document.getElementById('productsGrid');
       const intro = document.getElementById('sectionIntro');
-
-      if (!items || items.length === 0) {
+      if(!items || items.length===0){
         grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:40px;color:#6b7280;">No products available</div>`;
         return;
       }
 
-      let inStockCount = 0;
-      grid.innerHTML = '';
+      grid.innerHTML='';
+      let inStockCount=0;
 
-      items.forEach((rawItem, index) => {
+      items.forEach((raw,index)=>{
         const item = {
-          name: rawItem.name || 'Product',
-          subtitle: rawItem.subtitle || '',
-          features: Array.isArray(rawItem.features) ? rawItem.features : [],
-          stockStatus: rawItem.stockStatus || 'in-stock',
-          showBadge: !!rawItem.showBadge,
-          badge: rawItem.badge || '',
-          moreLink: rawItem.moreLink || '',
-          price: safeNumber(rawItem.price),
-          image: rawItem.image || '' // ✅ from API/DB, fallback handled below
+          id: raw.id,
+          name:raw.name || 'Product',
+          subtitle:raw.subtitle || '',
+          features:Array.isArray(raw.features)?raw.features:(()=>{
+            try { return JSON.parse(raw.features_json || '[]'); } catch { return []; }
+          })(),
+          stockStatus:raw.stockStatus || 'in-stock',
+          showBadge:!!raw.showBadge,
+          badge:raw.badge || '',
+          moreLink:raw.moreLink || '',
+          image:raw.image || ''
         };
-
-        const isInStock = item.stockStatus === 'in-stock';
-        if (isInStock) inStockCount++;
-
-        const hasValidPrice = item.price > 0;
+        const isInStock = item.stockStatus==='in-stock';
+        if(isInStock) inStockCount++;
 
         const card = document.createElement('div');
-        card.className = `product-card ${(!isInStock ? 'out-of-stock' : '')}`;
+        card.className = `product-card ${!isInStock?'out-of-stock':''}`;
         card.setAttribute('data-name', item.name);
-        card.setAttribute('data-price', item.price);
+        card.setAttribute('data-item-id', item.id);
 
-        const badgeHTML = (item.showBadge && item.badge)
-          ? `<span class="product-badge">${item.badge}</span>`
-          : '';
+        const pricingTable = PRODUCT_PRICING[item.name] || null;
+        const packOptions = pricingTable ? Object.keys(pricingTable) : [];
+        const defaultPack = pricingTable ? (getFirstAvailablePack(item.name) || packOptions[0]) : null;
+        const defaultPrices = defaultPack ? getPackPrice(item.name, defaultPack) : { biofmUsd:0, biofmInr:0, our:0 };
+        const ourInitial = safeNumber(defaultPrices.our);
+        const biofmUsdInitial = safeNumber(defaultPrices.biofmUsd);
+        const biofmInrInitial = safeNumber(defaultPrices.biofmInr);
 
-        const stockBadgeHTML =
-          `<span class="stock-badge ${isInStock ? 'stock-in' : 'stock-out'}">${isInStock ? 'IN STOCK' : 'OUT OF STOCK'}</span>`;
+        const badgeHTML = (item.showBadge && item.badge)?`<span class="product-badge">${item.badge}</span>`:'';
+        const stockBadgeHTML = `<span class="stock-badge ${isInStock?'stock-in':'stock-out'}">${isInStock?'IN STOCK':'OUT OF STOCK'}</span>`;
+        const featuresHTML = item.features.map(f=>`<li>${f}</li>`).join('');
+        const moreHTML = item.moreLink?`<a class="more-details" href="${item.moreLink}">More Details</a>`:'';
+        const outMsg = !isInStock?'<div class="out-of-stock-message">Currently Out of Stock</div>':'';
 
-        const featuresHTML = item.features.map(f => `<li>${f}</li>`).join('');
+        const fallbackImages=['assets/cl.jpeg','assets/sl.jpeg','assets/la.jpeg','assets/5hmf.jpeg','assets/el.jpeg','assets/ml.jpeg'];
+        const imageSrc = item.image || fallbackImages[index % fallbackImages.length];
 
-        const moreLinkHTML = item.moreLink
-          ? `<a class="more-details" href="${item.moreLink}">More Details</a>`
-          : '';
+        const packSelectHTML = pricingTable && packOptions.length > 0 ?`
+          <div class="pack-row">
+            <span class="pack-label">SELECT QUANTITY</span>
+            <span class="pack-label-badge">Required for price update</span>
+            <select class="pack-select">
+              ${packOptions.map(p=>`<option value="${p}" ${p===defaultPack?'selected':''}>${p}</option>`).join('')}
+            </select>
+          </div>` : '';
 
-        const outOfStockMsg = !isInStock
-          ? '<div class="out-of-stock-message">Currently Out of Stock</div>'
-          : '';
-
-        // ✅ Use DB image if provided, otherwise keep your old image mapping as fallback
-        const fallbackImages = [
-          'assets/cl.jpeg',
-          'assets/sl.jpeg',
-          'assets/la.jpeg',
-          'assets/5hmf.jpeg',
-          'assets/el.jpeg',
-          'assets/ml.jpeg'
-        ];
-        const imageSrc = item.image || fallbackImages[index] || fallbackImages[fallbackImages.length - 1];
-
-        const priceHTML = (isInStock && hasValidPrice)
-          ? `₹${item.price.toLocaleString()} / kg`
-          : `<span class="price-muted">Contact for Price</span>`;
-
-        const buyDisabled = (!isInStock || !hasValidPrice);
-        const cartDisabled = (!isInStock || !hasValidPrice);
-
-        const safeName = item.name.replace(/'/g, "\\'");
+        const safeName = item.name.replace(/'/g,"\\'");
+        const disabledInitial = !isInStock || !ourInitial;
 
         card.innerHTML = `
           ${stockBadgeHTML}
           ${badgeHTML}
-          ${outOfStockMsg}
+          ${outMsg}
 
           <div class="product-image">
             <img src="${imageSrc}" alt="${item.name}">
@@ -621,67 +747,153 @@
           <h3 class="product-title">${item.name}</h3>
           <p class="product-subtitle">${item.subtitle}</p>
 
-          <ul class="product-features">
-            ${featuresHTML}
-          </ul>
+          <ul class="product-features">${featuresHTML}</ul>
+          ${moreHTML}
 
-          ${moreLinkHTML}
+          ${packSelectHTML}
 
-          <div class="product-price">${priceHTML}</div>
+          <div class="biofm-price" data-biofm-line>
+            <div class="biofm-tag">BioFM vs Our Price</div>
+            <div class="biofm-row">
+              <div class="biofm-label">BioFM:</div>
+              <div class="biofm-value">$${biofmUsdInitial.toLocaleString('en-US')}<span class="biofm-sep">/pack</span>₹${biofmInrInitial.toLocaleString('en-IN')}</div>
+              <div class="biofm-label">Our Price:</div>
+              <div class="biofm-value">₹${ourInitial.toLocaleString('en-IN')}</div>
+            </div>
+          </div>
+
+          <div class="product-price" data-price-display>
+            ${ourInitial ? `Our Price: ₹${ourInitial.toLocaleString('en-IN')} / pack` : 'Our Price: –'}
+          </div>
 
           <div class="product-actions">
-            <button class="btn-buy" ${buyDisabled ? 'disabled' : ''} onclick="${buyDisabled ? '' : `goToBuyPage('${safeName}', ${item.price})`}">
-              ${buyDisabled ? 'Unavailable' : 'Buy Now'}
-            </button>
-
+            <button class="btn-buy" ${disabledInitial?'disabled':''}>${disabledInitial?'Unavailable':'Buy Now'}</button>
             <div class="cart-btn-container">
-              <button class="btn-cart" ${cartDisabled ? 'disabled' : ''} onclick="${cartDisabled ? '' : `updateItem('${safeName}', ${item.price}, 1)`}">
-                ${cartDisabled ? 'Unavailable' : 'Add to Cart'}
-              </button>
-
+              <button class="btn-cart" ${disabledInitial?'disabled':''}>${disabledInitial?'Unavailable':'Add to Cart'}</button>
               <div class="qty-selector">
-                <button class="qty-btn" onclick="updateItem('${safeName}', ${item.price}, -1)">−</button>
+                <button class="qty-btn">−</button>
                 <span class="qty-value">0</span>
-                <button class="qty-btn" onclick="updateItem('${safeName}', ${item.price}, 1)">+</button>
+                <button class="qty-btn">+</button>
               </div>
             </div>
           </div>
         `;
 
         grid.appendChild(card);
+
+        const selectEl = card.querySelector('.pack-select');
+        const priceDisplay = card.querySelector('[data-price-display]');
+        const biofmDisplay = card.querySelector('[data-biofm-line]');
+        const buyBtn = card.querySelector('.btn-buy');
+        const cartBtn = card.querySelector('.btn-cart');
+        const qtyMinus = card.querySelector('.qty-selector .qty-btn:first-child');
+        const qtyPlus = card.querySelector('.qty-selector .qty-btn:last-child');
+
+        function refreshForPack(){
+          const packLabel = selectEl ? selectEl.value : null;
+          const { biofmUsd, biofmInr, our } = packLabel ? getPackPrice(item.name, packLabel) : { biofmUsd:0,biofmInr:0,our:0 };
+          const u = safeNumber(our);
+          const usd = safeNumber(biofmUsd);
+          const inr = safeNumber(biofmInr);
+
+          if(biofmDisplay){
+            if(u || usd || inr){
+              biofmDisplay.innerHTML = `
+                <div class="biofm-tag">BioFM vs Our Price</div>
+                <div class="biofm-row">
+                  <div class="biofm-label">BioFM:</div>
+                  <div class="biofm-value">$${usd.toLocaleString('en-US')}<span class="biofm-sep">/pack</span>₹${inr.toLocaleString('en-IN')}</div>
+                  <div class="biofm-label">Our Price:</div>
+                  <div class="biofm-value">₹${u.toLocaleString('en-IN')}</div>
+                </div>`;
+            }else{
+              biofmDisplay.textContent = 'Contact for detailed quotation';
+            }
+          }
+          if(priceDisplay){
+            priceDisplay.textContent = u ? `Our Price: ₹${u.toLocaleString('en-IN')} / pack` : 'Our Price: –';
+          }
+          const dis = !isInStock || !u;
+          if(buyBtn){
+            buyBtn.disabled = dis;
+            buyBtn.textContent = dis?'Unavailable':'Buy Now';
+          }
+          if(cartBtn){
+            cartBtn.disabled = dis;
+            cartBtn.textContent = dis?'Unavailable':'Add to Cart';
+          }
+        }
+
+        if(selectEl){
+          selectEl.addEventListener('change',()=>{
+            refreshForPack();
+            syncUI();
+          });
+        }
+
+        if(buyBtn){
+          buyBtn.addEventListener('click',()=>{
+            const packLabel = selectEl ? selectEl.value : null;
+            const { our } = packLabel ? getPackPrice(item.name, packLabel) : { our:0 };
+            const price = safeNumber(our);
+            if(!price) return;
+            goToBuyPage(item.name, price, packLabel);
+          });
+        }
+
+        if(cartBtn){
+          cartBtn.addEventListener('click',()=>{
+            const packLabel = selectEl ? selectEl.value : null;
+            const { our } = packLabel ? getPackPrice(item.name, packLabel) : { our:0 };
+            const price = safeNumber(our);
+            if(!price) return;
+            updateItem(item.name, price, 1, packLabel);
+          });
+        }
+
+        if(qtyMinus && qtyPlus){
+          qtyMinus.addEventListener('click',()=>{
+            const packLabel = selectEl ? selectEl.value : null;
+            const { our } = packLabel ? getPackPrice(item.name, packLabel) : { our:0 };
+            const price = safeNumber(our);
+            updateItem(item.name, price, -1, packLabel);
+          });
+          qtyPlus.addEventListener('click',()=>{
+            const packLabel = selectEl ? selectEl.value : null;
+            const { our } = packLabel ? getPackPrice(item.name, packLabel) : { our:0 };
+            const price = safeNumber(our);
+            updateItem(item.name, price, 1, packLabel);
+          });
+        }
+
+        refreshForPack();
       });
 
       intro.textContent =
         `${inStockCount} of ${items.length} products available. High-purity, pharmaceutical-grade chemicals derived from sustainable bamboo biomass. Contact sales for volume pricing and custom specifications.`;
+      syncUI();
     }
 
-    document.getElementById('siteSearchForm').addEventListener('submit', function(e){
+    document.getElementById('siteSearchForm').addEventListener('submit',function(e){
       e.preventDefault();
-      const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
-      if (!query) return;
-
-      const productCards = document.querySelectorAll('.product-card');
-      const matchingCard = Array.from(productCards).find(card =>
-        card.querySelector('.product-title')?.textContent.toLowerCase().includes(query)
-      );
-
-      if (matchingCard) matchingCard.scrollIntoView({ behavior:'smooth' });
-      else if (query.includes('cart')) window.location.href = 'cart.html';
-      else window.location.href = 'index.html';
+      const q = document.getElementById('siteSearchInput').value.trim().toLowerCase();
+      if(!q) return;
+      if(q.includes('cart')) window.location.href='cart.html';
+      else if(q.includes('product') || q.includes('shop')) window.location.href='products.html';
+      else window.location.href='index.html';
     });
 
     window.toggleSidebar = toggleSidebar;
     window.updateItem = updateItem;
     window.goToBuyPage = goToBuyPage;
 
-    document.addEventListener('DOMContentLoaded', function(){
-      renderProducts();   // ✅ now async-driven from API
+    document.addEventListener('DOMContentLoaded', async function(){
+      await loadPricingData();
+      await renderProducts();
       saveCart();
       syncUI();
-
-      // Keep UI synced if cart changes in other tabs
-      window.addEventListener('storage', function(e){
-        if (e.key === 'chemsusCart') {
+      window.addEventListener('storage',function(e){
+        if(e.key==='chemsusCart'){
           cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
           saveCart();
           syncUI();

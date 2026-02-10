@@ -13,6 +13,7 @@
       --accent: #00b8b0;
       --bg: #F3F7FB;
       --ink: #1f2933;
+      --highlight:#f97316;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -25,7 +26,6 @@
     }
     a { text-decoration: none; color: inherit; }
 
-    /* SIDEBAR */
     .sidebar {
       width: 240px;
       background: var(--primary);
@@ -43,10 +43,7 @@
     .sidebar-overlay {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      inset:0;
       background: rgba(0, 0, 0, 0.5);
       z-index: 1001;
       backdrop-filter: blur(2px);
@@ -85,11 +82,7 @@
       font-size: 13.5px;
       transition: all 0.2s ease;
     }
-    .nav-menu li a:hover {
-      background: rgba(255,255,255,0.1);
-      border-left-color: var(--accent);
-    }
-    .nav-menu li a.active {
+    .nav-menu li a:hover, .nav-menu li a.active {
       background: rgba(255,255,255,0.1);
       border-left-color: var(--accent);
     }
@@ -129,7 +122,6 @@
       pointer-events: none;
     }
 
-    /* MAIN WRAPPER */
     .main-wrapper {
       margin-left: 240px;
       flex: 1;
@@ -139,14 +131,13 @@
       transition: margin-left 0.3s ease;
     }
 
-    /* HERO */
     .hero {
       position: relative;
       overflow: hidden;
       background: radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
                   radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
                   #041424;
-      height: 260px;
+      height: 240px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -180,40 +171,39 @@
     }
     .hero-title {
       font-family: "Montserrat", sans-serif;
-      font-size: 40px;
+      font-size: 36px;
       font-weight: 700;
       margin-bottom: 10px;
     }
     .hero-subtitle {
-      font-size: 16px;
+      font-size: 15px;
       color: #e2f3ff;
     }
 
     main {
-      max-width: 1150px;
+      max-width: 1000px;
       margin: 0 auto;
-      padding: 34px 18px 42px 18px;
+      padding: 34px 18px 42px;
       width: 100%;
       flex: 1;
     }
     .section {
       background: #fff;
-      padding: 36px;
+      padding: 32px;
       border-radius: 14px;
       box-shadow: 0 14px 30px rgba(15,23,42,0.12);
       border-top: 4px solid var(--accent);
     }
-    .section-header { margin-bottom: 24px; }
+    .section-header { margin-bottom: 20px; }
     .section-header h2 {
       font-family: "Montserrat", sans-serif;
-      font-size: 24px;
+      font-size: 22px;
       color: var(--primary-dark);
     }
 
-    /* ORDER SUMMARY BLOCK (product details like screenshot) */
     .order-summary {
       background: #f9fbff;
-      padding: 20px 22px 22px;
+      padding: 18px 20px 20px;
       border-radius: 12px;
       margin-bottom: 24px;
       border: 2px solid #e0f2fe;
@@ -222,7 +212,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
     }
     .order-summary-title {
       display: flex;
@@ -246,7 +236,7 @@
     }
     .order-summary-line {
       border-top: 1px solid #06b6d4;
-      margin: 10px 0 16px;
+      margin: 8px 0 14px;
     }
     .summary-row {
       display: flex;
@@ -266,7 +256,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-top: 14px;
+      margin-top: 12px;
       padding-top: 10px;
       border-top: 1px solid #e5e7eb;
       font-size: 18px;
@@ -274,11 +264,29 @@
       color: var(--primary);
     }
 
-    /* FORM */
-    .form-group { margin-bottom: 20px; }
+    .info-banner{
+      margin:0 0 16px;
+      padding:10px 12px;
+      border-radius:10px;
+      background:rgba(249,115,22,0.05);
+      border:1px solid rgba(249,115,22,0.5);
+      font-size:13px;
+      color:#7c2d12;
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+    }
+    .info-icon{
+      width:18px;height:18px;border-radius:999px;
+      background:var(--highlight);color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;font-weight:700;flex-shrink:0;
+    }
+
+    .form-group { margin-bottom: 18px; }
     .form-label {
       display: block;
-      margin-bottom: 8px;
+      margin-bottom: 7px;
       font-weight: 600;
       color: var(--primary-dark);
       font-size: 14px;
@@ -286,7 +294,7 @@
     .form-label.required::after { content: " *"; color: #ef4444; }
     .form-input, .form-textarea {
       width: 100%;
-      padding: 12px 14px;
+      padding: 11px 13px;
       border: 2px solid #e2e8f0;
       border-radius: 8px;
       font-size: 14px;
@@ -301,16 +309,16 @@
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 20px;
+      gap: 18px;
     }
     .form-textarea { resize: vertical; min-height: 80px; }
     .btn-submit {
       background: linear-gradient(135deg, var(--accent), #00d4cc);
       color: white;
-      padding: 14px 32px;
+      padding: 13px 30px;
       border: none;
       border-radius: 8px;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       font-family: "Montserrat", sans-serif;
       cursor: pointer;
@@ -324,18 +332,18 @@
     .error-message {
       background: #fee2e2;
       color: #991b1b;
-      padding: 12px 16px;
+      padding: 11px 14px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       display: none;
       border-left: 4px solid #ef4444;
     }
     .success-message {
       background: #dcfce7;
       color: #166534;
-      padding: 12px 16px;
+      padding: 11px 14px;
       border-radius: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
       display: none;
       border-left: 4px solid #22c55e;
     }
@@ -348,7 +356,6 @@
       margin-top: 24px;
     }
 
-    /* MOBILE TOGGLE */
     .mobile-toggle {
       display: none;
       position: fixed;
@@ -366,18 +373,18 @@
     .mobile-toggle svg { width: 20px; height: 20px; }
 
     @media (max-width: 1050px) {
-      .sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+      .sidebar { transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
       .main-wrapper { margin-left: 0; }
       .mobile-toggle { display: block; }
     }
     @media (max-width: 900px) {
       .form-row { grid-template-columns: 1fr; }
-      .hero-title { font-size: 32px; }
+      .hero-title { font-size: 30px; }
     }
     @media (max-width: 580px) {
-      .hero-title { font-size: 28px; }
-      .section { padding: 24px 20px; }
+      .hero-title { font-size: 26px; }
+      .section { padding: 22px 18px; }
     }
   </style>
 </head>
@@ -406,7 +413,7 @@
       <li><a href="cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
       <li><a href="contact.html">Contact us</a></li>
       <li><a href="request-sample.html">Request for Sample</a></li>
-      <li><a href="orders.html">Orders</a></li>
+      <li><a href="orders.html" class="active">Orders</a></li>
     </ul>
     <div class="search-section">
       <form class="search-form" id="siteSearchForm">
@@ -426,7 +433,7 @@
         <div class="hero-kicker">Secure Checkout</div>
         <h1 class="hero-title">Complete Your Order</h1>
         <p class="hero-subtitle">
-          Provide your details to proceed with payment
+          Review your order details and provide delivery information
         </p>
       </div>
     </section>
@@ -440,14 +447,19 @@
         <div id="errorMessage" class="error-message"></div>
         <div id="successMessage" class="success-message"></div>
 
-        <!-- NEW ORDER SUMMARY LAYOUT -->
+        <div class="info-banner">
+          <div class="info-icon">!</div>
+          <div>
+            <strong>Pack size and pricing confirmed.</strong> Review your order summary below, then fill in delivery details to proceed.
+          </div>
+        </div>
+
         <div class="order-summary">
           <div class="order-summary-header">
             <div class="order-summary-title">
               <span class="icon">📦</span>
               <span>Order Summary</span>
             </div>
-            <span id="summaryRightInfo" style="font-size:13px;color:#4b5563;"></span>
           </div>
 
           <div class="order-summary-line"></div>
@@ -457,11 +469,11 @@
             <span id="summaryProduct" class="summary-row-value">–</span>
           </div>
           <div class="summary-row">
-            <span class="summary-row-label">Quantity</span>
+            <span class="summary-row-label">Quantity (packs)</span>
             <span id="summaryQuantity" class="summary-row-value">–</span>
           </div>
           <div class="summary-row">
-            <span class="summary-row-label">Unit Price</span>
+            <span class="summary-row-label">Unit Price per pack</span>
             <span id="summaryUnitPrice" class="summary-row-value">–</span>
           </div>
 
@@ -532,7 +544,6 @@
   </div>
 
   <script>
-    // GLOBAL CONFIG
     let API_BASE = '/api';
 
     async function initBackend() {
@@ -561,28 +572,12 @@
       overlay.classList.remove('active');
     }
 
-    const navLinks = document.querySelectorAll('.nav-menu a');
-    navLinks.forEach(link => {
+    document.querySelectorAll('.nav-menu a').forEach(link => {
       link.addEventListener('click', () => {
-        if (window.innerWidth <= 1050) {
-          closeSidebar();
-        }
+        if (window.innerWidth <= 1050) closeSidebar();
       });
     });
 
-    function setActiveNavLink() {
-      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-      navLinks.forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === currentPage) {
-          link.classList.add('active');
-        } else {
-          link.classList.remove('active');
-        }
-      });
-    }
-
-    // LOAD PRODUCT DATA INTO SUMMARY BLOCK
     function loadOrderData() {
       const buyNowData = sessionStorage.getItem('buyNowData');
 
@@ -590,14 +585,12 @@
       const qtyEl = document.getElementById('summaryQuantity');
       const unitEl = document.getElementById('summaryUnitPrice');
       const totalEl = document.getElementById('totalAmount');
-      const rightInfo = document.getElementById('summaryRightInfo');
 
       if (!buyNowData) {
         productEl.textContent = 'No product selected';
-        qtyEl.textContent = '-';
+        qtyEl.textContent = '–';
         unitEl.textContent = '₹0';
         totalEl.textContent = '₹0';
-        rightInfo.textContent = '';
         document.getElementById('checkoutForm').style.display = 'none';
         return;
       }
@@ -607,10 +600,9 @@
         productData = JSON.parse(buyNowData);
       } catch (e) {
         productEl.textContent = 'Invalid product data';
-        qtyEl.textContent = '-';
+        qtyEl.textContent = '–';
         unitEl.textContent = '₹0';
         totalEl.textContent = '₹0';
-        rightInfo.textContent = '';
         document.getElementById('checkoutForm').style.display = 'none';
         return;
       }
@@ -621,14 +613,11 @@
       const totalPrice = quantity * unitPrice;
 
       productEl.textContent = productName;
-      qtyEl.textContent = quantity + ' kg';
+      qtyEl.textContent = quantity + ' pack(s)';
       unitEl.textContent = '₹' + unitPrice.toLocaleString('en-IN');
       totalEl.textContent = '₹' + totalPrice.toLocaleString('en-IN');
-      rightInfo.textContent = quantity + ' kg × ₹' + unitPrice.toLocaleString('en-IN') +
-        ' = ₹' + totalPrice.toLocaleString('en-IN');
 
       sessionStorage.setItem('orderTotal', totalPrice);
-      sessionStorage.setItem('buyNowProduct', JSON.stringify({ productName, quantity, unitPrice }));
     }
 
     async function placeBuyNowOrderAndProceed() {
@@ -751,12 +740,9 @@
 
     window.addEventListener('DOMContentLoaded', async function() {
       await initBackend();
-      setActiveNavLink();
       loadOrderData();
       updateCartBadge();
     });
-
-    window.addEventListener('resize', setActiveNavLink);
   </script>
 </body>
 </html>

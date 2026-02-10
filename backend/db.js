@@ -64,12 +64,28 @@ async function initDb() {
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS pack_pricing (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      shop_item_id INTEGER NOT NULL,
+      pack_size TEXT NOT NULL,
+      biofm_usd REAL NOT NULL DEFAULT 0,
+      biofm_inr REAL NOT NULL DEFAULT 0,
+      our_price REAL NOT NULL DEFAULT 0,
+      is_active INTEGER NOT NULL DEFAULT 1,
+      sort_order INTEGER NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY(shop_item_id) REFERENCES shop_items(id) ON DELETE CASCADE,
+      UNIQUE(shop_item_id, pack_size)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_pack_pricing_item ON pack_pricing(shop_item_id);
+
     CREATE TABLE IF NOT EXISTS site_settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL DEFAULT ''
     );
 
-    -- ✅ safer defaults (no NOT NULL failures if a field is missing)
     CREATE TABLE IF NOT EXISTS orders (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       customername TEXT NOT NULL DEFAULT '',
@@ -85,7 +101,7 @@ async function initDb() {
       quantity REAL NOT NULL DEFAULT 1,
       unitprice REAL NOT NULL DEFAULT 0,
       totalprice REAL NOT NULL DEFAULT 0,
-      payment_status TEXT NOT NULL DEFAULT 'PENDING', -- PENDING/VERIFYING/PAID/FAILED
+      payment_status TEXT NOT NULL DEFAULT 'PENDING',
       paymentmode TEXT NOT NULL DEFAULT 'PENDING',
       notes TEXT DEFAULT '',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -102,7 +118,7 @@ async function initDb() {
       payment_ref TEXT NOT NULL DEFAULT '',
       amount REAL NOT NULL DEFAULT 0,
       currency TEXT NOT NULL DEFAULT 'INR',
-      status TEXT NOT NULL DEFAULT 'PENDING', -- PENDING/SUCCESS/FAILED
+      status TEXT NOT NULL DEFAULT 'PENDING',
       receipt_path TEXT NOT NULL DEFAULT '',
       rating INTEGER NOT NULL DEFAULT 0,
       feedback TEXT NOT NULL DEFAULT '',
@@ -119,7 +135,7 @@ async function initDb() {
   `);
 
   await seed();
-  console.log("✅ SQLite ready");
+  console.log("✅ SQLite ready with pack_pricing table");
 }
 
 module.exports = { db, initDb, exec, get, run };

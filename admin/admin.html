@@ -35,16 +35,9 @@
       line-height: 1.6;
     }
 
-    a { 
-      color: inherit; 
-      text-decoration: none; 
-    }
+    a { color: inherit; text-decoration: none; }
+    button, input, select, textarea { font-family: inherit; }
 
-    button, input, select, textarea { 
-      font-family: inherit; 
-    }
-
-    /* TOPBAR */
     .topbar {
       position: sticky;
       top: 0;
@@ -72,7 +65,6 @@
       gap: 12px;
       font-family: "Montserrat", sans-serif;
       font-weight: 700;
-      letter-spacing: 0.02em;
     }
 
     .brand-badge {
@@ -93,17 +85,8 @@
       gap: 2px;
     }
 
-    .brand-title {
-      font-size: 16px;
-      line-height: 1.2;
-    }
-
-    .brand-subtitle {
-      font-size: 11px;
-      opacity: 0.85;
-      font-weight: 400;
-      line-height: 1.2;
-    }
+    .brand-title { font-size: 16px; line-height: 1.2; }
+    .brand-subtitle { font-size: 11px; opacity: 0.85; font-weight: 400; }
 
     .topbar-actions {
       display: flex;
@@ -135,14 +118,12 @@
       border-color: rgba(255,255,255,0.2);
     }
 
-    /* CONTAINER */
     .container {
       max-width: 1400px;
       margin: 0 auto;
       padding: 24px 20px 40px;
     }
 
-    /* SIDEBAR NAV */
     .sidebar-nav {
       background: var(--card);
       border-radius: var(--radius);
@@ -158,7 +139,6 @@
       display: flex;
       gap: 6px;
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
     }
 
     .nav a {
@@ -172,7 +152,6 @@
       border: 1px solid transparent;
       cursor: pointer;
       transition: all 0.2s ease;
-      user-select: none;
       white-space: nowrap;
       font-weight: 500;
     }
@@ -189,7 +168,6 @@
       border-color: #e2e8f0;
     }
 
-    /* CARD */
     .card {
       background: var(--card);
       border-radius: var(--radius);
@@ -214,7 +192,6 @@
       line-height: 1.5;
     }
 
-    /* FORM - Mobile First, then 2-column on desktop */
     .row {
       display: grid;
       grid-template-columns: 1fr;
@@ -223,13 +200,8 @@
     }
 
     @media (min-width: 768px) {
-      .row {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .row.full {
-        grid-template-columns: 1fr;
-      }
+      .row { grid-template-columns: 1fr 1fr; }
+      .row.full { grid-template-columns: 1fr; }
     }
 
     .field {
@@ -244,9 +216,7 @@
       color: var(--primary-dark);
     }
 
-    .field input,
-    .field select,
-    .field textarea {
+    .field input, .field select, .field textarea {
       width: 100%;
       padding: 11px 14px;
       border-radius: 8px;
@@ -257,14 +227,9 @@
       transition: all 0.2s ease;
     }
 
-    .field textarea {
-      min-height: 100px;
-      resize: vertical;
-    }
+    .field textarea { min-height: 100px; resize: vertical; }
 
-    .field input:focus,
-    .field select:focus,
-    .field textarea:focus {
+    .field input:focus, .field select:focus, .field textarea:focus {
       border-color: var(--accent);
       box-shadow: 0 0 0 3px rgba(0,184,176,0.1);
     }
@@ -276,7 +241,6 @@
       flex-wrap: wrap;
     }
 
-    /* BUTTONS */
     .btn {
       border: none;
       border-radius: 8px;
@@ -317,9 +281,7 @@
       border: 2px solid #fecaca;
     }
 
-    .btn.danger:hover {
-      background: #fecaca;
-    }
+    .btn.danger:hover { background: #fecaca; }
 
     .btn.small {
       padding: 7px 12px;
@@ -333,15 +295,12 @@
       transform: none;
     }
 
-    /* STATUS */
     .status {
       margin-top: 14px;
       font-size: 13px;
       padding: 12px 16px;
       border-radius: 10px;
       display: none;
-      word-break: break-word;
-      line-height: 1.5;
     }
 
     .status.ok {
@@ -364,13 +323,11 @@
       margin: 20px 0;
     }
 
-    /* TABLE - Mobile Scroll */
     .table-wrap {
       overflow-x: auto;
       border-radius: 12px;
       border: 2px solid #e2e8f0;
       margin-top: 16px;
-      -webkit-overflow-scrolling: touch;
     }
 
     table {
@@ -394,21 +351,12 @@
       font-size: 12px;
       color: var(--primary-dark);
       font-weight: 700;
-      position: sticky;
-      top: 0;
-      z-index: 10;
       border-bottom: 2px solid var(--accent);
     }
 
-    tbody tr {
-      transition: background 0.15s ease;
-    }
+    tbody tr { transition: background 0.15s ease; }
+    tbody tr:hover { background: #f8fafc; }
 
-    tbody tr:hover {
-      background: #f8fafc;
-    }
-
-    /* TAGS */
     .tag {
       display: inline-block;
       padding: 5px 12px;
@@ -416,36 +364,15 @@
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.03em;
-      border: 1px solid transparent;
       white-space: nowrap;
       text-transform: uppercase;
     }
 
-    .tag.pending {
-      background: #fff7ed;
-      color: #9a3412;
-      border-color: #fed7aa;
-    }
+    .tag.pending { background: #fff7ed; color: #9a3412; }
+    .tag.verify { background: #eff6ff; color: #1e40af; }
+    .tag.paid { background: #dcfce7; color: #166534; }
+    .tag.failed { background: #fee2e2; color: #991b1b; }
 
-    .tag.verify {
-      background: #eff6ff;
-      color: #1e40af;
-      border-color: #bfdbfe;
-    }
-
-    .tag.paid {
-      background: #dcfce7;
-      color: #166534;
-      border-color: #bbf7d0;
-    }
-
-    .tag.failed {
-      background: #fee2e2;
-      color: #991b1b;
-      border-color: #fecaca;
-    }
-
-    /* LOGIN */
     .login-wrap {
       max-width: 480px;
       margin: 60px auto;
@@ -467,20 +394,14 @@
       color: var(--primary-dark);
     }
 
-    .muted {
-      color: var(--muted);
-      font-size: 13px;
-    }
+    .muted { color: var(--muted); font-size: 13px; }
 
-    /* Action buttons inside table */
     .actions-cell {
       display: flex;
       gap: 6px;
       flex-wrap: wrap;
-      align-items: center;
     }
 
-    /* Receipt thumb */
     .thumb {
       width: 50px;
       height: 50px;
@@ -497,40 +418,13 @@
       border-color: var(--accent);
     }
 
-    /* Mobile Responsive */
     @media (max-width: 768px) {
       .topbar-inner {
         flex-direction: column;
         align-items: flex-start;
-        gap: 12px;
       }
-
-      .topbar-actions {
-        width: 100%;
-        justify-content: flex-start;
-      }
-
-      .card {
-        padding: 20px 16px;
-      }
-
-      table {
-        min-width: 1000px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 16px 12px;
-      }
-
-      .brand-title {
-        font-size: 14px;
-      }
-
-      .brand-subtitle {
-        font-size: 10px;
-      }
+      .card { padding: 20px 16px; }
+      table { min-width: 1000px; }
     }
   </style>
 </head>
@@ -542,7 +436,7 @@
         <div class="brand-badge">CS</div>
         <div class="brand-text">
           <div class="brand-title">ChemSus Admin</div>
-          <div class="brand-subtitle">Products • Shop • Orders • Payments</div>
+          <div class="brand-subtitle">Products • Shop • Pack Pricing • Orders</div>
         </div>
       </div>
       <div class="topbar-actions" id="topActions" style="display:none;">
@@ -557,15 +451,15 @@
   <div id="loginView" class="login-wrap" style="display:none;">
     <div class="login-card">
       <h2>Admin Login</h2>
-      <p class="muted" style="margin-bottom:20px;">Enter your ChemSus admin credentials to continue.</p>
+      <p class="muted" style="margin-bottom:20px;">Enter your ChemSus admin credentials.</p>
       <div class="row full">
         <div class="field">
           <label>Username</label>
-          <input id="loginUser" type="text" autocomplete="username">
+          <input id="loginUser" type="text">
         </div>
         <div class="field">
           <label>Password</label>
-          <input id="loginPass" type="password" autocomplete="current-password">
+          <input id="loginPass" type="password">
         </div>
       </div>
       <div class="inline" style="margin-top:16px;">
@@ -579,11 +473,11 @@
   <div id="appView" style="display:none;">
     <div class="container">
 
-      <!-- Sidebar Nav -->
       <nav class="sidebar-nav">
         <ul class="nav" id="nav">
           <li><a class="active" data-view="view-products" onclick="switchView('view-products')">📦 Products</a></li>
           <li><a data-view="view-shop" onclick="switchView('view-shop')">🛒 Shop</a></li>
+          <li><a data-view="view-packs" onclick="switchView('view-packs')">📋 Pack Pricing</a></li>
           <li><a data-view="view-orders" onclick="switchView('view-orders')">📋 Orders</a></li>
           <li><a data-view="view-payments" onclick="switchView('view-payments')">💳 Payments</a></li>
           <li><a data-view="view-settings" onclick="switchView('view-settings')">⚙️ Settings</a></li>
@@ -593,7 +487,7 @@
       <!-- PRODUCTS -->
       <section id="view-products" class="card">
         <h2>Products Page CRUD</h2>
-        <p class="hint">Fields used by <b>products.html</b> cards. Save updates page immediately.</p>
+        <p class="hint">Manage products displayed on <b>products.html</b>.</p>
         <div class="inline">
           <button class="btn ghost" onclick="clearProductsForm()">Clear</button>
           <button class="btn ghost" onclick="refreshProducts()">Refresh</button>
@@ -642,7 +536,6 @@
           <div class="field">
             <label>Sort order</label>
             <input id="psort" type="number" value="0">
-            <div class="muted">Controls display order on page.</div>
           </div>
         </div>
         <div class="inline" style="margin-top:16px;">
@@ -674,7 +567,7 @@
       <!-- SHOP -->
       <section id="view-shop" class="card" style="display:none;">
         <h2>Shop Page CRUD</h2>
-        <p class="hint">Fields used by <b>shop.html</b> cards. Save updates page immediately.</p>
+        <p class="hint">Manage shop items with features on <b>shop.html</b>. Pack pricing managed separately.</p>
         <div class="inline">
           <button class="btn ghost" onclick="clearShopForm()">Clear</button>
           <button class="btn ghost" onclick="refreshShop()">Refresh</button>
@@ -707,12 +600,12 @@
         <div class="row">
           <div class="field">
             <label>Features (one per line)</label>
-            <textarea id="sfeatures" placeholder="High bioavailability&#10;Pharma & nutraceutical use"></textarea>
+            <textarea id="sfeatures" placeholder="High bioavailability&#10;Pharma use"></textarea>
           </div>
           <div class="field">
-            <label>Price / kg</label>
+            <label>Base Price (display only)</label>
             <input id="sprice" type="number" step="0.01" placeholder="1800">
-            <div class="muted">Set 0 for "Contact for Price".</div>
+            <div class="muted">Actual pricing in Pack Pricing section.</div>
           </div>
         </div>
         <div class="row">
@@ -754,7 +647,6 @@
           <div class="field">
             <label>Sort order</label>
             <input id="ssort" type="number" value="0">
-            <div class="muted">Controls display order on page.</div>
           </div>
         </div>
         <div class="inline" style="margin-top:16px;">
@@ -784,15 +676,120 @@
         </div>
       </section>
 
+      <!-- PACK PRICING -->
+      <section id="view-packs" class="card" style="display:none;">
+        <h2>Pack Pricing Management</h2>
+        <p class="hint">Manage pack sizes and BioFM comparison pricing for shop items.</p>
+
+        <div class="row">
+          <div class="field">
+            <label>Select Shop Item</label>
+            <select id="packShopItemSelect" onchange="loadPacksForItem()">
+              <option value="">-- Select Product --</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>&nbsp;</label>
+            <div class="inline">
+              <button class="btn ghost" onclick="clearPackForm()">Clear</button>
+              <button class="btn ghost" onclick="loadPacksForItem()">Refresh</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="packFormSection" style="display:none;">
+          <div class="divider"></div>
+          <h2 style="font-size:18px;margin-bottom:12px;">Add/Edit Pack</h2>
+
+          <div class="row">
+            <div class="field">
+              <label>Pack ID (blank = new)</label>
+              <input id="packId" placeholder="Auto-filled when editing" readonly>
+            </div>
+            <div class="field">
+              <label>Active</label>
+              <select id="packActive">
+                <option value="1">Active</option>
+                <option value="0">Inactive</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Pack Size</label>
+              <input id="packSize" placeholder="100 g, 500 mL, 1 kg, etc.">
+            </div>
+            <div class="field">
+              <label>Sort Order</label>
+              <input id="packSort" type="number" value="0">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>BioFM USD Price</label>
+              <input id="packBiofmUsd" type="number" step="0.01" placeholder="36.3">
+            </div>
+            <div class="field">
+              <label>BioFM INR Price</label>
+              <input id="packBiofmInr" type="number" step="0.01" placeholder="7336">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>Our Price (INR)</label>
+              <input id="packOurPrice" type="number" step="0.01" placeholder="2000">
+            </div>
+            <div class="field">
+              <label>&nbsp;</label>
+              <div class="muted">This is the customer-facing price per pack.</div>
+            </div>
+          </div>
+
+          <div class="inline" style="margin-top:16px;">
+            <button class="btn primary" onclick="savePack()">💾 Save Pack</button>
+            <button class="btn danger" onclick="deletePack()">🗑️ Delete</button>
+          </div>
+          <div id="packstatus" class="status"></div>
+        </div>
+
+        <div class="divider"></div>
+        <h2 style="font-size:18px;margin-bottom:12px;">Existing Packs</h2>
+        <div id="packsTableWrap" style="display:none;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Active</th>
+                  <th>Pack Size</th>
+                  <th>BioFM USD</th>
+                  <th>BioFM INR</th>
+                  <th>Our Price</th>
+                  <th>Sort</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="packstable"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="packsEmpty" style="padding:40px;text-align:center;color:#6b7280;">
+          Select a shop item to manage its pack pricing
+        </div>
+      </section>
+
       <!-- ORDERS -->
       <section id="view-orders" class="card" style="display:none;">
         <h2>Orders</h2>
-        <p class="hint">Orders created from <b>checkout.html</b>. Filter & manage orders.</p>
+        <p class="hint">Orders from checkout with full address details.</p>
 
         <div class="row">
           <div class="field">
             <label>Search</label>
-            <input id="orderSearch" placeholder="name, phone, product, city, id..." oninput="applyOrderFilters()">
+            <input id="orderSearch" placeholder="name, phone, product, city..." oninput="applyOrderFilters()">
           </div>
           <div class="field">
             <label>Status</label>
@@ -839,12 +836,12 @@
       <!-- PAYMENTS -->
       <section id="view-payments" class="card" style="display:none;">
         <h2>Payments & Receipts</h2>
-        <p class="hint">Receipts uploaded from <b>payment2.html</b>. Filter, preview, mark status.</p>
+        <p class="hint">Receipts uploaded from payment2.html. Mark SUCCESS/FAILED.</p>
 
         <div class="row">
           <div class="field">
             <label>Search</label>
-            <input id="paySearch" placeholder="order id, name, phone..." oninput="applyPaymentFilters()">
+            <input id="paySearch" placeholder="order id, name..." oninput="applyPaymentFilters()">
           </div>
           <div class="field">
             <label>Receipt</label>
@@ -899,13 +896,12 @@
       <!-- SETTINGS -->
       <section id="view-settings" class="card" style="display:none;">
         <h2>Site Settings</h2>
-        <p class="hint">Upload brochure PDF and update download link used on products page.</p>
+        <p class="hint">Upload brochure PDF.</p>
 
         <div class="row">
           <div class="field">
             <label>Current brochure URL</label>
             <input id="brochureurl" placeholder="assets/broucher.pdf">
-            <div class="muted">Use path like <b>assets/uploads/xxx.pdf</b></div>
           </div>
           <div class="field">
             <label>Upload brochure PDF</label>
@@ -923,11 +919,11 @@
     </div>
   </div>
 
-  <!-- Receipt Viewer Modal -->
-  <div id="imgModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;padding:20px;">
+  <!-- Receipt Modal -->
+  <div id="imgModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;padding:20px;" onclick="if(event.target===this)closeModal()">
     <div style="max-width:960px;margin:60px auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3);">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:linear-gradient(135deg, #f8fafc, #f1f5f9);border-bottom:2px solid #e2e8f0;">
-        <b style="font-family:Montserrat, sans-serif;color:var(--primary-dark);font-size:16px;">Receipt Preview</b>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#f8fafc;border-bottom:2px solid #e2e8f0;">
+        <b style="font-family:Montserrat;color:var(--primary-dark);">Receipt Preview</b>
         <button class="btn ghost small" onclick="closeModal()">✕ Close</button>
       </div>
       <div style="padding:20px;max-height:70vh;overflow:auto;">
@@ -951,49 +947,27 @@
     }
 
     function escapeHtml(s) {
-      return String(s ?? '')
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#039;');
+      return String(s ?? '').replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
     }
 
-    function tagHTML(orderStatus) {
-      const s = (orderStatus || '').toUpperCase();
+    function tagHTML(st) {
+      const s = (st || '').toUpperCase();
       if (s === 'PAID') return '<span class="tag paid">PAID</span>';
       if (s === 'FAILED') return '<span class="tag failed">FAILED</span>';
       if (s === 'VERIFYING') return '<span class="tag verify">VERIFYING</span>';
       return '<span class="tag pending">PENDING</span>';
     }
 
-    function openPage(p) {
-      window.open(p, '_blank');
-    }
-
-    // ============ BACKEND ============
-    async function initBackend() {
-      try {
-        const r = await fetch('/api/test');
-        if (r.ok) {
-          const cfg = await r.json();
-          API_BASE = cfg.apiBase || '/api';
-        }
-      } catch {}
-    }
+    function openPage(p) { window.open(p, '_blank'); }
 
     async function api(url, opts) {
       const r = await fetch(API_BASE + url, { credentials: 'include', ...opts });
-      if (!r.ok) {
-        const t = await r.text();
-        throw new Error(`${t} (HTTP ${r.status})`);
-      }
+      if (!r.ok) throw new Error(await r.text());
       const ct = r.headers.get('content-type');
       if (ct && ct.includes('application/json')) return r.json();
       return r.text();
     }
 
-    // Normalize receipt path
     function receiptUrl(p) {
       const rp = String(p?.receiptpath || '').trim();
       if (!rp) return '';
@@ -1003,32 +977,18 @@
       return '../assets/receipts/' + rp;
     }
 
-    // Modal preview
     function openModal(src) {
-      const m = document.getElementById('imgModal');
-      const img = document.getElementById('modalImg');
-      img.src = src;
-      m.style.display = 'block';
+      document.getElementById('modalImg').src = src;
+      document.getElementById('imgModal').style.display = 'block';
     }
 
     function closeModal() {
-      const m = document.getElementById('imgModal');
-      const img = document.getElementById('modalImg');
-      img.src = '';
-      m.style.display = 'none';
+      document.getElementById('imgModal').style.display = 'none';
+      document.getElementById('modalImg').src = '';
     }
 
-    document.addEventListener('click', (e) => {
-      const m = document.getElementById('imgModal');
-      if (!m || m.style.display === 'none') return;
-      if (e.target === m) closeModal();
-    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeModal();
-    });
-
-    // ============ LOGIN ============
     async function login() {
       const username = document.getElementById('loginUser').value.trim();
       const password = document.getElementById('loginPass').value.trim();
@@ -1048,15 +1008,12 @@
     }
 
     async function logout() {
-      try {
-        await api('/admin/logout', { method: 'POST' });
-      } catch {}
+      try { await api('/admin/logout', { method: 'POST' }); } catch {}
       document.getElementById('topActions').style.display = 'none';
       document.getElementById('appView').style.display = 'none';
       document.getElementById('loginView').style.display = 'block';
     }
 
-    // ============ VIEW SWITCH ============
     function switchView(id) {
       document.querySelectorAll('.card').forEach(s => s.style.display = 'none');
       document.getElementById(id).style.display = 'block';
@@ -1066,17 +1023,17 @@
 
       if (id === 'view-products') refreshProducts();
       if (id === 'view-shop') refreshShop();
+      if (id === 'view-packs') { loadShopItemsForPackSelect(); loadPacksForItem(); }
       if (id === 'view-orders') refreshOrders();
       if (id === 'view-payments') refreshPayments();
       if (id === 'view-settings') loadBrochure();
     }
 
-    // ============ Upload helpers ============
     async function uploadFor(fileInputId, targetInputId, statusId) {
       const fileInput = document.getElementById(fileInputId);
       const target = document.getElementById(targetInputId);
       const statusEl = document.getElementById(statusId);
-      if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+      if (!fileInput?.files?.length) {
         if (statusEl) statusEl.textContent = '⚠️ Choose a file first.';
         return;
       }
@@ -1102,12 +1059,10 @@
       await uploadFor('brochurefile', 'brochureurl', 'brochureuploadstatus');
     }
 
-    // ============ Products CRUD ============
     function clearProductsForm() {
       ['pid','pname','pdesc','pimage','plink','psort'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('pactive').value = '1';
       document.getElementById('psort').value = '0';
-      document.getElementById('puploadstatus').textContent = '';
     }
 
     function fillProductsForm(r) {
@@ -1156,7 +1111,7 @@
           link: document.getElementById('plink').value.trim(),
           sortorder: Number(document.getElementById('psort').value || 0),
         };
-        if (!payload.name) return showStatus('pstatus', 'err', '❌ Name is required.');
+        if (!payload.name) return showStatus('pstatus', 'err', '❌ Name required.');
         if (id) {
           await api(`/admin/products-page/${id}`, {
             method: 'PUT',
@@ -1192,14 +1147,12 @@
       }
     }
 
-    // ============ Shop CRUD ============
     function clearShopForm() {
       ['sid','sname','ssubtitle','sfeatures','sprice','sbadge','smore','simage','ssort'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('sactive').value = '1';
       document.getElementById('sstock').value = 'in-stock';
       document.getElementById('sshowbadge').value = '0';
       document.getElementById('ssort').value = '0';
-      document.getElementById('suploadstatus').textContent = '';
     }
 
     function fillShopForm(r) {
@@ -1215,10 +1168,10 @@
       })();
       document.getElementById('sfeatures').value = feats;
       document.getElementById('sprice').value = r.price ?? 0;
-      document.getElementById('sstock').value = r.stockStatus || r.stockstatus || 'in-stock';
-      document.getElementById('sshowbadge').value = String(r.showBadge ?? r.showbadge ?? 0);
-      document.getElementById('sbadge').value = r.badge ?? r.badgetext ?? '';
-      document.getElementById('smore').value = r.moreLink ?? r.morelink ?? '';
+      document.getElementById('sstock').value = r.stockStatus || 'in-stock';
+      document.getElementById('sshowbadge').value = String(r.showBadge ?? 0);
+      document.getElementById('sbadge').value = r.badge ?? '';
+      document.getElementById('smore').value = r.moreLink ?? '';
       document.getElementById('simage').value = r.image ?? '';
       document.getElementById('ssort').value = r.sort_order ?? 0;
       switchView('view-shop');
@@ -1266,7 +1219,7 @@
           image: document.getElementById('simage').value.trim(),
           sortorder: Number(document.getElementById('ssort').value || 0),
         };
-        if (!payload.name) return showStatus('sstatus', 'err', '❌ Name is required.');
+        if (!payload.name) return showStatus('sstatus', 'err', '❌ Name required.');
         if (id) {
           await api(`/admin/shop-items/${id}`, {
             method: 'PUT',
@@ -1302,7 +1255,145 @@
       }
     }
 
-    // ============ Orders ============
+    // ============ Pack Pricing Management ============
+    async function loadShopItemsForPackSelect() {
+      try {
+        const rows = await api('/admin/shop-items');
+        const select = document.getElementById('packShopItemSelect');
+        select.innerHTML = '<option value="">-- Select Product --</option>';
+        rows.forEach(r => {
+          const opt = document.createElement('option');
+          opt.value = r.id;
+          opt.textContent = `${r.name} (ID: ${r.id})`;
+          select.appendChild(opt);
+        });
+      } catch (e) {
+        showStatus('packstatus', 'err', '❌ Error loading shop items');
+      }
+    }
+
+    function clearPackForm() {
+      ['packId','packSize','packBiofmUsd','packBiofmInr','packOurPrice','packSort'].forEach(id => {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('packActive').value = '1';
+      document.getElementById('packSort').value = '0';
+    }
+
+    function fillPackForm(p) {
+      document.getElementById('packId').value = p.id ?? '';
+      document.getElementById('packActive').value = String(p.is_active ?? 1);
+      document.getElementById('packSize').value = p.pack_size ?? '';
+      document.getElementById('packBiofmUsd').value = p.biofm_usd ?? 0;
+      document.getElementById('packBiofmInr').value = p.biofm_inr ?? 0;
+      document.getElementById('packOurPrice').value = p.our_price ?? 0;
+      document.getElementById('packSort').value = p.sort_order ?? 0;
+      document.getElementById('packFormSection').style.display = 'block';
+      window.scrollTo({ top: document.getElementById('packFormSection').offsetTop - 100, behavior: 'smooth' });
+    }
+
+    async function loadPacksForItem() {
+      const shopItemId = document.getElementById('packShopItemSelect').value;
+      const formSection = document.getElementById('packFormSection');
+      const tableWrap = document.getElementById('packsTableWrap');
+      const emptyMsg = document.getElementById('packsEmpty');
+
+      if (!shopItemId) {
+        formSection.style.display = 'none';
+        tableWrap.style.display = 'none';
+        emptyMsg.style.display = 'block';
+        emptyMsg.textContent = 'Select a shop item to manage its pack pricing';
+        return;
+      }
+
+      formSection.style.display = 'block';
+      clearPackForm();
+
+      try {
+        const rows = await api(`/admin/pack-pricing/${shopItemId}`);
+        const tb = document.getElementById('packstable');
+        tb.innerHTML = '';
+
+        if (rows.length === 0) {
+          tableWrap.style.display = 'none';
+          emptyMsg.textContent = 'No packs defined yet for this item. Add packs below.';
+          emptyMsg.style.display = 'block';
+        } else {
+          emptyMsg.style.display = 'none';
+          tableWrap.style.display = 'block';
+          rows.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><b>${p.id}</b></td>
+              <td>${p.is_active ? '✅ Yes' : '❌ No'}</td>
+              <td><b>${escapeHtml(p.pack_size)}</b></td>
+              <td>$${Number(p.biofm_usd||0).toFixed(2)}</td>
+              <td>₹${Number(p.biofm_inr||0).toLocaleString('en-IN')}</td>
+              <td><b>₹${Number(p.our_price||0).toLocaleString('en-IN')}</b></td>
+              <td>${p.sort_order ?? 0}</td>
+              <td><button class="btn ghost small" onclick='fillPackForm(${JSON.stringify(p)})'>✏️ Edit</button></td>
+            `;
+            tb.appendChild(tr);
+          });
+        }
+      } catch (e) {
+        showStatus('packstatus', 'err', '❌ Error: ' + (e.message || e));
+      }
+    }
+
+    async function savePack() {
+      try {
+        const shopItemId = document.getElementById('packShopItemSelect').value;
+        if (!shopItemId) return showStatus('packstatus', 'err', '❌ Select a shop item first.');
+
+        const id = document.getElementById('packId').value.trim();
+        const payload = {
+          shopItemId: Number(shopItemId),
+          packSize: document.getElementById('packSize').value.trim(),
+          biofmUsd: Number(document.getElementById('packBiofmUsd').value || 0),
+          biofmInr: Number(document.getElementById('packBiofmInr').value || 0),
+          ourPrice: Number(document.getElementById('packOurPrice').value || 0),
+          isActive: Number(document.getElementById('packActive').value),
+          sortOrder: Number(document.getElementById('packSort').value || 0),
+        };
+
+        if (!payload.packSize) return showStatus('packstatus', 'err', '❌ Pack size required.');
+
+        if (id) {
+          await api(`/admin/pack-pricing/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          showStatus('packstatus', 'ok', `✅ Updated pack #${id}`);
+        } else {
+          await api('/admin/pack-pricing', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+          showStatus('packstatus', 'ok', '✅ Created pack');
+        }
+        await loadPacksForItem();
+      } catch (e) {
+        showStatus('packstatus', 'err', '❌ Error: ' + (e.message || e));
+      }
+    }
+
+    async function deletePack() {
+      const id = document.getElementById('packId').value.trim();
+      if (!id) return showStatus('packstatus', 'err', '❌ Enter pack ID to delete.');
+      if (!confirm(`Delete pack #${id}?`)) return;
+      try {
+        await api(`/admin/pack-pricing/${id}`, { method: 'DELETE' });
+        showStatus('packstatus', 'ok', `✅ Deleted pack #${id}`);
+        clearPackForm();
+        await loadPacksForItem();
+      } catch (e) {
+        showStatus('packstatus', 'err', '❌ Error: ' + (e.message || e));
+      }
+    }
+
     async function refreshOrders() {
       try {
         ORDERS_CACHE = await api('/admin/orders');
@@ -1316,7 +1407,7 @@
       const q = document.getElementById('orderSearch').value.trim().toLowerCase();
       const st = document.getElementById('orderStatusFilter').value.trim().toUpperCase();
       const rows = ORDERS_CACHE.filter(o => {
-        const hay = [o.id, o.customername, o.email, o.phone, o.productname, o.city, o.region, o.pincode, o.address, o.paymentstatus, o.paymentmode].join(' ').toLowerCase();
+        const hay = [o.id, o.customername, o.email, o.phone, o.productname, o.city, o.region, o.pincode, o.address, o.paymentstatus].join(' ').toLowerCase();
         const okQ = !q || hay.includes(q);
         const okSt = !st || String(o.paymentstatus).toUpperCase() === st;
         return okQ && okSt;
@@ -1333,7 +1424,7 @@
             <div class="muted" style="font-size:12px;">${escapeHtml(o.email)}</div>
           </td>
           <td>${escapeHtml(o.productname)}</td>
-          <td><b>${Number(o.quantity||0)} kg</b></td>
+          <td><b>${Number(o.quantity||0)} packs</b></td>
           <td><b>₹${Number(o.totalprice||0).toLocaleString('en-IN')}</b></td>
           <td>${escapeHtml(o.phone)}</td>
           <td style="max-width:200px;"><span class="muted">${escapeHtml(o.address || '—')}</span></td>
@@ -1364,7 +1455,6 @@
       }
     }
 
-    // ============ Payments ============
     async function refreshPayments() {
       try {
         PAY_CACHE = await api('/admin/payments');
@@ -1445,7 +1535,6 @@
       }
     }
 
-    // ============ Settings ============
     async function loadBrochure() {
       try {
         const data = await api('/site/brochure');
@@ -1469,7 +1558,6 @@
       }
     }
 
-    // ============ Boot ============
     async function boot() {
       try {
         const me = await api('/admin/me');
@@ -1485,7 +1573,6 @@
     }
 
     window.addEventListener('load', async function() {
-      await initBackend();
       await boot();
     });
   </script>
