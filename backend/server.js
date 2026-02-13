@@ -7,11 +7,9 @@ const { db, initDb } = require("./db");
 
 const app = express();
 const ROOT = path.join(__dirname, "..");
-
-initDb().catch((e) => {
-  console.error("DB init failed:", e);
-  process.exit(1);
-});
+const PUBLIC = path.join(ROOT, "public");
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
+const SESSION_TTL_SEC = Math.floor(SESSION_TTL_MS / 1000);
 
 app.use(express.json({ limit: "2mb" }));
 
@@ -35,11 +33,51 @@ function all(sql, params = []) {
   });
 }
 
+function clampInt(v, min, max) {
+  const n = Number(v);
+  if (!Number.isFinite(n)) return min;
+  return Math.min(max, Math.max(min, Math.trunc(n)));
+}
+
+function safeNumber(v, fallback = 0) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function isValidEmail(s) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(s || "").trim());
+}
+
+function isValidPhone(s) {
+  return /^[0-9]{10,15}$/.test(String(s || "").trim());
+}
+
+const RECEIPT_ROOT = path.join(PUBLIC, "assets", "receipts");
+function resolveReceiptPath(receiptPath) {
+  const raw = String(receiptPath || "").replace(/^[\\/]+/, "");
+  if (!raw) return "";
+  if (raw.startsWith("assets/")) return path.join(PUBLIC, raw);
+  if (raw.startsWith("receipts/")) return path.join(PUBLIC, "assets", raw);
+  return path.join(PUBLIC, "assets", "receipts", raw);
+}
+
+function deleteReceiptFile(receiptPath) {
+  try {
+    const full = resolveReceiptPath(receiptPath);
+    if (!full) return;
+    const normalized = path.normalize(full);
+    if (!normalized.startsWith(RECEIPT_ROOT)) return;
+    if (fs.existsSync(normalized)) fs.unlinkSync(normalized);
+  } catch (e) {
+    console.warn("Receipt delete failed:", e.message || e);
+  }
+}
+
 // ---------------- Static ----------------
-app.use("/assets", express.static(path.join(ROOT, "assets")));
-app.use("/products", express.static(path.join(ROOT, "products")));
-app.use("/admin", express.static(path.join(ROOT, "admin")));
-app.use(express.static(ROOT));
+app.use("/assets", express.static(path.join(PUBLIC, "assets")));
+app.use("/products", express.static(path.join(PUBLIC, "products")));
+app.use("/admin", express.static(path.join(PUBLIC, "admin")));
+app.use(express.static(PUBLIC));
 
 // ---------------- Cookies helper ----------------
 function parseCookies(req) {
@@ -53,9 +91,12 @@ function parseCookies(req) {
   return out;
 }
 function setCookie(res, name, value) {
+  const isProd = process.env.NODE_ENV === "production";
   res.setHeader(
     "Set-Cookie",
-    `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax`
+    `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_TTL_SEC}${
+      isProd ? "; Secure" : ""
+    }`
   );
 }
 function clearCookie(res, name) {
@@ -66,16 +107,44 @@ function clearCookie(res, name) {
 }
 
 // ---------------- Admin auth ----------------
-const ADMIN_USER = "admin";
-const ADMIN_PASS = "chemsus123";
+const ADMIN_USER = process.env.ADMIN_USER || "admin";
+const ADMIN_PASS = process.env.ADMIN_PASS || "chemsus123";
 const sessions = new Map();
 
+function purgeExpiredSessions() {
+  const now = Date.now();
+  for (const [token, sess] of sessions.entries()) {
+    if (now - sess.createdAt > SESSION_TTL_MS) sessions.delete(token);
+  }
+}
+
+function isSameOrigin(req) {
+  const origin = req.headers.origin || req.headers.referer;
+  if (!origin) return true;
+  const host = `${req.protocol}://${req.get("host")}`;
+  return origin.startsWith(host);
+}
+
+function requireAdminCsrf(req, res, next) {
+  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+  if (!isSameOrigin(req)) return res.status(403).json({ error: "CSRF blocked" });
+  return next();
+}
+
 function requireAdmin(req, res, next) {
+  purgeExpiredSessions();
   const token = parseCookies(req).admin_session;
   if (!token || !sessions.has(token))
     return res.status(401).json({ error: "Unauthorized" });
+  const sess = sessions.get(token);
+  if (!sess || Date.now() - sess.createdAt > SESSION_TTL_MS) {
+    sessions.delete(token);
+    return res.status(401).json({ error: "Session expired" });
+  }
   next();
 }
+
+app.use("/api/admin", requireAdminCsrf);
 
 app.post("/api/admin/login", (req, res) => {
   const { username, password } = req.body || {};
@@ -101,13 +170,38 @@ app.get("/api/admin/me", (req, res) => {
 });
 
 // ---------------- Uploads ----------------
-const ADMIN_UPLOAD_DIR = path.join(ROOT, "assets", "uploads");
-const RECEIPT_DIR = path.join(ROOT, "assets", "receipts");
+const ADMIN_UPLOAD_DIR = path.join(PUBLIC, "assets", "uploads");
+const RECEIPT_DIR = path.join(PUBLIC, "assets", "receipts");
 fs.mkdirSync(ADMIN_UPLOAD_DIR, { recursive: true });
 fs.mkdirSync(RECEIPT_DIR, { recursive: true });
 
 function safeName(originalname) {
   return originalname.replace(/[^a-zA-Z0-9._-]/g, "_");
+}
+
+const ADMIN_ALLOWED_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "application/pdf",
+]);
+const RECEIPT_ALLOWED_MIME = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "application/pdf",
+]);
+const ADMIN_ALLOWED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".pdf"]);
+const RECEIPT_ALLOWED_EXT = new Set([".jpg", ".jpeg", ".png", ".webp", ".gif", ".pdf"]);
+
+function checkFile(file, allowedMime, allowedExt) {
+  const ext = path.extname(file.originalname || "").toLowerCase();
+  if (!allowedMime.has(file.mimetype) || !allowedExt.has(ext)) {
+    return new Error("Invalid file type");
+  }
+  return null;
 }
 
 const adminUpload = multer({
@@ -118,6 +212,11 @@ const adminUpload = multer({
       cb(null, unique + "_" + safeName(file.originalname));
     },
   }),
+  fileFilter: (req, file, cb) => {
+    const err = checkFile(file, ADMIN_ALLOWED_MIME, ADMIN_ALLOWED_EXT);
+    if (err) return cb(err);
+    return cb(null, true);
+  },
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
@@ -129,6 +228,11 @@ const receiptUpload = multer({
       cb(null, unique + "_" + safeName(file.originalname));
     },
   }),
+  fileFilter: (req, file, cb) => {
+    const err = checkFile(file, RECEIPT_ALLOWED_MIME, RECEIPT_ALLOWED_EXT);
+    if (err) return cb(err);
+    return cb(null, true);
+  },
   limits: { fileSize: 10 * 1024 * 1024 },
 });
 
@@ -439,13 +543,20 @@ app.post("/api/orders", async (req, res) => {
   try {
     const b = req.body || {};
 
-    if (!b.customername || !b.email || !b.phone || !b.productname) {
+    const customername = (b.customername || "").trim();
+    const email = (b.email || "").trim();
+    const phone = (b.phone || "").trim();
+    const companyName = (b.companyName || "").trim();
+
+    if (!customername || !email || !phone) {
       return res.status(400).json({ error: "Missing required fields" });
     }
-
-    const quantity = Number(b.quantity || 1);
-    const totalprice = Number(b.totalprice || 0);
-    const unitprice = quantity > 0 ? totalprice / quantity : 0;
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+    if (!isValidPhone(phone)) {
+      return res.status(400).json({ error: "Invalid phone" });
+    }
 
     const address = (
       b.address ||
@@ -461,27 +572,148 @@ app.post("/api/orders", async (req, res) => {
     const pincode = (b.pincode || "").trim();
     const country = (b.country || "India").trim();
 
+    const itemsIn = Array.isArray(b.items) ? b.items : [];
+    let items = [];
+    let totalprice = 0;
+    let totalQty = 0;
+    let productname = (b.productname || "").trim();
+
+    if (itemsIn.length > 0) {
+      for (const it of itemsIn) {
+        const shopItemId = Number(it.shopItemId || it.shop_item_id || it.id || 0);
+        const packSize = String(it.packSize || it.pack || "").trim();
+        const quantity = safeNumber(it.quantity || 0, 0);
+        if (!shopItemId || quantity <= 0) {
+          return res.status(400).json({ error: "Invalid items" });
+        }
+        const shop = await get(
+          `SELECT id, name, price FROM shop_items WHERE id=? AND is_active=1`,
+          [shopItemId]
+        );
+        if (!shop) return res.status(400).json({ error: "Invalid item" });
+
+        let unitPrice = 0;
+        if (packSize) {
+          const pack = await get(
+            `SELECT our_price FROM pack_pricing WHERE shop_item_id=? AND pack_size=? AND is_active=1`,
+            [shopItemId, packSize]
+          );
+          if (!pack) return res.status(400).json({ error: "Invalid pack" });
+          unitPrice = safeNumber(pack.our_price, 0);
+        } else {
+          unitPrice = safeNumber(shop.price, 0);
+        }
+        if (unitPrice <= 0) {
+          return res.status(400).json({ error: "Invalid pricing" });
+        }
+        const lineTotal = unitPrice * quantity;
+        totalprice += lineTotal;
+        totalQty += quantity;
+        items.push({
+          shop_item_id: shopItemId,
+          product_name: shop.name || "",
+          pack_size: packSize,
+          unit_price: unitPrice,
+          quantity,
+          total_price: lineTotal,
+        });
+      }
+
+      if (items.length === 1) {
+        const one = items[0];
+        productname = `${one.product_name}${one.pack_size ? " (" + one.pack_size + ")" : ""}`;
+      } else {
+        productname = `${items.length} item(s) from Cart`;
+      }
+    } else {
+      if (!productname) {
+        return res.status(400).json({ error: "Missing productname" });
+      }
+      const quantity = safeNumber(b.quantity || 1, 1);
+      const total = safeNumber(b.totalprice || 0, 0);
+      if (quantity <= 0 || total <= 0) {
+        return res.status(400).json({ error: "Invalid quantity or price" });
+      }
+      totalprice = total;
+      totalQty = quantity;
+
+      const shopItemId = Number(b.shopItemId || 0);
+      const packSize = String(b.packSize || b.pack || "").trim();
+      if (shopItemId) {
+        const shop = await get(
+          `SELECT id, name, price FROM shop_items WHERE id=? AND is_active=1`,
+          [shopItemId]
+        );
+        if (shop) {
+          let unitPrice = 0;
+          if (packSize) {
+            const pack = await get(
+              `SELECT our_price FROM pack_pricing WHERE shop_item_id=? AND pack_size=? AND is_active=1`,
+              [shopItemId, packSize]
+            );
+            unitPrice = safeNumber(pack?.our_price || 0, 0);
+          } else {
+            unitPrice = safeNumber(shop.price, 0);
+          }
+          if (unitPrice > 0) {
+            totalprice = unitPrice * quantity;
+            items.push({
+              shop_item_id: shopItemId,
+              product_name: shop.name || "",
+              pack_size: packSize,
+              unit_price: unitPrice,
+              quantity,
+              total_price: totalprice,
+            });
+            productname = `${shop.name || productname}${
+              packSize ? " (" + packSize + ")" : ""
+            }`;
+          }
+        }
+      }
+    }
+
+    const unitprice = totalQty > 0 ? totalprice / totalQty : 0;
     const r = await run(
       `INSERT INTO orders
         (customername,email,phone,companyName,address,city,region,pincode,country,
          productname,quantity,unitprice,totalprice,payment_status,paymentmode,updated_at)
        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,'PENDING','PENDING',datetime('now'))`,
       [
-        b.customername,
-        b.email,
-        b.phone,
-        b.companyName || "",
+        customername,
+        email,
+        phone,
+        companyName,
         address,
         city,
         region,
         pincode,
         country,
-        b.productname,
-        quantity,
+        productname,
+        totalQty || 1,
         unitprice,
         totalprice,
       ]
     );
+
+    if (items.length > 0) {
+      for (const it of items) {
+        await run(
+          `INSERT INTO order_items
+           (order_id, shop_item_id, product_name, pack_size, unit_price, quantity, total_price)
+           VALUES (?,?,?,?,?,?,?)`,
+          [
+            r.lastID,
+            it.shop_item_id,
+            it.product_name,
+            it.pack_size,
+            it.unit_price,
+            it.quantity,
+            it.total_price,
+          ]
+        );
+      }
+    }
 
     res.json({ orderId: r.lastID });
   } catch (e) {
@@ -504,13 +736,27 @@ app.post(
       if (!req.file)
         return res.status(400).json({ error: "receiptimage required" });
 
-      const amount = Number(body.amount || 0);
-      const rating = Number(body.rating || 0);
+      const amount = safeNumber(body.amount || 0, 0);
+      const ratingRaw = Number(body.rating || 0);
+      if (!ratingRaw) return res.status(400).json({ error: "rating required" });
+      const rating = clampInt(ratingRaw, 1, 5);
       const feedback = (body.feedback || "").toString().slice(0, 2000);
       const receipt_path = `receipts/${req.file.filename}`;
 
       const order = await get(`SELECT * FROM orders WHERE id=?`, [orderId]);
       if (!order) return res.status(404).json({ error: "Order not found" });
+
+      const existing = await get(
+        `SELECT id FROM payments WHERE order_id=? LIMIT 1`,
+        [orderId]
+      );
+      if (existing)
+        return res.status(409).json({ error: "Payment already submitted" });
+
+      const expectedTotal = safeNumber(order.totalprice || 0, 0);
+      if (Math.abs(expectedTotal - amount) > 0.01) {
+        return res.status(400).json({ error: "Amount mismatch" });
+      }
 
       const payInsert = await run(
         `INSERT INTO payments
@@ -549,6 +795,8 @@ app.post(
 app.delete("/api/admin/orders/:id", requireAdmin, async (req, res) => {
   const id = Number(req.params.id);
   try {
+    const pays = await all(`SELECT receipt_path FROM payments WHERE order_id = ?`, [id]);
+    pays.forEach((p) => deleteReceiptFile(p.receipt_path));
     await run("DELETE FROM payments WHERE order_id = ?", [id]);
     await run("DELETE FROM orders WHERE id = ?", [id]);
     res.json({ ok: true });
@@ -561,6 +809,8 @@ app.delete("/api/admin/orders/:id", requireAdmin, async (req, res) => {
 app.delete("/api/admin/payments/:id", requireAdmin, async (req, res) => {
   const id = Number(req.params.id);
   try {
+    const pay = await get(`SELECT receipt_path FROM payments WHERE id = ?`, [id]);
+    if (pay?.receipt_path) deleteReceiptFile(pay.receipt_path);
     await run("DELETE FROM payments WHERE id = ?", [id]);
     res.json({ ok: true });
   } catch (e) {
@@ -658,5 +908,29 @@ app.post("/api/admin/payment-status", requireAdmin, async (req, res) => {
   }
 });
 
+app.use((err, req, res, next) => {
+  if (!err) return next();
+  if (err.message === "Invalid file type") {
+    return res.status(400).json({ error: "Invalid file type" });
+  }
+  if (err.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({ error: "File too large" });
+  }
+  console.error("Unhandled error:", err);
+  return res.status(500).json({ error: "Server error" });
+});
+
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on http://localhost:${PORT}`));
+async function start() {
+  try {
+    await initDb();
+    app.listen(PORT, () =>
+      console.log(`Server running on http://localhost:${PORT}`)
+    );
+  } catch (e) {
+    console.error("DB init failed:", e);
+    process.exit(1);
+  }
+}
+
+start();
