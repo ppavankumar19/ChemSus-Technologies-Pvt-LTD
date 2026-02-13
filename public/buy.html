@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Buy | ChemSus Technologies Pvt Ltd</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="assets/logo.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0074c7;
+      --primary-dark: #00508a;
+      --accent: #00b8b0;
+      --bg: #F3F7FB;
+      --ink: #1f2933;
+      --highlight: #f97316;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Open Sans", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a { text-decoration: none; color: inherit; }
+
+    .sidebar {
+      width: 240px;
+      background: var(--primary);
+      color: #ffffff;
+      border-right: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1002;
+      transition: transform 0.3s ease;
+    }
+
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1001;
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
+    .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      white-space: nowrap;
+    }
+
+    .nav-logo-img { height: 24px; width: auto; }
+
+    .nav-menu {
+      list-style: none;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .nav-menu li a {
+      display: block;
+      color: #ffffff;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav-menu li a.active,
+    .nav-menu li a:hover {
+      background: rgba(255,255,255,0.1);
+      border-left-color: var(--accent);
+    }
+
+    #cart-count {
+      background: var(--accent);
+      color: white;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: bold;
+      margin-left: 8px;
+    }
+
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .search-form { position: relative; }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.1);
+      color: #ffffff;
+      font-size: 12.5px;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-input::placeholder { color: #d1d5db; font-size: 11.5px; }
+
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #ffffff;
+      pointer-events: none;
+    }
+
+    .main-wrapper {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left 0.3s ease;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
+        #041424;
+      color: #ffffff;
+      min-height: 220px;
+      padding: 32px 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-top: 3px solid var(--accent);
+    }
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
+      background-size: 140px 140px;
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      padding: 0 18px;
+    }
+
+    .hero-kicker {
+      font-size: 12px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #b9e6ff;
+    }
+
+    .hero-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: #e2f3ff;
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 18px 40px 18px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .buy-card {
+      background: #ffffff;
+      padding: 26px;
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.12);
+      border-top: 4px solid var(--accent);
+    }
+
+    .buy-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 12px;
+    }
+
+    .buy-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #123559;
+    }
+
+    .buy-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e0f7f6;
+      color: #04726d;
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .info-banner{
+      margin:8px 0 16px;
+      padding:10px 12px;
+      border-radius:10px;
+      background:rgba(249,115,22,0.05);
+      border:1px solid rgba(249,115,22,0.5);
+      font-size:13px;
+      color:#7c2d12;
+      display:flex;
+      gap:8px;
+      align-items:flex-start;
+    }
+    .info-icon{
+      width:18px;height:18px;border-radius:999px;
+      background:var(--highlight);color:#fff;
+      display:flex;align-items:center;justify-content:center;
+      font-size:12px;font-weight:700;flex-shrink:0;
+    }
+
+    .q-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin:8px 0 4px;
+    }
+    .q-label{
+      font-size:13px;
+      font-weight:600;
+      color:#1f2937;
+    }
+    .q-pill{
+      font-size:11px;
+      padding:2px 8px;
+      border-radius:999px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      font-weight:600;
+    }
+
+    .qty-input-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:10px 0 6px;
+    }
+    .qty-input{
+      width:100px;
+      padding:8px 10px;
+      border-radius:8px;
+      border:2px solid #e2e8f0;
+      font-size:14px;
+      font-family:inherit;
+    }
+    .qty-input:focus{border-color:var(--primary)}
+
+    .price-line{
+      margin-top:6px;
+      padding:8px 10px;
+      border-radius:10px;
+      background:#ecfdf5;
+      border:1px solid #34d399;
+      font-size:13px;
+      color:#065f46;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .price-left{
+      font-family:"Montserrat",sans-serif;
+      font-size:15px;
+      font-weight:700;
+      color:#0f766e;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #e5e7eb;
+      font-size: 14px;
+    }
+
+    .totals-row strong {
+      font-family: "Montserrat", sans-serif;
+      font-size: 18px;
+      color: var(--primary-dark);
+    }
+
+    .payment-box {
+      margin-top: 16px;
+      padding: 14px 12px;
+      border-radius: 10px;
+      background: #f1f5f9;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .payment-box ul {
+      margin-left: 18px;
+      margin-top: 6px;
+    }
+
+    .actions-row {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #00d4cc);
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0,184,176,0.3);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #123559;
+      border-radius: 8px;
+      padding: 11px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: var(--primary);
+    }
+
+    footer {
+      background: #06121f;
+      color: #cbd5f5;
+      font-size: 13px;
+      text-align: center;
+      padding: 14px 0;
+      margin-top: 22px;
+    }
+
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1003;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .mobile-toggle svg { width: 20px; height: 20px; }
+
+    @media (max-width: 1050px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-wrapper { margin-left: 0; }
+      .mobile-toggle { display: block; }
+    }
+
+    @media (max-width: 768px) {
+      .buy-header { flex-direction: column; }
+      .hero-title { font-size: 24px; }
+      .buy-card { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+    <svg viewBox="0 0 24 24" fill="currentColor">
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+    </svg>
+  </button>
+
+  <nav class="sidebar" id="sidebar">
+    <a href="index.html" class="nav-logo">
+      <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
+      <span>ChemSus</span>
+    </a>
+    <ul class="nav-menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="products.html">Products</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collaboration.html">Collaboration</a></li>
+      <li><a href="recognitions.html">Recognitions</a></li>
+      <li><a href="investors.html">Investors</a></li>
+      <li><a href="cart.html">Cart 🛒 <span id="cart-count">0</span></a></li>
+      <li><a href="contact.html">Contact us</a></li>
+      <li><a href="request-sample.html">Request for Sample</a></li>
+      <li><a href="orders.html">Orders</a></li>
+    </ul>
+
+    <div class="search-section">
+      <form class="search-form" id="siteSearchForm">
+        <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
+        <span class="search-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+          </svg>
+        </span>
+      </form>
+    </div>
+  </nav>
+
+  <div class="main-wrapper">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-kicker">Checkout</div>
+        <h1 class="hero-title" id="heroProductName">Review Your Order</h1>
+        <p class="hero-subtitle">
+          Confirm pack, quantity, and final amount, then proceed to secure order confirmation.
+        </p>
+      </div>
+    </section>
+
+    <main>
+      <div class="buy-card">
+        <div class="buy-header">
+          <div>
+            <div class="buy-title" id="productNameHeading">Order Summary</div>
+            <div class="buy-tag" id="packLabelTag">Single product</div>
+          </div>
+          <div>
+            <div class="price-line">
+              <div class="price-left" id="unitPriceText">Our Price: ₹0 / pack</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="info-banner">
+          <div class="info-icon">!</div>
+          <div>
+            <strong>Pack size is fixed from Shop.</strong> Change the number of packs below if you need more than one.
+          </div>
+        </div>
+
+        <div class="q-row">
+          <span class="q-label">Pack size</span>
+          <span class="q-pill">from Shop</span>
+          <span id="packNameText" style="font-weight:700;color:#1d4ed8;">–</span>
+        </div>
+
+        <div class="qty-input-row">
+          <span class="q-label">Number of packs</span>
+          <input type="number" id="quantityInput" class="qty-input" value="1" min="1" step="1">
+        </div>
+
+        <div class="price-line" style="margin-top:8px;">
+          <div class="price-left" id="subtotalText">Subtotal: ₹0</div>
+          <div style="font-size:13px;color:#4b5563;" id="perPackText">Per pack: ₹0</div>
+        </div>
+
+        <div class="totals-row">
+          <div>Grand total (₹, excl. taxes &amp; shipping)</div>
+          <strong id="totalText">₹0</strong>
+        </div>
+
+        <div class="payment-box">
+          <strong>Payment &amp; fulfilment:</strong>
+          <ul>
+            <li>Online payment or bank transfer (details shared after order placement).</li>
+            <li>Taxes and shipping calculated by sales team before final invoice.</li>
+            <li>Orders are confirmed via email from ChemSus.</li>
+          </ul>
+        </div>
+
+        <div class="actions-row">
+          <button class="btn-primary" id="confirmBtn">Confirm &amp; Go to Orders</button>
+          <button class="btn-secondary" onclick="window.location.href='shop.html'">← Back to Shop</button>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+    }
+
+    document.querySelectorAll('.nav-menu a').forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 1050) closeSidebar();
+      });
+    });
+
+    function loadCart() {
+      return JSON.parse(localStorage.getItem('chemsusCart')) || [];
+    }
+
+    function saveCart(cart) {
+      localStorage.setItem('chemsusCart', JSON.stringify(cart));
+      const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+      const span = document.getElementById('cart-count');
+      if (span) span.textContent = count;
+    }
+
+    function splitNameAndPack(name){
+      const m = name.match(/^(.*)\s+\((.+)\)$/);
+      if(!m) return { base:name, pack:null };
+      return { base:m[1], pack:m[2] };
+    }
+
+    function safeNumber(v, fallback = 0){
+      const n = Number(v);
+      return Number.isFinite(n) ? n : fallback;
+    }
+    const RUPEE = String.fromCharCode(0x20B9);
+    function escapeHtml(s){
+      return String(s ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    async function fetchUnitPrice(itemId, packLabel, fallback){
+      try{
+        if(itemId && packLabel){
+          const res = await fetch(`/api/pack-pricing/${itemId}`);
+          if(res.ok){
+            const packs = await res.json();
+            const match = packs.find(p => String(p.pack_size) === String(packLabel));
+            if(match && Number(match.our_price) > 0) return Number(match.our_price);
+          }
+        }
+        if(itemId){
+          const res = await fetch('/api/shop-items');
+          if(res.ok){
+            const items = await res.json();
+            const it = items.find(i => Number(i.id) === Number(itemId));
+            if(it && Number(it.price) > 0) return Number(it.price);
+          }
+        }
+      }catch(e){}
+      return fallback;
+    }
+
+    async function renderSummary() {
+      const cart = loadCart();
+      saveCart(cart);
+
+      const params = new URLSearchParams(window.location.search);
+      const buyNowName = params.get('name');
+      const buyNowItemId = Number(params.get('itemId') || 0);
+      const buyNowPack = params.get('pack') || '';
+      let buyNowPrice = safeNumber(params.get('price'), 0);
+      if (buyNowItemId) {
+        buyNowPrice = await fetchUnitPrice(buyNowItemId, buyNowPack, buyNowPrice);
+      }
+
+      const heroTitle = document.getElementById('heroProductName');
+      const heading = document.getElementById('productNameHeading');
+      const packLabelTag = document.getElementById('packLabelTag');
+      const packNameText = document.getElementById('packNameText');
+      const unitPriceText = document.getElementById('unitPriceText');
+      const subtotalText = document.getElementById('subtotalText');
+      const perPackText = document.getElementById('perPackText');
+      const totalText = document.getElementById('totalText');
+      const qtyInput = document.getElementById('quantityInput');
+      const confirmBtn = document.getElementById('confirmBtn');
+
+      const itemsListBox = null; // not used in this streamlined buy-now page
+
+      // BUY NOW MODE (from Shop)
+      if (buyNowName && buyNowPrice) {
+        const parsed = splitNameAndPack(buyNowName);
+        const base = parsed.base;
+        const pack = buyNowPack || parsed.pack;
+        const displayName = base + (pack ? ' ('+pack+')' : '');
+
+        heroTitle.textContent = 'Buy ' + base;
+        heading.textContent = base;
+        packLabelTag.textContent = pack ? 'Pack: ' + pack : 'Single product';
+        packNameText.textContent = pack || 'N/A';
+
+        unitPriceText.textContent = 'Our Price: ₹' + buyNowPrice.toLocaleString('en-IN') + ' / pack';
+
+        function recalc() {
+          let q = parseInt(qtyInput.value, 10);
+          if (!Number.isFinite(q) || q <= 0) { q = 1; qtyInput.value = 1; }
+          const subtotal = buyNowPrice * q;
+          subtotalText.textContent = 'Subtotal: ₹' + subtotal.toLocaleString('en-IN');
+          perPackText.textContent = 'Per pack: ₹' + buyNowPrice.toLocaleString('en-IN');
+          totalText.textContent = '₹' + subtotal.toLocaleString('en-IN');
+        }
+
+        qtyInput.addEventListener('input', recalc);
+        recalc();
+
+        confirmBtn.onclick = function() {
+          let q = parseInt(qtyInput.value, 10);
+          if (!Number.isFinite(q) || q <= 0) { q = 1; }
+          const total = buyNowPrice * q;
+
+          const buyNowData = {
+            productName: displayName,
+            quantity: q,
+            unitPrice: buyNowPrice,
+            shopItemId: buyNowItemId || null,
+            packSize: pack || ''
+          };
+
+          sessionStorage.setItem('buyNowData', JSON.stringify(buyNowData));
+          sessionStorage.setItem('orderTotal', total);
+
+          window.location.href = 'orders.html';
+        };
+
+        return;
+      }
+
+      // FALLBACK: CART CHECKOUT (if someone opens buy.html directly without query)
+      const itemsListBoxFallback = document.createElement('div');
+      itemsListBoxFallback.className = 'payment-box';
+      const container = document.querySelector('.buy-card');
+      container.insertBefore(itemsListBoxFallback, container.children[1]);
+
+      if (!cart.length) {
+        heroTitle.textContent = 'No items in cart';
+        heading.textContent = 'Order Summary';
+        unitPriceText.textContent = 'Our Price: ₹0 / pack';
+        subtotalText.textContent = 'Subtotal: ₹0';
+        totalText.textContent = '₹0';
+        packLabelTag.textContent = 'Cart empty';
+        packNameText.textContent = '–';
+        qtyInput.value = 0;
+        qtyInput.disabled = true;
+        confirmBtn.disabled = true;
+        itemsListBoxFallback.innerHTML = `
+          <p style="color:#d32f2f;font-weight:600;">⚠️ Your cart is empty.
+            <a href="shop.html" style="color:var(--accent);">Go to Shop</a>
+          </p>`;
+        return;
+      }
+
+      let grandTotal = 0;
+      let totalQty = 0;
+      let listHtml = '<strong>Items in your cart:</strong><ul style="margin-left: 18px; margin-top: 6px;">';
+
+      cart.forEach(item => {
+        const qty = safeNumber(item.quantity, 0);
+        const price = safeNumber(item.price, 0);
+        const subtotal = price * qty;
+        grandTotal += subtotal;
+        totalQty += qty;
+        const safeName = escapeHtml(item.name || '');
+        listHtml += `
+          <li style="margin-bottom: 6px;">
+            ${safeName} x ${qty} @ ${RUPEE}${price.toLocaleString('en-IN')}
+            = ${RUPEE}${subtotal.toLocaleString('en-IN')}
+          </li>`;
+      });
+      listHtml += '</ul>';
+
+      heroTitle.textContent = 'Review Your Order';
+      heading.textContent = 'Cart Checkout';
+      packLabelTag.textContent = `${cart.length} item(s) in cart`;
+      packNameText.textContent = 'Multiple packs';
+      unitPriceText.textContent = 'Cart Total: ' + RUPEE + grandTotal.toLocaleString('en-IN');
+      subtotalText.textContent = 'Subtotal: ' + RUPEE + grandTotal.toLocaleString('en-IN');
+      perPackText.textContent = 'Net quantity: ' + totalQty + ' pack(s)';
+      totalText.textContent = RUPEE + grandTotal.toLocaleString('en-IN');
+      qtyInput.style.display = 'none';
+      document.querySelector('.qty-input-row .q-label').textContent = 'Quantity from cart';
+      itemsListBoxFallback.innerHTML = listHtml;
+
+      confirmBtn.onclick = function() {
+        const totalPrice = grandTotal;
+        const totalPacks = totalQty;
+
+        sessionStorage.setItem('buyNowData', JSON.stringify({
+          productName: `${cart.length} product(s) from Cart`,
+          quantity: totalPacks,
+          unitPrice: (totalPrice / totalPacks).toFixed(2)
+        }));
+        sessionStorage.setItem('cartItems', JSON.stringify(cart));
+        sessionStorage.setItem('orderTotal', totalPrice);
+
+        window.location.href = 'orders.html';
+      };
+    }
+
+    document.getElementById('siteSearchForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const query = document.getElementById('siteSearchInput').value.trim().toLowerCase();
+      if (!query) return;
+
+      if (query.includes('product') || query.includes('shop')) {
+        window.location.href = 'products.html';
+      } else if (query.includes('recognition') || query.includes('award')) {
+        window.location.href = 'recognitions.html';
+      } else if (query.includes('investor') || query.includes('funding')) {
+        window.location.href = 'investors.html';
+      } else if (query.includes('contact') || query.includes('address') || query.includes('phone')) {
+        window.location.href = 'contact.html';
+      } else if (query.includes('home') || query.includes('objective') || query.includes('chemsus')) {
+        window.location.href = 'index.html';
+      } else if (query.includes('about') || query.includes('company')) {
+        window.location.href = 'about.html';
+      } else if (query.includes('collab') || query.includes('collaboration') || query.includes('partner')) {
+        window.location.href = 'collaboration.html';
+      } else if (query.includes('sample') || query.includes('request')) {
+        window.location.href = 'request-sample.html';
+      } else if (query.includes('order') || query.includes('orders')) {
+        window.location.href = 'orders.html';
+      } else {
+        alert('No matching page. Try: home, about, products, shop, collaboration, recognitions, investors, contact, sample, orders.');
+      }
+    });
+
+    window.addEventListener('DOMContentLoaded', renderSummary);
+  </script>
+
+</body>
+</html>
