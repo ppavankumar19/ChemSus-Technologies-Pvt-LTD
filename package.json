@@ -7,7 +7,7 @@
     "start": "node backend/server.js",
     "dev": "nodemon backend/server.js",
     "seed": "node seed.js",
-    "reset": "rm -rf db/chemsus.sqlite && node seed.js"
+    "reset": "node -e \"require('fs').rmSync('db/chemsus.sqlite',{force:true});\" && node seed.js"
   },
   "keywords": ["chemicals", "sustainable", "ecommerce"],
   "author": "ChemSus Technologies",
