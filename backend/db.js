@@ -26,7 +26,7 @@ function run(sql, p = []) {
 async function seed() {
   const st = await get(`SELECT COUNT(*) AS c FROM site_settings`);
   if ((st?.c || 0) === 0) {
-    await run(`INSERT INTO site_settings(key,value) VALUES ('brochure_url','assets/broucher.pdf')`);
+    await run(`INSERT INTO site_settings(key,value) VALUES ('brochure_url','assets/brochure.pdf')`);
     console.log("✅ Seeded brochure_url");
   }
 }
@@ -110,6 +110,22 @@ async function initDb() {
 
     CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(payment_status);
     CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at);
+
+    CREATE TABLE IF NOT EXISTS order_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      order_id INTEGER NOT NULL,
+      shop_item_id INTEGER NOT NULL,
+      product_name TEXT NOT NULL DEFAULT '',
+      pack_size TEXT NOT NULL DEFAULT '',
+      unit_price REAL NOT NULL DEFAULT 0,
+      quantity REAL NOT NULL DEFAULT 1,
+      total_price REAL NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
+      FOREIGN KEY(shop_item_id) REFERENCES shop_items(id) ON DELETE RESTRICT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
 
     CREATE TABLE IF NOT EXISTS payments (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
