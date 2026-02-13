@@ -13,7 +13,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 const imagePath = 'assets/dala.jpg';
-const dalaName = 'Delta-aminolevulinic acid (DALA)';
+const dalaName = 'DALA';
 
 db.serialize(() => {
     // Update products_page
