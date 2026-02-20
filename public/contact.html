@@ -394,7 +394,7 @@
     /* === WhatsApp QR Floating Widget === */
     #ib-wa {
       position: fixed;
-      bottom: 25px;
+      bottom: 95px;
       right: 25px;
       z-index: 99999;
       font-family: Arial, sans-serif;
@@ -496,9 +496,10 @@
 
     /* === Brochure Download Button (Minimalist V3) === */
     .download-section {
+      width: auto;
       position: fixed;
       bottom: 25px;
-      right: 100px;
+      right: 25px;
       z-index: 99998;
     }
 
@@ -558,10 +559,19 @@
 
     @media (max-width: 580px) {
       .download-section {
-        right: 90px;
+        right: 20px;
       }
 
       .download-btn {
+        width: 50px;
+        height: 50px;
+      }
+
+      #ib-wa {
+        right: 20px;
+      }
+
+      #ib-wa-btn {
         width: 50px;
         height: 50px;
       }

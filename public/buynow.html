@@ -484,7 +484,193 @@
       font-size: 13px;
       text-align: center;
       padding: 14px 0;
-      margin-top: 22px;
+      margin-top: 24px;
+    }
+
+    /* === WhatsApp QR Floating Widget === */
+    #ib-wa {
+      position: fixed;
+      bottom: 95px;
+      right: 25px;
+      z-index: 99999;
+      font-family: Arial, sans-serif;
+    }
+
+    #ib-wa-btn {
+      background: #25d366;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      transition: transform 0.3s ease;
+    }
+
+    #ib-wa-btn:hover {
+      transform: scale(1.1);
+    }
+
+    #ib-wa-btn svg {
+      width: 35px;
+      height: 35px;
+      fill: white;
+    }
+
+    #ib-wa-popup {
+      display: none;
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      width: 300px;
+      max-width: 85vw;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      animation: waSlideUp 0.3s ease-out;
+    }
+
+    @keyframes waSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #ib-wa-popup header {
+      background: #075e54;
+      color: #fff;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    #ib-wa-popup header span:last-child {
+      cursor: pointer;
+      font-size: 18px;
+      opacity: 0.8;
+    }
+
+    #ib-wa-popup .body {
+      padding: 16px;
+      text-align: center;
+    }
+
+    #ib-wa-popup .body img {
+      width: 180px;
+      height: auto;
+      margin: 10px 0;
+      border: 4px solid #f0f0f0;
+      border-radius: 8px;
+    }
+
+    #ib-wa-popup .body a {
+      display: block;
+      background: #25d366;
+      color: #fff;
+      padding: 12px;
+      border-radius: 50px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: bold;
+      margin-top: 10px;
+      box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+    }
+
+    /* === Brochure Download Button (Minimalist V3) === */
+    .download-section {
+      width: auto;
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 99998;
+    }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      border: 2px solid var(--primary);
+      position: relative;
+    }
+
+    .download-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .download-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tooltip style label */
+    .download-btn::before {
+      content: "Brochure";
+      position: absolute;
+      bottom: 75px;
+      right: 50%;
+      transform: translateX(50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .download-btn:hover::before {
+      opacity: 1;
+      visibility: visible;
+      bottom: 70px;
+    }
+
+    @media (max-width: 580px) {
+      .download-section {
+        right: 20px;
+      }
+
+      .download-btn {
+        width: 50px;
+        height: 50px;
+      }
+
+      #ib-wa {
+        right: 20px;
+      }
+
+      #ib-wa-btn {
+        width: 50px;
+        height: 50px;
+      }
     }
 
     @media(max-width:1050px) {
@@ -680,10 +866,49 @@
       <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align:center; font-size: 11px;">
         &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
       </div>
+      <div class="download-section">
+        <a href="assets/brochure.pdf" download="ChemSus_Brochure.pdf" class="download-btn" title="Download Brochure">
+          <svg viewBox="0 0 24 24">
+            <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+          </svg>
+        </a>
+      </div>
     </footer>
   </div>
 
+  <div id="ib-wa">
+    <div id="ib-wa-popup">
+      <header>
+        <span>Chat with ChemSus</span>
+        <span onclick="ibToggleWA()">✕</span>
+      </header>
+      <div class="body">
+        <p style="font-size:13px;margin-bottom:10px;">Scan to chat on mobile</p>
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://wa.me/918486877575?text=Hello%20ChemSus%20Team%2C%0A%0AI%20am%20interested%20in%20your%20sustainable%20specialty%20chemicals%20and%20would%20like%20to%20request%20product%20details%20and%2For%20evaluation%20samples.%0APlease%20share%20specifications%2C%20pricing%2C%20MOQ%2C%20and%20lead%20times.%0A%0AThank%20you."
+          alt="WhatsApp QR">
+        <div style="display:flex;align-items:center;margin:12px 0;color:#999;font-size:13px;">
+          <span style="flex:1;height:1px;background:#ddd;"></span>
+          <span style="padding:0 10px;font-weight:600;">OR</span>
+          <span style="flex:1;height:1px;background:#ddd;"></span>
+        </div>
+        <a href="https://wa.me/918486877575?text=Hello%20ChemSus%20Team%2C%0A%0AI%20am%20interested%20in%20your%20sustainable%20specialty%20chemicals%20and%20would%20like%20to%20request%20product%20details%20and%2For%20evaluation%20samples.%0APlease%20share%20specifications%2C%20pricing%2C%20MOQ%2C%20and%20lead%20times.%0A%0AThank%20you."
+          target="_blank">Open WhatsApp</a>
+      </div>
+    </div>
+    <button id="ib-wa-btn" onclick="ibToggleWA()" aria-label="Open WhatsApp Chat">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+        <path
+          d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-222 99.6-222 222 0 39.1 10.2 77.3 29.6 111L0 480l117.7-30.9c32.4 17.7 68.9 27 106.1 27h.1c122.3 0 224.1-99.6 224.1-222 0-59.3-25.2-115-67.1-157zm-157 341.6c-33.2 0-65.7-8.9-94-25.7l-6.7-4-69.8 18.3 18.6-68.1-4.4-6.9c-18.6-29.5-28.4-63.5-28.4-98.6 0-101.9 82.9-184.8 185-184.8 49.3 0 95.7 19.2 130.5 54.1 34.8 34.9 56.2 81.2 56.1 130.5 0 101.8-84.9 184.6-186.6 184.6zm101.2-138.2c-5.5-2.8-32.8-16.2-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8-3.7 5.6-14.3 18-17.6 21.8-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.5-66-5.7-9.8 5.7-9.1 16.3-30.3 1.8-3.7 .9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.8-9.1-9.3-12.5-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 19-19.4 46.3 0 27.3 19.9 53.7 22.6 57.4 2.8 3.7 39.1 59.7 94.8 83.8 35.2 15.2 49 16.5 66.6 13.9 10.7-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.5-5-4-10.5-6.8z" />
+      </svg>
+    </button>
+  </div>
+
   <script>
+    function ibToggleWA() {
+      const popup = document.getElementById("ib-wa-popup");
+      popup.style.display = (popup.style.display === "block") ? "none" : "block";
+    }
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
 
