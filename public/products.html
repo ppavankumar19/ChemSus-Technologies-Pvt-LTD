@@ -352,6 +352,8 @@
 
       .main-wrapper {
         margin-left: 0;
+        padding-top: 60px;
+        /* Space for mobile toggle */
       }
 
       .mobile-toggle {
@@ -398,6 +400,96 @@
       cursor: pointer;
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
       transition: transform 0.3s ease;
+    }
+
+    /* === Brochure Download Button (Minimalist V3) === */
+    .download-section {
+      position: fixed;
+      bottom: 25px;
+      right: 100px;
+      z-index: 99998;
+    }
+
+    .download-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: var(--primary);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
+      text-decoration: none;
+      border: 2px solid var(--primary);
+      position: relative;
+    }
+
+    .download-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .download-btn:hover {
+      background: var(--primary);
+      color: #ffffff;
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Tooltip style label */
+    .download-btn::before {
+      content: "Brochure";
+      position: absolute;
+      bottom: 75px;
+      right: 50%;
+      transform: translateX(50%);
+      background: var(--ink);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .download-btn:hover::before {
+      opacity: 1;
+      visibility: visible;
+      bottom: 70px;
+    }
+
+    @media (max-width: 580px) {
+      .download-section {
+        right: 90px;
+      }
+
+      .download-btn {
+        width: 50px;
+        height: 50px;
+      }
+    }
+
+    .download-btn:hover::before {
+      opacity: 1;
+      visibility: visible;
+      bottom: 70px;
+    }
+
+    @media (max-width: 580px) {
+      .download-section {
+        right: 90px;
+      }
+
+      .download-btn {
+        width: 50px;
+        height: 50px;
+      }
     }
 
     #ib-wa-btn:hover {
@@ -480,30 +572,6 @@
       margin-top: 10px;
       box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
     }
-
-    /* === Brochure Download Button === */
-    .download-section {
-      text-align: center;
-      margin: 25px 0 10px;
-    }
-
-    .download-btn {
-      display: inline-block;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: #ffffff;
-      padding: 12px 24px;
-      border-radius: 999px;
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .download-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
-    }
   </style>
 </head>
 
@@ -574,13 +642,55 @@
       </section>
     </main>
     <div class="download-section">
-      <a href="assets/brochure.pdf" download class="download-btn">
-        ⬇ Download Company Brochure (PDF)
+      <a href="assets/brochure.pdf" download="ChemSus_Brochure.pdf" class="download-btn" title="Download Brochure">
+        <svg viewBox="0 0 24 24">
+          <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" />
+        </svg>
       </a>
     </div>
 
-    <footer>
-      © 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+    <footer
+      style="background:#06121f; color:#cbd5f5; padding: 20px 0; text-align: left; margin-top: 40px; font-size: 12px;">
+      <div
+        style="max-width:1100px; margin:0 auto; padding: 0 20px; display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom: 20px;">
+
+        <!-- Address Section -->
+        <div>
+          <h4 style="color:#fff; font-family:'Montserrat',sans-serif; margin-bottom:10px; font-size: 14px;">Registered
+            Office</h4>
+          <p style="font-size: 12px; line-height: 1.5;">
+            House No. 555, GNB Road,<br>
+            North Guwahati, Assam – 781030
+          </p>
+        </div>
+
+        <div>
+          <h4 style="color:#fff; font-family:'Montserrat',sans-serif; margin-bottom:10px; font-size: 14px;">Branch
+            Office</h4>
+          <p style="font-size: 12px; line-height: 1.5;">
+            11-2, Gavara jaggayyapalem,<br>
+            BHPV, Visakhapatnam 530012
+          </p>
+        </div>
+
+        <!-- Contact Section -->
+        <div>
+          <h4 style="color:#fff; font-family:'Montserrat',sans-serif; margin-bottom:10px; font-size: 14px;">Contact</h4>
+          <p style="font-size: 12px; margin-bottom:6px;">
+            <span style="font-size:14px;">📞</span> <a href="tel:+918486877575"
+              style="color:#cbd5f5; text-decoration:none;">+91 84868 77575</a>
+          </p>
+          <p style="font-size: 12px;">
+            <span style="font-size:14px;">✉️</span> <a href="mailto:info@chemsus.in"
+              style="color:#cbd5f5; text-decoration:none;">info@chemsus.in</a>
+          </p>
+        </div>
+
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align:center; font-size: 11px;">
+        &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+      </div>
     </footer>
   </div>
 

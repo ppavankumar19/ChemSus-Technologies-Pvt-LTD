@@ -1,390 +1,538 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Buy | ChemSus Technologies Pvt Ltd</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="assets/logo.jpg">
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap"
+    rel="stylesheet">
 
   <style>
     :root {
-      --primary:#0074c7;
-      --primary-dark:#00508a;
-      --accent:#00b8b0;
-      --bg:#F3F7FB;
-      --ink:#1f2933;
-      --highlight:#f97316;
+      --primary: #0074c7;
+      --primary-dark: #00508a;
+      --accent: #00b8b0;
+      --bg: #F3F7FB;
+      --ink: #1f2933;
+      --highlight: #f97316;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      font-family:"Open Sans",Arial,sans-serif;
-      background:var(--bg);
-      color:var(--ink);
-      line-height:1.6;
-      min-height:100vh;
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
     }
-    a{text-decoration:none;color:inherit}
+
+    body {
+      font-family: "Open Sans", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit
+    }
 
     /* Sidebar */
-    .sidebar{
-      width:240px;
-      background:var(--primary);
-      color:#fff;
-      border-right:3px solid var(--accent);
-      display:flex;
-      flex-direction:column;
-      min-height:100vh;
-      position:fixed;
-      left:0;top:0;
-      z-index:1002;
-      transition:transform .3s ease;
-    }
-    .sidebar-overlay{
-      display:none;
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.5);
-      backdrop-filter:blur(2px);
-      z-index:1001;
-      opacity:0;
-      transition:opacity .3s ease;
-    }
-    .sidebar-overlay.active{display:block;opacity:1}
-
-    .nav-logo{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-family:"Montserrat",sans-serif;
-      font-size:16px;
-      font-weight:700;
-      letter-spacing:.02em;
-      padding:16px 20px;
-      border-bottom:1px solid rgba(255,255,255,.1);
-      white-space:nowrap;
-    }
-    .nav-logo-img{height:24px;width:auto}
-    .nav-menu{list-style:none;padding:8px 0;flex:1;overflow-y:auto}
-    .nav-menu li a{
-      display:block;
-      padding:10px 20px;
-      font-size:13.5px;
-      border-left:3px solid transparent;
-      transition:all .2s ease;
-      color:#fff;
-    }
-    .nav-menu li a.active,.nav-menu li a:hover{
-      background:rgba(255,255,255,.1);
-      border-left-color:var(--accent);
-    }
-    #cart-count{
-      background:var(--accent);
-      color:#fff;
-      padding:2px 8px;
-      border-radius:10px;
-      font-size:11px;
-      font-weight:700;
-      margin-left:8px;
-    }
-    .search-section{padding:12px 20px 16px;border-top:1px solid rgba(255,255,255,.1)}
-    .search-form{position:relative}
-    .search-input{
-      width:100%;
-      padding:8px 32px 8px 12px;
-      border-radius:6px;
-      border:1px solid rgba(255,255,255,.3);
-      background:rgba(255,255,255,.1);
-      color:#fff;
-      font-size:12.5px;
-      outline:none;
-      backdrop-filter:blur(10px);
-    }
-    .search-input::placeholder{color:#d1d5db;font-size:11.5px}
-    .search-icon{
-      position:absolute;right:12px;top:50%;
-      transform:translateY(-50%);
-      width:14px;height:14px;color:#fff;pointer-events:none;
+    .sidebar {
+      width: 240px;
+      background: var(--primary);
+      color: #fff;
+      border-right: 3px solid var(--accent);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 1002;
+      transition: transform .3s ease;
     }
 
-    .mobile-toggle{
-      display:none;
-      position:fixed;
-      top:20px;left:20px;
-      z-index:1003;
-      background:var(--primary);
-      color:#fff;
-      border:none;
-      padding:12px;
-      border-radius:8px;
-      cursor:pointer;
-      box-shadow:0 4px 12px rgba(0,0,0,.15);
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .5);
+      backdrop-filter: blur(2px);
+      z-index: 1001;
+      opacity: 0;
+      transition: opacity .3s ease;
     }
-    .mobile-toggle svg{width:20px;height:20px}
+
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1
+    }
+
+    .nav-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      white-space: nowrap;
+    }
+
+    .nav-logo-img {
+      height: 24px;
+      width: auto
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 8px 0;
+      flex: 1;
+      overflow-y: auto
+    }
+
+    .nav-menu li a {
+      display: block;
+      padding: 10px 20px;
+      font-size: 13.5px;
+      border-left: 3px solid transparent;
+      transition: all .2s ease;
+      color: #fff;
+    }
+
+    .nav-menu li a.active,
+    .nav-menu li a:hover {
+      background: rgba(255, 255, 255, .1);
+      border-left-color: var(--accent);
+    }
+
+    #cart-count {
+      background: var(--accent);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    .search-section {
+      padding: 12px 20px 16px;
+      border-top: 1px solid rgba(255, 255, 255, .1)
+    }
+
+    .search-form {
+      position: relative
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 32px 8px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, .3);
+      background: rgba(255, 255, 255, .1);
+      color: #fff;
+      font-size: 12.5px;
+      outline: none;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-input::placeholder {
+      color: #d1d5db;
+      font-size: 11.5px
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      color: #fff;
+      pointer-events: none;
+    }
+
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1003;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, .15);
+    }
+
+    .mobile-toggle svg {
+      width: 20px;
+      height: 20px
+    }
 
     /* Main */
-    .main-wrapper{
-      margin-left:240px;
-      flex:1;
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      transition:margin-left .3s ease;
+    .main-wrapper {
+      margin-left: 240px;
+      flex: 1;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: margin-left .3s ease;
     }
-    .hero{
-      position:relative;
-      overflow:hidden;
+
+    .hero {
+      position: relative;
+      overflow: hidden;
       background:
-        radial-gradient(circle at top left, rgba(0,184,176,0.18), transparent 55%),
-        radial-gradient(circle at bottom right, rgba(0,116,199,0.2), transparent 55%),
+        radial-gradient(circle at top left, rgba(0, 184, 176, 0.18), transparent 55%),
+        radial-gradient(circle at bottom right, rgba(0, 116, 199, 0.2), transparent 55%),
         #041424;
-      color:#fff;
+      color: #fff;
       min-height: 220px;
       padding: 32px 0;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-align:center;
-      border-top:3px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border-top: 3px solid var(--accent);
     }
-    .hero::before{
-      content:"";
-      position:absolute;inset:0;
+
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
       background-image:
-        radial-gradient(circle at 10% 20%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px),
-        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.08) 0, rgba(255,255,255,0.08) 2px, transparent 3px);
-      background-size:140px 140px;
-      opacity:.6;
-      pointer-events:none;
-    }
-    .hero-content{position:relative;z-index:1;max-width:720px;padding:0 18px}
-    .hero-kicker{font-size:12px;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;color:#b9e6ff}
-    .hero-title{font-family:"Montserrat",sans-serif;font-size:28px;
-      line-height: 1.1;font-weight:700;margin-bottom:6px}
-    .hero-subtitle{font-size:14px;color:#e2f3ff}
-
-    main{
-      max-width:900px;
-      margin:0 auto;
-      padding:32px 18px 40px;
-      width:100%;
-      flex:1;
+        radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 2px, transparent 3px),
+        radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.08) 0, rgba(255, 255, 255, 0.08) 2px, transparent 3px);
+      background-size: 140px 140px;
+      opacity: .6;
+      pointer-events: none;
     }
 
-    .buy-card{
-      background:#fff;
-      padding:26px;
-      border-radius:16px;
-      box-shadow:0 14px 30px rgba(15,23,42,.12);
-      border-top:4px solid var(--accent);
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;
+      padding: 0 18px
     }
-    .buy-header{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      margin-bottom:14px;
+
+    .hero-kicker {
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      color: #b9e6ff
     }
-    .buy-title{
-      font-family:"Montserrat",sans-serif;
-      font-size:20px;
-      font-weight:700;
-      color:#123559;
+
+    .hero-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: 700;
+      margin-bottom: 6px
     }
-    .buy-tag{
-      font-size:11px;
-      padding:4px 8px;
-      border-radius:999px;
-      background:#e0f7f6;
-      color:#04726d;
-      text-transform:uppercase;
-      letter-spacing:.16em;
+
+    .hero-subtitle {
+      font-size: 14px;
+      color: #e2f3ff
+    }
+
+    main {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 18px 40px;
+      width: 100%;
+      flex: 1;
+    }
+
+    .buy-card {
+      background: #fff;
+      padding: 26px;
+      border-radius: 16px;
+      box-shadow: 0 14px 30px rgba(15, 23, 42, .12);
+      border-top: 4px solid var(--accent);
+    }
+
+    .buy-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .buy-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: #123559;
+    }
+
+    .buy-tag {
+      font-size: 11px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #e0f7f6;
+      color: #04726d;
+      text-transform: uppercase;
+      letter-spacing: .16em;
     }
 
     /* Highlighted quantity + BioFM info */
-    .info-banner{
-      margin:8px 0 16px;
-      padding:10px 12px;
-      border-radius:10px;
-      background:rgba(249,115,22,0.05);
-      border:1px solid rgba(249,115,22,0.5);
-      font-size:13px;
-      color:#7c2d12;
-      display:flex;
-      gap:8px;
-      align-items:flex-start;
-    }
-    .info-icon{
-      width:18px;height:18px;border-radius:999px;
-      background:var(--highlight);color:#fff;
-      display:flex;align-items:center;justify-content:center;
-      font-size:12px;font-weight:700;flex-shrink:0;
+    .info-banner {
+      margin: 8px 0 16px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(249, 115, 22, 0.05);
+      border: 1px solid rgba(249, 115, 22, 0.5);
+      font-size: 13px;
+      color: #7c2d12;
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
     }
 
-    .q-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin:8px 0 4px;
-    }
-    .q-label{
-      font-size:13px;
-      font-weight:600;
-      color:#1f2937;
-    }
-    .q-pill{
-      font-size:11px;
-      padding:2px 8px;
-      border-radius:999px;
-      background:#eff6ff;
-      color:#1d4ed8;
-      font-weight:600;
+    .info-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--highlight);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
     }
 
-    .qty-pack-select{
-      padding:8px 10px;
-      border-radius:8px;
-      border:2px solid #1d4ed8;
-      background:#e0ecff;
-      color:#1e3a8a;
-      font-size:13px;
-      font-weight:600;
-      min-width:160px;
-      outline:none;
+    .q-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 8px 0 4px;
     }
 
-    .qty-input-row{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      margin:10px 0 6px;
-    }
-    .qty-input{
-      width:100px;
-      padding:8px 10px;
-      border-radius:8px;
-      border:2px solid #e2e8f0;
-      font-size:14px;
-      font-family:inherit;
-    }
-    .qty-input:focus{border-color:var(--primary)}
-
-    .price-line{
-      margin-top:6px;
-      padding:8px 10px;
-      border-radius:10px;
-      background:#ecfdf5;
-      border:1px solid #34d399;
-      font-size:13px;
-      color:#065f46;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-    .price-left{
-      font-family:"Montserrat",sans-serif;
-      font-size:15px;
-      font-weight:700;
-      color:#0f766e;
-    }
-    .biofm-compare{
-      font-size:12px;
-      color:#7c2d12;
-    }
-    .biofm-compare span{
-      font-weight:700;
+    .q-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #1f2937;
     }
 
-    .totals-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-top:12px;
-      padding-top:12px;
-      border-top:1px dashed #e5e7eb;
-      font-size:14px;
-    }
-    .totals-row strong{
-      font-family:"Montserrat",sans-serif;
-      font-size:18px;
-      color:var(--primary-dark);
+    .q-pill {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 600;
     }
 
-    .payment-box{
-      margin-top:16px;
-      padding:14px 12px;
-      border-radius:10px;
-      background:#f1f5f9;
-      font-size:13px;
-      color:#4b5563;
-    }
-    .payment-box ul{margin-left:18px;margin-top:6px}
-
-    .actions-row{
-      margin-top:20px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-    }
-    .btn-primary{
-      background:linear-gradient(135deg,var(--accent),#00d4cc);
-      color:#fff;
-      border:none;
-      border-radius:8px;
-      padding:12px 22px;
-      font-size:14px;
-      font-weight:600;
-      font-family:"Montserrat",sans-serif;
-      cursor:pointer;
-      transition:all .2s ease;
-    }
-    .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(0,184,176,.3)}
-    .btn-primary:disabled{opacity:.6;cursor:not-allowed;transform:none}
-    .btn-secondary{
-      background:transparent;
-      color:#123559;
-      border-radius:8px;
-      padding:11px 20px;
-      font-size:13px;
-      font-weight:600;
-      font-family:"Montserrat",sans-serif;
-      border:1px solid #cbd5e1;
-      cursor:pointer;
-      transition:all .2s ease;
-    }
-    .btn-secondary:hover{background:#f1f5f9;border-color:var(--primary)}
-
-    footer{
-      background:#06121f;
-      color:#cbd5f5;
-      font-size:13px;
-      text-align:center;
-      padding:14px 0;
-      margin-top:22px;
+    .qty-pack-select {
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 2px solid #1d4ed8;
+      background: #e0ecff;
+      color: #1e3a8a;
+      font-size: 13px;
+      font-weight: 600;
+      min-width: 160px;
+      outline: none;
     }
 
-    @media(max-width:1050px){
-      .sidebar{transform:translateX(-100%)}
-      .sidebar.open{transform:translateX(0)}
-      .main-wrapper{margin-left:0}
-      .mobile-toggle{display:block}
-      body.no-scroll{overflow:hidden}
+    .qty-input-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0 6px;
     }
-    @media(max-width:768px){
-      .buy-header{flex-direction:column}
-      .hero-title{font-size:24px}
-      .buy-card{padding:20px}
+
+    .qty-input {
+      width: 100px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 2px solid #e2e8f0;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .qty-input:focus {
+      border-color: var(--primary)
+    }
+
+    .price-line {
+      margin-top: 6px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #ecfdf5;
+      border: 1px solid #34d399;
+      font-size: 13px;
+      color: #065f46;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .price-left {
+      font-family: "Montserrat", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #0f766e;
+    }
+
+    .biofm-compare {
+      font-size: 12px;
+      color: #7c2d12;
+    }
+
+    .biofm-compare span {
+      font-weight: 700;
+    }
+
+    .totals-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed #e5e7eb;
+      font-size: 14px;
+    }
+
+    .totals-row strong {
+      font-family: "Montserrat", sans-serif;
+      font-size: 18px;
+      color: var(--primary-dark);
+    }
+
+    .payment-box {
+      margin-top: 16px;
+      padding: 14px 12px;
+      border-radius: 10px;
+      background: #f1f5f9;
+      font-size: 13px;
+      color: #4b5563;
+    }
+
+    .payment-box ul {
+      margin-left: 18px;
+      margin-top: 6px
+    }
+
+    .actions-row {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #00d4cc);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 184, 176, .3)
+    }
+
+    .btn-primary:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: #123559;
+      border-radius: 8px;
+      padding: 11px 20px;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: "Montserrat", sans-serif;
+      border: 1px solid #cbd5e1;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .btn-secondary:hover {
+      background: #f1f5f9;
+      border-color: var(--primary)
+    }
+
+    footer {
+      background: #06121f;
+      color: #cbd5f5;
+      font-size: 13px;
+      text-align: center;
+      padding: 14px 0;
+      margin-top: 22px;
+    }
+
+    @media(max-width:1050px) {
+      .sidebar {
+        transform: translateX(-100%)
+      }
+
+      .sidebar.open {
+        transform: translateX(0)
+      }
+
+      .main-wrapper {
+        margin-left: 0;
+        padding-top: 60px;
+        /* Space for mobile toggle */
+      }
+
+      .mobile-toggle {
+        display: block
+      }
+
+      body.no-scroll {
+        overflow: hidden
+      }
+    }
+
+    @media(max-width:768px) {
+      .buy-header {
+        flex-direction: column
+      }
+
+      .hero-title {
+        font-size: 24px
+      }
+
+      .buy-card {
+        padding: 20px
+      }
     }
   </style>
 </head>
+
 <body>
   <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
 
   <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
     <svg viewBox="0 0 24 24" fill="currentColor">
-      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+      <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
     </svg>
   </button>
 
@@ -412,7 +560,9 @@
         <input type="search" id="siteSearchInput" class="search-input" placeholder="Search pages...">
         <span class="search-icon">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"></path>
+            <path
+              d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0">
+            </path>
           </svg>
         </span>
       </form>
@@ -488,106 +638,148 @@
       </div>
     </main>
 
-    <footer>&copy; 2025 ChemSus Technologies Pvt Ltd.</footer>
+    <footer
+      style="background:#06121f; color:#cbd5f5; padding: 20px 0; text-align: left; margin-top: 40px; font-size: 12px;">
+      <div
+        style="max-width:1100px; margin:0 auto; padding: 0 20px; display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px; margin-bottom: 20px;">
+
+        <!-- Address Section -->
+        <div>
+          <h4 style="color:#fff; font-family:'Montserrat',sans-serif; margin-bottom:10px; font-size: 14px;">Registered
+            Office</h4>
+          <p style="font-size: 12px; line-height: 1.5;">
+            House No. 555, GNB Road,<br>
+            North Guwahati, Assam – 781030
+          </p>
+        </div>
+
+        <div>
+          <h4 style="color:#fff; font-family:'Montserrat',sans-serif; margin-bottom:10px; font-size: 14px;">Branch
+            Office</h4>
+          <p style="font-size: 12px; line-height: 1.5;">
+            11-2, Gavara jaggayyapalem,<br>
+            BHPV, Visakhapatnam 530012
+          </p>
+        </div>
+
+        <!-- Contact Section -->
+        <div>
+          <h4 style="color:#fff; font-family:'Montserrat',sans-serif; margin-bottom:10px; font-size: 14px;">Contact</h4>
+          <p style="font-size: 12px; margin-bottom:6px;">
+            <span style="font-size:14px;">📞</span> <a href="tel:+918486877575"
+              style="color:#cbd5f5; text-decoration:none;">+91 84868 77575</a>
+          </p>
+          <p style="font-size: 12px;">
+            <span style="font-size:14px;">✉️</span> <a href="mailto:info@chemsus.in"
+              style="color:#cbd5f5; text-decoration:none;">info@chemsus.in</a>
+          </p>
+        </div>
+
+      </div>
+
+      <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align:center; font-size: 11px;">
+        &copy; 2025 ChemSus Technologies Pvt Ltd. All rights reserved.
+      </div>
+    </footer>
   </div>
 
   <script>
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebar-overlay');
 
-    function toggleSidebar(){
+    function toggleSidebar() {
       sidebar.classList.toggle('open');
       overlay.classList.toggle('active');
       document.body.classList.toggle('no-scroll');
     }
-    function closeSidebar(){
+    function closeSidebar() {
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
       document.body.classList.remove('no-scroll');
     }
 
     const navLinks = document.querySelectorAll('.nav-menu a');
-    navLinks.forEach(link=>{
-      link.addEventListener('click',()=>{
-        if(window.innerWidth<=1050) closeSidebar();
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        if (window.innerWidth <= 1050) closeSidebar();
       });
     });
 
-    function loadCart(){
+    function loadCart() {
       return JSON.parse(localStorage.getItem('chemsusCart')) || [];
     }
-    function saveCart(cart){
-      localStorage.setItem('chemsusCart',JSON.stringify(cart));
-      const count = cart.reduce((s,i)=>s+i.quantity,0);
+    function saveCart(cart) {
+      localStorage.setItem('chemsusCart', JSON.stringify(cart));
+      const count = cart.reduce((s, i) => s + i.quantity, 0);
       const span = document.getElementById('cart-count');
-      if(span) span.textContent = count;
+      if (span) span.textContent = count;
     }
 
     // Pricing table must match shop.html per-pack prices
     const PRODUCT_PRICING = {
       "Methyl Levulinate": {
-        "100 g": { biofm: 7077,  our: 4000 },
-        "500 mL": { biofm: 8915,  our: 7000 },
+        "100 g": { biofm: 7077, our: 4000 },
+        "500 mL": { biofm: 8915, our: 7000 },
         "1 L": { biofm: 11535, our: 10000 },
         "2 L": null,
         "5 L": null
       },
       "Ethyl Levulinate": {
-        "100 g": { biofm: 7077,  our: 4000 },
-        "500 mL": { biofm: 8915,  our: 7000 },
+        "100 g": { biofm: 7077, our: 4000 },
+        "500 mL": { biofm: 8915, our: 7000 },
         "1 L": { biofm: 11535, our: 10000 },
         "2 L": null,
         "5 L": null
       },
       "DALA": {
-        "5 g":  { biofm: 16774, our: 15000 },
+        "5 g": { biofm: 16774, our: 15000 },
         "10 g": { biofm: 25156, our: 20000 },
         "25 g": { biofm: 37748, our: 30000 },
-        "100 g":{ biofm: 85084, our: 70000 }
+        "100 g": { biofm: 85084, our: 70000 }
       },
       "5-HMF": {
-        "5 g":  { biofm: 2206, our: 2000 },
+        "5 g": { biofm: 2206, our: 2000 },
         "25 g": { biofm: 6250, our: 5000 },
-        "100 g":{ biofm: 18290, our: 15000 }
+        "100 g": { biofm: 18290, our: 15000 }
       },
       "Sodium Levulinate": {
-        "100 g": { biofm: 2390,  our: 2000 },
-        "500 g": { biofm: 7969,  our: 7000 },
-        "1 kg":  { biofm: 13281, our: 10000 },
-        "2 kg":  { biofm: 24163, our: 18000 },
-        "3 kg":  { biofm: 37168, our: 27000 },
-        "5 kg":  { biofm: 59034, our: 42500 }
+        "100 g": { biofm: 2390, our: 2000 },
+        "500 g": { biofm: 7969, our: 7000 },
+        "1 kg": { biofm: 13281, our: 10000 },
+        "2 kg": { biofm: 24163, our: 18000 },
+        "3 kg": { biofm: 37168, our: 27000 },
+        "5 kg": { biofm: 59034, our: 42500 }
       },
       "Calcium Levulinate": {
-        "100 g": { biofm: 7336,  our: 2000 },
+        "100 g": { biofm: 7336, our: 2000 },
         "500 g": { biofm: 10735, our: 7000 },
-        "1 kg":  { biofm: 18658, our: 10000 },
-        "2 kg":  { biofm: 0,     our: 19000 },
-        "5 kg":  { biofm: 0,     our: 42500 }
+        "1 kg": { biofm: 18658, our: 10000 },
+        "2 kg": { biofm: 0, our: 19000 },
+        "5 kg": { biofm: 0, our: 42500 }
       },
       "Levulinic Acid": {
-        "100 g": { biofm: 7373,  our: 2000 },
-        "500 g": { biofm: 9936,  our: 3000 },
-        "1 kg":  { biofm: 15128, our: 5000 }
+        "100 g": { biofm: 7373, our: 2000 },
+        "500 g": { biofm: 9936, our: 3000 },
+        "1 kg": { biofm: 15128, our: 5000 }
       }
     };
 
-    function getPackPriceFromNameWithPack(fullName, unitPrice){
+    function getPackPriceFromNameWithPack(fullName, unitPrice) {
       // fullName is like "Sodium Levulinate (500 g)"
       const match = fullName.match(/^(.*)\s+\((.+)\)$/);
-      if(!match){
+      if (!match) {
         return { baseName: fullName, pack: null, biofm: 0, our: unitPrice };
       }
       const baseName = match[1];
       const pack = match[2];
       const table = PRODUCT_PRICING[baseName];
-      if(table && table[pack]){
+      if (table && table[pack]) {
         return { baseName, pack, biofm: table[pack].biofm || 0, our: table[pack].our || unitPrice };
       }
       return { baseName, pack, biofm: 0, our: unitPrice };
     }
 
-    function renderBuyNow(){
+    function renderBuyNow() {
       const params = new URLSearchParams(window.location.search);
       const nameParam = params.get('name');
       const priceParam = parseFloat(params.get('price'));
@@ -607,7 +799,7 @@
       // update cart badge
       saveCart(loadCart());
 
-      if(!nameParam || !priceParam){
+      if (!nameParam || !priceParam) {
         heroNameEl.textContent = 'Invalid Buy Request';
         headingEl.textContent = 'Order Summary';
         unitPriceText.textContent = '₹0';
@@ -618,7 +810,7 @@
       }
 
       const { baseName, pack, biofm, our } = getPackPriceFromNameWithPack(nameParam, priceParam);
-      const displayName = baseName + (pack ? ' ('+pack+')' : '');
+      const displayName = baseName + (pack ? ' (' + pack + ')' : '');
 
       heroNameEl.textContent = 'Buy ' + baseName;
       headingEl.textContent = baseName;
@@ -631,9 +823,9 @@
         'BioFM: <span>₹' + (biofm || 0).toLocaleString('en-IN') +
         '</span> —— Our Price: <span>₹' + unit.toLocaleString('en-IN') + '</span>';
 
-      function recalc(){
-        let q = parseInt(qtyInput.value,10);
-        if(!Number.isFinite(q) || q <= 0){ q = 1; qtyInput.value = 1; }
+      function recalc() {
+        let q = parseInt(qtyInput.value, 10);
+        if (!Number.isFinite(q) || q <= 0) { q = 1; qtyInput.value = 1; }
         const sub = unit * q;
         subtotalText.textContent = 'Subtotal: ₹' + sub.toLocaleString('en-IN');
         perPackText.textContent = 'Per pack: ₹' + unit.toLocaleString('en-IN');
@@ -643,9 +835,9 @@
       qtyInput.addEventListener('input', recalc);
       recalc();
 
-      confirmBtn.onclick = function(){
-        let q = parseInt(qtyInput.value,10);
-        if(!Number.isFinite(q) || q <= 0){ q = 1; }
+      confirmBtn.onclick = function () {
+        let q = parseInt(qtyInput.value, 10);
+        if (!Number.isFinite(q) || q <= 0) { q = 1; }
         const total = unit * q;
 
         const buyNowData = {
@@ -664,18 +856,19 @@
       };
     }
 
-    document.getElementById('siteSearchForm').addEventListener('submit', function(e){
+    document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const q = document.getElementById('siteSearchInput').value.trim().toLowerCase();
-      if(!q) return;
-      if(q.includes('shop')) window.location.href='shop.html';
-      else if(q.includes('product')) window.location.href='products.html';
-      else if(q.includes('order')) window.location.href='orders.html';
-      else if(q.includes('contact')) window.location.href='contact.html';
-      else window.location.href='index.html';
+      if (!q) return;
+      if (q.includes('shop')) window.location.href = 'shop.html';
+      else if (q.includes('product')) window.location.href = 'products.html';
+      else if (q.includes('order')) window.location.href = 'orders.html';
+      else if (q.includes('contact')) window.location.href = 'contact.html';
+      else window.location.href = 'index.html';
     });
 
     window.addEventListener('DOMContentLoaded', renderBuyNow);
   </script>
 </body>
+
 </html>

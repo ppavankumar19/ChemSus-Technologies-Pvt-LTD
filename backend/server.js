@@ -94,8 +94,7 @@ function setCookie(res, name, value) {
   const isProd = process.env.NODE_ENV === "production";
   res.setHeader(
     "Set-Cookie",
-    `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_TTL_SEC}${
-      isProd ? "; Secure" : ""
+    `${name}=${encodeURIComponent(value)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_TTL_SEC}${isProd ? "; Secure" : ""
     }`
   );
 }
@@ -107,8 +106,8 @@ function clearCookie(res, name) {
 }
 
 // ---------------- Admin auth ----------------
-const ADMIN_USER = process.env.ADMIN_USER || "admin";
-const ADMIN_PASS = process.env.ADMIN_PASS || "chemsus123";
+const ADMIN_USER = process.env.ADMIN_USER || "chemsus";
+const ADMIN_PASS = process.env.ADMIN_PASS || "chemsus2026";
 const sessions = new Map();
 
 function purgeExpiredSessions() {
@@ -144,7 +143,10 @@ function requireAdmin(req, res, next) {
   next();
 }
 
-app.use("/api/admin", requireAdminCsrf);
+app.use("/api/admin", (req, res, next) => {
+  if (req.path === "/login") return next();
+  requireAdminCsrf(req, res, next);
+});
 
 app.post("/api/admin/login", (req, res) => {
   const { username, password } = req.body || {};
@@ -665,9 +667,8 @@ app.post("/api/orders", async (req, res) => {
               quantity,
               total_price: totalprice,
             });
-            productname = `${shop.name || productname}${
-              packSize ? " (" + packSize + ")" : ""
-            }`;
+            productname = `${shop.name || productname}${packSize ? " (" + packSize + ")" : ""
+              }`;
           }
         }
       }
