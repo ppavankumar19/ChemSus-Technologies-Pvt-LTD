@@ -643,7 +643,7 @@
 
     .floating-cart-btn {
       position: fixed;
-      right: 20px;
+      right: 25px;
       bottom: 165px;
       z-index: 1200;
       background: linear-gradient(135deg, var(--primary), var(--primary-dark));
@@ -725,8 +725,8 @@
       }
 
       .floating-cart-btn {
-        right: 14px;
-        bottom: 154px;
+        right: 20px;
+        bottom: 160px;
         padding: 10px 16px
       }
 
@@ -963,8 +963,8 @@
     </footer>
   </div>
 
-  <button class="floating-cart-btn" onclick="window.location.href='cart.html'">
-    Go to Cart <span id="floating-cart-count">0</span>
+  <button class="floating-cart-btn" onclick="window.location.href='cart.html'" aria-label="Open Cart">
+    Cart <span id="floating-cart-count">0</span>
   </button>
 
   <script>
