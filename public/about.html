@@ -172,6 +172,7 @@
     /* MAIN WRAPPER */
     .main-wrapper {
       margin-left: 0;
+      width: 100%;
       flex: 1;
       min-height: 100vh;
       display: flex;
@@ -331,6 +332,14 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
+    @media (max-width: 1050px) {
+      .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+        padding-top: 72px;
+      }
+    }
+
     @media (min-width: 1051px) {
       .sidebar {
         transform: translateX(0);
@@ -338,6 +347,7 @@
 
       .main-wrapper {
         margin-left: 240px;
+      width: calc(100% - 240px);
       }
 
       .mobile-toggle {
@@ -543,7 +553,14 @@
         height: 50px;
       }
     }
-  </style>
+  
+    @media (max-width: 1050px) {
+      body.no-scroll .mobile-toggle {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+</style>
 </head>
 
 <body>
@@ -760,14 +777,16 @@
 
     // Open/Close Sidebar function
     function toggleSidebar() {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
+      const isOpen = sidebar.classList.toggle('open');
+      overlay.classList.toggle('active', isOpen);
+      document.body.classList.toggle('no-scroll', isOpen);
     }
 
     // Explicitly close Sidebar
     function closeSidebar() {
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
+      document.body.classList.remove('no-scroll');
     }
 
     // Initialize Cart Badge
@@ -829,3 +848,5 @@
 </body>
 
 </html>
+
+

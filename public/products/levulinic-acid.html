@@ -186,6 +186,7 @@
     /* ===== MAIN WRAPPER ===== */
     .main-wrapper {
       margin-left: 240px;
+      width: calc(100% - 240px);
       flex: 1;
       min-height: 100vh;
       display: flex;
@@ -562,6 +563,8 @@
 
       .main-wrapper {
         margin-left: 0;
+        width: 100%;
+        padding-top: 72px;
       }
 
       .mobile-toggle {
@@ -749,7 +752,14 @@
         font-size: 24px
       }
     }
-  </style>
+  
+    @media (max-width: 1050px) {
+      body.no-scroll .mobile-toggle {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+</style>
   <style id="sweezy-cursors--styles">
     body a,
     body button,
@@ -919,14 +929,16 @@
 
     // Open Sidebar
     function toggleSidebar() {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
+      const isOpen = sidebar.classList.toggle('open');
+      overlay.classList.toggle('active', isOpen);
+      document.body.classList.toggle('no-scroll', isOpen);
     }
 
     // Close Sidebar (Explicit)
     function closeSidebar() {
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
+      document.body.classList.remove('no-scroll');
     }
 
     // Close mobile menu automatically when a link inside it is clicked
@@ -1010,3 +1022,5 @@
 </body>
 
 </html>
+
+

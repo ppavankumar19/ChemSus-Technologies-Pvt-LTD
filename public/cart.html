@@ -156,6 +156,7 @@
 
     .main-wrapper {
       margin-left: 240px;
+      width: calc(100% - 240px);
       flex: 1;
       min-height: 100vh;
       display: flex;
@@ -446,8 +447,9 @@
 
       .main-wrapper {
         margin-left: 0;
-        padding-top: 60px;
-      }
+        width: 100%;
+        padding-top: 72px;
+}
     }
 
     @media (max-width: 640px) {
@@ -461,7 +463,14 @@
         padding: 20px 12px;
       }
     }
-  </style>
+  
+    @media (max-width: 1050px) {
+      body.no-scroll .mobile-toggle {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+</style>
 </head>
 
 <body>
@@ -568,12 +577,14 @@
     const overlay = document.getElementById('sidebar-overlay');
 
     function toggleSidebar() {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
+      const isOpen = sidebar.classList.toggle('open');
+      overlay.classList.toggle('active', isOpen);
+      document.body.classList.toggle('no-scroll', isOpen);
     }
     function closeSidebar() {
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
+      document.body.classList.remove('no-scroll');
     }
 
     function normalizeCart() {
@@ -729,3 +740,5 @@
 </body>
 
 </html>
+
+

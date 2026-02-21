@@ -223,6 +223,7 @@
     /* MAIN CONTENT WITH OFFSET */
     .main-wrapper {
       margin-left: 240px;
+      width: calc(100% - 240px);
       flex: 1;
       min-height: 100vh;
       transition: margin-left 0.3s ease;
@@ -427,6 +428,8 @@
 
       .main-wrapper {
         margin-left: 0;
+        width: 100%;
+        padding-top: 72px;
       }
 
       /* Mobile menu toggle */
@@ -695,7 +698,14 @@
         height: 50px;
       }
     }
-  </style>
+  
+    @media (max-width: 1050px) {
+      body.no-scroll .mobile-toggle {
+        opacity: 0;
+        pointer-events: none;
+      }
+    }
+</style>
 
 </head>
 
@@ -949,14 +959,16 @@
 
     // Open/Close Sidebar function
     function toggleSidebar() {
-      sidebar.classList.toggle('open');
-      overlay.classList.toggle('active');
+      const isOpen = sidebar.classList.toggle('open');
+      overlay.classList.toggle('active', isOpen);
+      document.body.classList.toggle('no-scroll', isOpen);
     }
 
     // Explicitly close Sidebar (when clicking overlay or link)
     function closeSidebar() {
       sidebar.classList.remove('open');
       overlay.classList.remove('active');
+      document.body.classList.remove('no-scroll');
     }
 
     document.getElementById('siteSearchForm').addEventListener('submit', function (e) {
@@ -1021,3 +1033,5 @@
 </body>
 
 </html>
+
+
