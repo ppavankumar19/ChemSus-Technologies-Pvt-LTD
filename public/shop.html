@@ -670,6 +670,12 @@
       font-weight: 800;
     }
 
+    .floating-cart-btn.wa-active {
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+    }
+
     @media(max-width:1050px) {
       .sidebar {
         transform: translateX(-100%)
@@ -1388,15 +1394,33 @@
       else window.location.href = 'index.html';
     });
 
+    function syncFloatingCartWithWA(isOpen) {
+      const floatingCart = document.querySelector('.floating-cart-btn');
+      if (!floatingCart) return;
+      floatingCart.classList.toggle('wa-active', !!isOpen);
+    }
+
+    function ibToggleWA(forceOpen) {
+      const popup = document.getElementById('ib-wa-popup');
+      if (!popup) return;
+      const shouldOpen = typeof forceOpen === 'boolean'
+        ? forceOpen
+        : popup.style.display !== 'block';
+      popup.style.display = shouldOpen ? 'block' : 'none';
+      syncFloatingCartWithWA(shouldOpen);
+    }
+
     window.toggleSidebar = toggleSidebar;
     window.updateItem = updateItem;
     window.goToBuyPage = goToBuyPage;
+    window.ibToggleWA = ibToggleWA;
 
     document.addEventListener('DOMContentLoaded', async function () {
       await loadPricingData();
       await renderProducts();
       saveCart();
       syncUI();
+      ibToggleWA(false);
       window.addEventListener('storage', function (e) {
         if (e.key === 'chemsusCart') {
           cart = JSON.parse(localStorage.getItem('chemsusCart')) || [];
@@ -1404,6 +1428,12 @@
           syncUI();
         }
       });
+    });
+
+    document.addEventListener('click', function (e) {
+      const waRoot = document.getElementById('ib-wa');
+      if (!waRoot) return;
+      if (!waRoot.contains(e.target)) ibToggleWA(false);
     });
   </script>
   <div id="ib-wa">
