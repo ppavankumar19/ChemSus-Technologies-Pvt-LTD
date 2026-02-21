@@ -429,40 +429,82 @@
     }
 
     .login-wrap {
-      min-height: calc(100vh - 80px);
+      min-height: 100vh;
+      width: 100%;
+      position: fixed;
+      inset: 0;
+      z-index: 200;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 40px 20px;
-      background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(0, 184, 176, 0.18), transparent 34%),
+        radial-gradient(circle at 85% 85%, rgba(0, 116, 199, 0.18), transparent 38%),
+        linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
     }
 
     .login-card {
-      background: rgba(255, 255, 255, 0.9);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      padding: 40px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      border-radius: 22px;
+      box-shadow: 0 22px 50px rgba(15, 23, 42, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      padding: 34px 30px 30px;
       width: 100%;
-      max-width: 420px;
+      max-width: 430px;
       text-align: center;
+      position: relative;
     }
 
     .login-card .brand-logo {
-      width: 80px;
-      height: 80px;
+      width: 72px;
+      height: 72px;
       object-fit: contain;
-      border-radius: 16px;
-      margin-bottom: 24px;
-      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+      border-radius: 14px;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 24px rgba(0, 116, 199, 0.25);
     }
 
     .login-card h2 {
-      margin-bottom: 10px;
-      font-size: 24px;
+      margin-bottom: 8px;
+      font-size: 26px;
       font-family: "Montserrat", sans-serif;
       color: var(--primary-dark);
+    }
+
+    .login-card .field label {
+      text-align: left;
+    }
+
+    .login-card .field input {
+      height: 46px;
+      border-radius: 10px;
+      border-width: 1px;
+      background: #fff;
+    }
+
+    .login-card .field input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0, 116, 199, 0.12);
+    }
+
+    .login-actions {
+      justify-content: center;
+    }
+
+    .login-actions .btn {
+      width: 100%;
+      justify-content: center;
+      min-height: 46px;
+      font-size: 15px;
+      border-radius: 10px;
+    }
+
+    .login-card #loginStatus {
+      margin-top: 16px;
+      text-align: left;
     }
 
     .muted {
@@ -505,6 +547,11 @@
       table {
         min-width: 1000px;
       }
+
+      .login-card {
+        padding: 26px 20px 22px;
+        border-radius: 18px;
+      }
     }
   </style>
 </head>
@@ -544,7 +591,7 @@
           <input id="loginPass" type="password">
         </div>
       </div>
-      <div class="inline" style="margin-top:16px;">
+      <div class="inline login-actions" style="margin-top:16px;">
         <button class="btn primary" onclick="login()">Login</button>
       </div>
       <div id="loginStatus" class="status err"></div>
@@ -1048,9 +1095,39 @@
 
     function openPage(p) { window.open(p, '_blank'); }
 
-    async function api(url, opts) {
+    function showLoginView() {
+      document.getElementById('topActions').style.display = 'none';
+      document.getElementById('appView').style.display = 'none';
+      document.getElementById('loginView').style.display = 'flex';
+    }
+
+    function showAppView() {
+      document.getElementById('loginView').style.display = 'none';
+      document.getElementById('appView').style.display = 'block';
+      document.getElementById('topActions').style.display = 'flex';
+    }
+
+    async function parseApiError(r) {
+      const ct = r.headers.get('content-type') || '';
+      if (ct.includes('application/json')) {
+        try {
+          const payload = await r.json();
+          if (payload && typeof payload === 'object') {
+            return payload.error || payload.message || `Request failed (${r.status})`;
+          }
+        } catch { }
+      }
+      try {
+        const txt = (await r.text()).trim();
+        return txt || `Request failed (${r.status})`;
+      } catch {
+        return `Request failed (${r.status})`;
+      }
+    }
+
+    async function api(url, opts = {}) {
       const r = await fetch(API_BASE + url, { credentials: 'include', ...opts });
-      if (!r.ok) throw new Error(await r.text());
+      if (!r.ok) throw new Error(await parseApiError(r));
       const ct = r.headers.get('content-type');
       if (ct && ct.includes('application/json')) return r.json();
       return r.text();
@@ -1122,16 +1199,14 @@
         });
         await boot();
       } catch (e) {
-        st.textContent = '❌ Login failed: ' + (e.message || e);
+        st.textContent = 'Login failed: ' + (e.message || e);
         st.style.display = 'block';
       }
     }
 
     async function logout() {
       try { await api('/admin/logout', { method: 'POST' }); } catch { }
-      document.getElementById('topActions').style.display = 'none';
-      document.getElementById('appView').style.display = 'none';
-      document.getElementById('loginView').style.display = 'block';
+      showLoginView();
     }
 
     function switchView(id) {
@@ -1678,13 +1753,10 @@
       try {
         const me = await api('/admin/me');
         if (!me.loggedIn) throw new Error('Not logged in');
-        document.getElementById('loginView').style.display = 'none';
-        document.getElementById('appView').style.display = 'block';
-        document.getElementById('topActions').style.display = 'flex';
+        showAppView();
         await refreshProducts();
       } catch (e) {
-        document.getElementById('loginView').style.display = 'block';
-        document.getElementById('appView').style.display = 'none';
+        showLoginView();
       }
     }
 

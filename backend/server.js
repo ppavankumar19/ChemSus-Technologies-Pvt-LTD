@@ -106,8 +106,8 @@ function clearCookie(res, name) {
 }
 
 // ---------------- Admin auth ----------------
-const ADMIN_USER = process.env.ADMIN_USER || "chemsus";
-const ADMIN_PASS = process.env.ADMIN_PASS || "chemsus2026";
+const ADMIN_USER = process.env.ADMIN_USER || "admin";
+const ADMIN_PASS = process.env.ADMIN_PASS || "chemsus123";
 const sessions = new Map();
 
 function purgeExpiredSessions() {
