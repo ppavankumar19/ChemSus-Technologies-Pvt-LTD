@@ -376,10 +376,11 @@
       overflow: hidden;
     }
 
-    .product-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain
+    .product-emoji {
+      font-size: 82px;
+      line-height: 1;
+      filter: drop-shadow(0 8px 12px rgba(15, 23, 42, .18));
+      user-select: none;
     }
 
     .product-title {
@@ -1117,8 +1118,8 @@
         const moreHTML = safeMore ? `<a class="more-details" href="${safeMore}">More Details ↗</a>` : '';
         const outMsg = !isInStock ? '<div class="out-of-stock-message">Currently Out of Stock</div>' : '';
 
-        const fallbackImages = ['assets/cl.jpeg', 'assets/sl.jpeg', 'assets/la.jpeg', 'assets/5hmf.jpeg', 'assets/el.jpeg', 'assets/ml.jpeg'];
-        const imageSrc = safeUrl(item.image || '') || fallbackImages[index % fallbackImages.length];
+        const chemicalEmojis = ['&#x1F9EA;', '&#x2697;&#xFE0F;', '&#x1F52C;', '&#x1F9EB;', '&#x1F9EC;', '&#x1F97C;'];
+        const productEmoji = chemicalEmojis[index % chemicalEmojis.length];
 
         const packSelectHTML = pricingTable && packOptions.length > 0 ? `
           <div class="pack-row">
@@ -1140,7 +1141,7 @@
           ${outMsg}
 
           <div class="product-image">
-            <img src="${imageSrc}" alt="${safeName}">
+            <span class="product-emoji" aria-hidden="true">${productEmoji}</span>
           </div>
 
           <h3 class="product-title">${safeName}</h3>
