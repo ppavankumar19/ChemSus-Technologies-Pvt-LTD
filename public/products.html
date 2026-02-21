@@ -313,10 +313,10 @@
     footer {
       background: #06121f;
       color: #cbd5f5;
-      font-size: 13px;
+      padding: 20px 0;
       text-align: center;
-      padding: 14px 0;
-      margin-top: 24px;
+      margin-top: 40px;
+      font-size: 12px;
     }
 
     /* MOBILE TOGGLE */
@@ -380,7 +380,7 @@
     /* === WhatsApp QR Floating Widget (UPDATED) === */
     #ib-wa {
       position: fixed;
-      bottom: 25px;
+      bottom: 95px;
       right: 25px;
       z-index: 99999;
       font-family: Arial, sans-serif;
@@ -406,7 +406,7 @@
     .download-section {
       position: fixed;
       bottom: 25px;
-      right: 100px;
+      right: 25px;
       z-index: 99998;
     }
 
@@ -466,27 +466,19 @@
 
     @media (max-width: 580px) {
       .download-section {
-        right: 90px;
+        right: 20px;
       }
 
       .download-btn {
         width: 50px;
         height: 50px;
       }
-    }
 
-    .download-btn:hover::before {
-      opacity: 1;
-      visibility: visible;
-      bottom: 70px;
-    }
-
-    @media (max-width: 580px) {
-      .download-section {
-        right: 90px;
+      #ib-wa {
+        right: 20px;
       }
 
-      .download-btn {
+      #ib-wa-btn {
         width: 50px;
         height: 50px;
       }

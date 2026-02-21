@@ -347,17 +347,21 @@
         .mobile-toggle {
             display: none;
             position: fixed;
-            top: 20px;
+            top: 15px;
             left: 20px;
             z-index: 1003;
-            /* Highest z-index */
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 10px;
             border-radius: 8px;
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.open~.mobile-toggle {
+            left: 175px;
         }
 
         .mobile-toggle svg {
@@ -595,12 +599,6 @@
 
     <div id="sidebar-overlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
 
-    <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
-        <svg viewBox="0 0 24 24" fill="currentColor">
-            <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
-        </svg>
-    </button>
-
     <nav class="sidebar" id="sidebar">
         <a href="index.html" class="nav-logo">
             <img src="assets/logo.jpg" alt="ChemSus Logo" class="nav-logo-img">
@@ -635,6 +633,12 @@
             </form>
         </div>
     </nav>
+
+    <button class="mobile-toggle" onclick="toggleSidebar()" aria-label="Toggle Menu">
+        <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z" />
+        </svg>
+    </button>
 
     <div class="main-wrapper">
         <section class="hero">
