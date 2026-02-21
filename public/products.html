@@ -256,6 +256,36 @@
       color: var(--primary-dark);
     }
 
+    .product-search-wrap {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .product-search-input {
+      width: 100%;
+      padding: 9px 12px;
+      border: 2px solid #dbe5f0;
+      border-radius: 8px;
+      font-size: 13px;
+      background: #fff;
+      color: var(--ink);
+      transition: all 0.2s ease;
+    }
+
+    .product-search-input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0, 184, 176, 0.12);
+    }
+
+    .product-search-meta {
+      margin-top: 10px;
+      text-align: center;
+      color: #5b6470;
+      font-size: 13px;
+      min-height: 20px;
+    }
+
     .product-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -629,6 +659,12 @@
           <h2>Our Product Portfolio</h2>
         </div>
 
+        <div class="product-search-wrap">
+          <input type="search" id="productSearchInput" class="product-search-input"
+            placeholder="Search products by name or description..." aria-label="Search products">
+          <p id="productSearchMeta" class="product-search-meta"></p>
+        </div>
+
         <div class="product-grid" id="productGrid">
         </div>
       </section>
@@ -802,30 +838,66 @@
       ];
     }
 
+    let ALL_PRODUCTS = [];
+
+    function escapeHtml(s) {
+      return String(s ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function safeUrl(u) {
+      const s = String(u || '').trim();
+      if (!s) return '#';
+      if (s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/') || s.startsWith('products/')) return s;
+      if (/^[a-z0-9._/\\-]+$/i.test(s)) return s;
+      return '#';
+    }
+
+    function updateProductSearchMeta(visibleCount, totalCount, query) {
+      const meta = document.getElementById('productSearchMeta');
+      if (!meta) return;
+      const q = String(query || '').trim();
+      if (!q) {
+        meta.textContent = `${visibleCount} product${visibleCount === 1 ? '' : 's'} available`;
+        return;
+      }
+      meta.textContent = `${visibleCount} of ${totalCount} product${totalCount === 1 ? '' : 's'} for "${q}"`;
+    }
+
+    function filterProducts(products, query) {
+      const q = String(query || '').trim().toLowerCase();
+      if (!q) return products;
+      return products.filter((product) => {
+        const haystack = `${product?.name || ''} ${product?.description || ''} ${product?.link || ''}`.toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+
+    function applyProductSearch(query) {
+      const filtered = filterProducts(ALL_PRODUCTS, query);
+      renderProducts(filtered, query);
+      updateProductSearchMeta(filtered.length, ALL_PRODUCTS.length, query);
+    }
+
     // Render products to the grid
-    function renderProducts(products) {
+    function renderProducts(products, query = '') {
       const grid = document.getElementById('productGrid');
       grid.innerHTML = '';
 
       if (!products || products.length === 0) {
-        grid.innerHTML = '<p style="text-align:center;color:#666;grid-column:1/-1;">No products available yet.</p>';
+        const empty = document.createElement('p');
+        empty.style.textAlign = 'center';
+        empty.style.color = '#666';
+        empty.style.gridColumn = '1 / -1';
+        empty.textContent = String(query || '').trim()
+          ? `No products found for "${String(query).trim()}".`
+          : 'No products available yet.';
+        grid.appendChild(empty);
         return;
-      }
-
-      function escapeHtml(s) {
-        return String(s ?? '')
-          .replaceAll('&', '&amp;')
-          .replaceAll('<', '&lt;')
-          .replaceAll('>', '&gt;')
-          .replaceAll('"', '&quot;')
-          .replaceAll("'", '&#39;');
-      }
-      function safeUrl(u) {
-        const s = String(u || '').trim();
-        if (!s) return '#';
-        if (s.startsWith('http://') || s.startsWith('https://') || s.startsWith('/') || s.startsWith('products/')) return s;
-        if (/^[a-z0-9._/\\-]+$/i.test(s)) return s;
-        return '#';
       }
 
       products.forEach(product => {
@@ -865,19 +937,30 @@
         // If database is empty, use defaults
         if (activeProducts.length === 0) {
           console.warn('No active products in database, using defaults');
-          renderProducts(getDefaultProducts());
+          ALL_PRODUCTS = getDefaultProducts();
         } else {
-          renderProducts(activeProducts);
+          ALL_PRODUCTS = activeProducts;
         }
+        const q = document.getElementById('productSearchInput')?.value || '';
+        applyProductSearch(q);
       } catch (e) {
         console.error('Failed to load products:', e);
         console.warn('Using default products as fallback');
-        renderProducts(getDefaultProducts());
+        ALL_PRODUCTS = getDefaultProducts();
+        const q = document.getElementById('productSearchInput')?.value || '';
+        applyProductSearch(q);
       }
     }
 
     // Initial Load
     loadProducts();
+
+    const productSearchInput = document.getElementById('productSearchInput');
+    if (productSearchInput) {
+      productSearchInput.addEventListener('input', function () {
+        applyProductSearch(this.value);
+      });
+    }
 
     // Cart badge updater
     (function () {
