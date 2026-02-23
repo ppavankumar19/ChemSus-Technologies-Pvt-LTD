@@ -724,7 +724,22 @@
         pointer-events: none;
       }
     }
-</style>
+  
+    /* Mobile viewport fix */
+    html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      min-height: 100%;
+      background: var(--bg, #F3F7FB);
+    }
+
+    body {
+      min-height: 100dvh;
+      overflow-x: hidden;
+      background: var(--bg, #F3F7FB);
+    }
+  </style>
   <style id="sweezy-cursors--styles">
     body a,
     body button,
