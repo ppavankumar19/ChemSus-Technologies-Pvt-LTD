@@ -391,6 +391,60 @@
       min-height: 80px;
     }
 
+    .otp-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+
+    .otp-input {
+      flex: 1;
+      min-width: 140px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .otp-btn {
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      background: #fff;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .otp-btn:hover {
+      background: #eff6ff;
+    }
+
+    .otp-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .otp-meta {
+      font-size: 12px;
+      color: #475569;
+    }
+
+    .otp-status {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0f766e;
+      min-height: 18px;
+    }
+
+    .otp-status.error {
+      color: #b91c1c;
+    }
+
     .btn-submit {
       background: linear-gradient(135deg, var(--accent), #00d4cc);
       color: white;
@@ -659,6 +713,17 @@
             <div class="form-group">
               <label class="form-label required">Email ID</label>
               <input type="email" id="email" class="form-input" placeholder="Enter your email address" required>
+              <div class="otp-actions">
+                <button type="button" class="otp-btn" id="sendOtpBtn">Send OTP</button>
+                <span id="otpCountdown" class="otp-meta"></span>
+              </div>
+              <div class="otp-actions">
+                <input type="text" id="emailOtp" class="form-input otp-input" placeholder="Enter 6-digit OTP"
+                  inputmode="numeric" maxlength="6" pattern="[0-9]{6}">
+                <button type="button" class="otp-btn" id="verifyOtpBtn">Verify OTP</button>
+              </div>
+              <div id="otpStatus" class="otp-status"></div>
+              <input type="hidden" id="emailOtpToken">
             </div>
           </div>
 
@@ -840,6 +905,139 @@
       sessionStorage.setItem('orderTotal', totalPrice);
     }
 
+    const otpState = {
+      challengeId: '',
+      verified: false,
+      cooldownSeconds: 0,
+      cooldownTimer: null
+    };
+
+    function setOtpStatus(message, isError = false) {
+      const el = document.getElementById('otpStatus');
+      el.textContent = message || '';
+      el.classList.toggle('error', !!isError);
+    }
+
+    function resetOtpState({ clearChallenge = true } = {}) {
+      otpState.verified = false;
+      if (clearChallenge) otpState.challengeId = '';
+      document.getElementById('emailOtpToken').value = '';
+      document.getElementById('verifyOtpBtn').disabled = false;
+    }
+
+    function updateSendOtpButton() {
+      const btn = document.getElementById('sendOtpBtn');
+      const label = document.getElementById('otpCountdown');
+      if (otpState.cooldownSeconds > 0) {
+        btn.disabled = true;
+        btn.textContent = 'Resend OTP';
+        label.textContent = `Try again in ${otpState.cooldownSeconds}s`;
+      } else {
+        btn.disabled = false;
+        btn.textContent = otpState.challengeId ? 'Resend OTP' : 'Send OTP';
+        label.textContent = '';
+      }
+    }
+
+    function startOtpCooldown(seconds) {
+      if (otpState.cooldownTimer) clearInterval(otpState.cooldownTimer);
+      otpState.cooldownSeconds = Math.max(0, Number(seconds) || 0);
+      updateSendOtpButton();
+      if (otpState.cooldownSeconds <= 0) return;
+
+      otpState.cooldownTimer = setInterval(() => {
+        otpState.cooldownSeconds = Math.max(0, otpState.cooldownSeconds - 1);
+        updateSendOtpButton();
+        if (otpState.cooldownSeconds <= 0) {
+          clearInterval(otpState.cooldownTimer);
+          otpState.cooldownTimer = null;
+        }
+      }, 1000);
+    }
+
+    async function sendEmailOtp() {
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      if (!email) {
+        setOtpStatus('Enter email first to receive OTP.', true);
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setOtpStatus('Enter a valid email address before sending OTP.', true);
+        return;
+      }
+
+      const btn = document.getElementById('sendOtpBtn');
+      btn.disabled = true;
+      btn.textContent = 'Sending...';
+      setOtpStatus('');
+
+      try {
+        const response = await fetch(`${API_BASE}/otp/email/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const msg = [result.error, result.details].filter(Boolean).join(': ');
+          throw new Error(msg || 'Failed to send OTP');
+        }
+
+        otpState.challengeId = result.challengeId || '';
+        resetOtpState({ clearChallenge: false });
+        startOtpCooldown(result.resendInSec || 60);
+        const info = result.delivery === 'dev' && result.devOtp
+          ? ` OTP: ${result.devOtp}`
+          : '';
+        setOtpStatus(`OTP sent to ${email}.${info}`, false);
+      } catch (err) {
+        setOtpStatus(err.message || 'Failed to send OTP', true);
+        otpState.cooldownSeconds = 0;
+      } finally {
+        updateSendOtpButton();
+      }
+    }
+
+    async function verifyEmailOtp() {
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const otp = document.getElementById('emailOtp').value.trim();
+      if (!otpState.challengeId) {
+        setOtpStatus('Please send OTP first.', true);
+        return;
+      }
+      if (!/^[0-9]{6}$/.test(otp)) {
+        setOtpStatus('Enter valid 6-digit OTP.', true);
+        return;
+      }
+
+      const btn = document.getElementById('verifyOtpBtn');
+      btn.disabled = true;
+      btn.textContent = 'Verifying...';
+
+      try {
+        const response = await fetch(`${API_BASE}/otp/email/verify`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, otp, challengeId: otpState.challengeId })
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          const msg = [result.error, result.details].filter(Boolean).join(': ');
+          throw new Error(msg || 'OTP verification failed');
+        }
+        otpState.verified = true;
+        document.getElementById('emailOtpToken').value = result.verificationToken || '';
+        setOtpStatus('Email verified successfully.', false);
+      } catch (err) {
+        otpState.verified = false;
+        document.getElementById('emailOtpToken').value = '';
+        setOtpStatus(err.message || 'OTP verification failed', true);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Verify OTP';
+      }
+    }
+
     async function placeBuyNowOrderAndProceed() {
       const submitBtn = document.getElementById('submitBtn');
       const errorMsg = document.getElementById('errorMessage');
@@ -861,6 +1059,7 @@
         const totalprice = parseFloat(sessionStorage.getItem('orderTotal')) || 0;
         const companyName = document.getElementById('companyName').value.trim();
         const country = document.getElementById('country').value.trim();
+        const emailOtpToken = document.getElementById('emailOtpToken').value.trim();
 
         let items = [];
         const cartItemsRaw = sessionStorage.getItem('cartItems');
@@ -891,7 +1090,8 @@
           paymentmode: "PENDING",
           address, city, region, pincode,
           companyName, country,
-          items
+          items,
+          emailOtpToken
         };
 
         const response = await fetch(`${API_BASE}/orders`, {
@@ -952,7 +1152,12 @@
         return;
       }
       if (pincode.length !== 6 || isNaN(pincode)) {
-        document.getElementById('errorMessage').textContent = '❌ Please enter a valid 6-digit pincode.';
+        document.getElementById('errorMessage').textContent = 'Please enter a valid 6-digit pincode.';
+        document.getElementById('errorMessage').style.display = 'block';
+        return;
+      }
+      if (!otpState.verified || !document.getElementById('emailOtpToken').value.trim()) {
+        document.getElementById('errorMessage').textContent = 'Please verify your email OTP before placing order.';
         document.getElementById('errorMessage').style.display = 'block';
         return;
       }
@@ -988,6 +1193,14 @@
       await initBackend();
       loadOrderData();
       updateCartBadge();
+      updateSendOtpButton();
+
+      document.getElementById('sendOtpBtn').addEventListener('click', sendEmailOtp);
+      document.getElementById('verifyOtpBtn').addEventListener('click', verifyEmailOtp);
+      document.getElementById('email').addEventListener('input', () => {
+        resetOtpState();
+        setOtpStatus('');
+      });
     });
   </script>
 </body>
