@@ -85,17 +85,24 @@ function hashOtp(email, otp, challengeId) {
 let otpTransporter = null;
 function getOtpTransporter() {
   if (otpTransporter) return otpTransporter;
-  if (!nodemailer) return null;
+  if (!nodemailer) {
+    console.error("[OTP-CONFIG] Error: nodemailer is NOT loaded. Run 'npm install' on the server.");
+    return null;
+  }
 
   const host = (process.env.OTP_SMTP_HOST || process.env.SMTP_HOST || "").trim();
   const user = (process.env.OTP_SMTP_USER || process.env.SMTP_USER || "").trim();
   const pass = (process.env.OTP_SMTP_PASS || process.env.SMTP_PASS || "").trim();
-  const port = Number(process.env.OTP_SMTP_PORT || process.env.SMTP_PORT || 587);
+  const portVal = process.env.OTP_SMTP_PORT || process.env.SMTP_PORT;
+  const port = Number(portVal || 587);
   const secure =
     String(process.env.OTP_SMTP_SECURE || process.env.SMTP_SECURE || "false") ===
     "true";
+
+  console.log(`[OTP-CONFIG] Checking settings: host='${host}', user='${user}', port=${port}, secure=${secure}, hasPass=${!!pass}`);
+
   if (!host || !user || !pass || !Number.isFinite(port)) {
-    console.warn("SMTP configuration is incomplete. OTP will not be sent via email.");
+    console.warn("[OTP-CONFIG] FAILED: Missing one or more required SMTP settings (Host, User, Pass, or Port).");
     return null;
   }
 
@@ -105,6 +112,7 @@ function getOtpTransporter() {
     secure,
     auth: { user, pass },
   });
+  console.log("[OTP-CONFIG] SUCCESS: Transporter created.");
   return otpTransporter;
 }
 
