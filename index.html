@@ -507,11 +507,6 @@
                 --fab-bottom: calc(72px + env(safe-area-inset-bottom));
                 --fab-gap: 10px;
             }
-
-            #ib-wa-btn svg {
-                width: 30px;
-                height: 30px;
-            }
         }
 
         #ib-wa-btn:hover {
@@ -519,8 +514,8 @@
         }
 
         #ib-wa-btn svg {
-            width: 35px;
-            height: 35px;
+            width: calc(var(--fab-size) * 0.58);
+            height: calc(var(--fab-size) * 0.58);
             fill: white;
         }
 

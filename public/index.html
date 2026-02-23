@@ -498,15 +498,6 @@
       .section {
         padding: 20px 16px;
       }
-
-      .download-section {
-        padding: 0 14px 18px;
-      }
-
-      .download-btn {
-        width: 100%;
-        text-align: center;
-      }
     }
 
     /* Shared floating action button layout (WhatsApp + Brochure) */
@@ -547,8 +538,8 @@
     }
 
     #ib-wa-btn svg {
-      width: 35px;
-      height: 35px;
+      width: calc(var(--fab-size) * 0.58);
+      height: calc(var(--fab-size) * 0.58);
       fill: white;
     }
 
@@ -693,11 +684,6 @@
         --fab-right: 20px;
         --fab-bottom: calc(72px + env(safe-area-inset-bottom));
         --fab-gap: 10px;
-      }
-
-      #ib-wa-btn svg {
-        width: 30px;
-        height: 30px;
       }
     }
   
