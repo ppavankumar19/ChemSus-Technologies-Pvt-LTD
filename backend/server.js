@@ -3,6 +3,12 @@ const path = require("path");
 const crypto = require("crypto");
 const multer = require("multer");
 const fs = require("fs");
+let nodemailer = null;
+try {
+  nodemailer = require("nodemailer");
+} catch {
+  nodemailer = null;
+}
 const { db, initDb } = require("./db");
 
 const app = express();
@@ -10,6 +16,15 @@ const ROOT = path.join(__dirname, "..");
 const PUBLIC = path.join(ROOT, "public");
 const SESSION_TTL_MS = 8 * 60 * 60 * 1000;
 const SESSION_TTL_SEC = Math.floor(SESSION_TTL_MS / 1000);
+const OTP_TTL_MIN = Math.max(1, Number(process.env.OTP_TTL_MIN || 10));
+const OTP_RESEND_SEC = Math.max(15, Number(process.env.OTP_RESEND_SEC || 60));
+const OTP_MAX_ATTEMPTS = Math.max(1, Number(process.env.OTP_MAX_ATTEMPTS || 5));
+const OTP_TOKEN_TTL_MIN = Math.max(
+  5,
+  Number(process.env.OTP_TOKEN_TTL_MIN || 30)
+);
+const OTP_HASH_SECRET =
+  process.env.OTP_HASH_SECRET || "change_me_for_production";
 
 app.use(express.json({ limit: "2mb" }));
 
@@ -50,6 +65,86 @@ function isValidEmail(s) {
 
 function isValidPhone(s) {
   return /^[0-9]{10,15}$/.test(String(s || "").trim());
+}
+
+function normalizeEmail(s) {
+  return String(s || "").trim().toLowerCase();
+}
+
+function generateOtpCode() {
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+function hashOtp(email, otp, challengeId) {
+  return crypto
+    .createHash("sha256")
+    .update(`${normalizeEmail(email)}|${otp}|${challengeId}|${OTP_HASH_SECRET}`)
+    .digest("hex");
+}
+
+let otpTransporter = null;
+function getOtpTransporter() {
+  if (otpTransporter) return otpTransporter;
+  if (!nodemailer) return null;
+
+  const host = (process.env.OTP_SMTP_HOST || process.env.SMTP_HOST || "").trim();
+  const user = (process.env.OTP_SMTP_USER || process.env.SMTP_USER || "").trim();
+  const pass = (process.env.OTP_SMTP_PASS || process.env.SMTP_PASS || "").trim();
+  const port = Number(process.env.OTP_SMTP_PORT || process.env.SMTP_PORT || 587);
+  const secure =
+    String(process.env.OTP_SMTP_SECURE || process.env.SMTP_SECURE || "false") ===
+    "true";
+  if (!host || !user || !pass || !Number.isFinite(port)) return null;
+
+  otpTransporter = nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+  });
+  return otpTransporter;
+}
+
+async function sendOtpEmail(email, otp) {
+  const transporter = getOtpTransporter();
+  const from =
+    (
+      process.env.OTP_EMAIL_FROM ||
+      process.env.FROM_EMAIL ||
+      process.env.OTP_SMTP_USER ||
+      process.env.SMTP_USER ||
+      ""
+    ).trim();
+  if (!transporter || !from) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("Email OTP is not configured");
+    }
+    console.log(`[OTP-DEV] email=${email} otp=${otp}`);
+    return { mode: "dev" };
+  }
+
+  await transporter.sendMail({
+    from,
+    to: email,
+    subject: "ChemSus Order Verification OTP",
+    text: `Your ChemSus OTP is ${otp}. It expires in ${OTP_TTL_MIN} minutes.`,
+    html: `<p>Your ChemSus OTP is <b>${otp}</b>.</p><p>This OTP expires in ${OTP_TTL_MIN} minutes.</p>`,
+  });
+  return { mode: "smtp" };
+}
+
+async function purgeOtpSessions() {
+  try {
+    await run(
+      `DELETE FROM email_otp_sessions
+       WHERE
+         (used_at IS NOT NULL AND datetime(used_at) < datetime('now','-7 days'))
+         OR (verified_at IS NULL AND datetime(expires_at) < datetime('now','-1 day'))
+         OR (verified_at IS NOT NULL AND datetime(token_expires_at) < datetime('now','-1 day'))`
+    );
+  } catch (e) {
+    console.warn("OTP purge failed:", e.message || e);
+  }
 }
 
 const RECEIPT_ROOT = path.join(PUBLIC, "assets", "receipts");
@@ -537,17 +632,158 @@ app.get("/api/pack-pricing/:shopItemId", async (req, res) => {
 });
 
 // ---------------- Orders API ----------------
+app.post("/api/otp/email/send", async (req, res) => {
+  try {
+    await purgeOtpSessions();
+    const email = normalizeEmail(req.body?.email || "");
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+
+    const cooldownRow = await get(
+      `SELECT CAST((julianday(cooldown_until) - julianday('now')) * 86400 AS INTEGER) AS wait_sec
+       FROM email_otp_sessions
+       WHERE email=? AND verified_at IS NULL AND used_at IS NULL
+       ORDER BY id DESC
+       LIMIT 1`,
+      [email]
+    );
+    if (cooldownRow && Number(cooldownRow.wait_sec) > 0) {
+      return res.status(429).json({
+        error: "Please wait before requesting another OTP",
+        retryAfterSec: Number(cooldownRow.wait_sec),
+      });
+    }
+
+    const challengeId = crypto.randomBytes(18).toString("hex");
+    const otp = generateOtpCode();
+    const otpHash = hashOtp(email, otp, challengeId);
+
+    await run(
+      `INSERT INTO email_otp_sessions
+       (challenge_id,email,otp_hash,attempts,max_attempts,expires_at,cooldown_until,created_at,updated_at)
+       VALUES (?,?,?,0,?,datetime('now', ?),datetime('now', ?),datetime('now'),datetime('now'))`,
+      [
+        challengeId,
+        email,
+        otpHash,
+        OTP_MAX_ATTEMPTS,
+        `+${OTP_TTL_MIN} minutes`,
+        `+${OTP_RESEND_SEC} seconds`,
+      ]
+    );
+
+    let delivery;
+    try {
+      delivery = await sendOtpEmail(email, otp);
+    } catch (mailErr) {
+      await run(`DELETE FROM email_otp_sessions WHERE challenge_id=?`, [challengeId]);
+      return res.status(500).json({
+        error: "Failed to send OTP email",
+        details: String(mailErr?.message || mailErr),
+      });
+    }
+
+    const out = {
+      ok: true,
+      challengeId,
+      expiresInSec: OTP_TTL_MIN * 60,
+      resendInSec: OTP_RESEND_SEC,
+      delivery: delivery?.mode || "unknown",
+    };
+    if ((delivery?.mode || "") === "dev" && process.env.NODE_ENV !== "production") {
+      out.devOtp = otp;
+    }
+    res.json(out);
+  } catch (e) {
+    console.error("OTP send error:", e);
+    res.status(500).json({ error: "OTP send failed" });
+  }
+});
+
+app.post("/api/otp/email/verify", async (req, res) => {
+  try {
+    await purgeOtpSessions();
+    const email = normalizeEmail(req.body?.email || "");
+    const challengeId = String(req.body?.challengeId || "").trim();
+    const otp = String(req.body?.otp || "").trim();
+
+    if (!isValidEmail(email)) {
+      return res.status(400).json({ error: "Invalid email" });
+    }
+    if (!challengeId || !/^[a-f0-9]{20,}$/i.test(challengeId)) {
+      return res.status(400).json({ error: "Invalid challenge" });
+    }
+    if (!/^[0-9]{6}$/.test(otp)) {
+      return res.status(400).json({ error: "Invalid OTP format" });
+    }
+
+    const row = await get(
+      `SELECT id, otp_hash, attempts, max_attempts, verified_at, used_at,
+              CAST((julianday(expires_at) - julianday('now')) * 86400 AS INTEGER) AS expires_in_sec
+       FROM email_otp_sessions
+       WHERE challenge_id=? AND email=?
+       LIMIT 1`,
+      [challengeId, email]
+    );
+
+    if (!row) return res.status(400).json({ error: "OTP session not found" });
+    if (row.used_at) return res.status(400).json({ error: "OTP session already used" });
+    if (row.verified_at)
+      return res.status(400).json({ error: "OTP already verified. Please request a new OTP." });
+    if (Number(row.expires_in_sec) <= 0)
+      return res.status(400).json({ error: "OTP expired. Request a new OTP." });
+    if (Number(row.attempts) >= Number(row.max_attempts)) {
+      return res.status(429).json({ error: "Maximum OTP attempts exceeded. Request a new OTP." });
+    }
+
+    const expectedHash = hashOtp(email, otp, challengeId);
+    if (expectedHash !== row.otp_hash) {
+      await run(
+        `UPDATE email_otp_sessions
+         SET attempts = attempts + 1, updated_at=datetime('now')
+         WHERE id=?`,
+        [row.id]
+      );
+      return res.status(400).json({ error: "Invalid OTP" });
+    }
+
+    const verificationToken = crypto.randomBytes(24).toString("hex");
+    await run(
+      `UPDATE email_otp_sessions
+       SET verified_at=datetime('now'),
+           verification_token=?,
+           token_expires_at=datetime('now', ?),
+           updated_at=datetime('now')
+       WHERE id=?`,
+      [verificationToken, `+${OTP_TOKEN_TTL_MIN} minutes`, row.id]
+    );
+
+    return res.json({
+      ok: true,
+      verificationToken,
+      tokenExpiresInSec: OTP_TOKEN_TTL_MIN * 60,
+    });
+  } catch (e) {
+    console.error("OTP verify error:", e);
+    res.status(500).json({ error: "OTP verification failed" });
+  }
+});
+
 app.get("/api/test", (req, res) =>
   res.json({ ok: true, apiBase: "/api", backendURL: req.headers.host })
 );
 
 app.post("/api/orders", async (req, res) => {
   try {
+    await purgeOtpSessions();
     const b = req.body || {};
 
     const customername = (b.customername || "").trim();
     const email = (b.email || "").trim();
+    const emailNorm = normalizeEmail(email);
     const phone = (b.phone || "").trim();
+    const emailOtpToken = String(b.emailOtpToken || "").trim();
     const companyName = (b.companyName || "").trim();
 
     if (!customername || !email || !phone) {
@@ -558,6 +794,24 @@ app.post("/api/orders", async (req, res) => {
     }
     if (!isValidPhone(phone)) {
       return res.status(400).json({ error: "Invalid phone" });
+    }
+    if (!emailOtpToken) {
+      return res.status(400).json({ error: "Email OTP verification required" });
+    }
+
+    const otpSession = await get(
+      `SELECT id
+       FROM email_otp_sessions
+       WHERE email=?
+         AND verification_token=?
+         AND verified_at IS NOT NULL
+         AND used_at IS NULL
+         AND datetime(token_expires_at) > datetime('now')
+       LIMIT 1`,
+      [emailNorm, emailOtpToken]
+    );
+    if (!otpSession) {
+      return res.status(400).json({ error: "Invalid or expired email OTP verification" });
     }
 
     const address = (
@@ -715,6 +969,13 @@ app.post("/api/orders", async (req, res) => {
         );
       }
     }
+
+    await run(
+      `UPDATE email_otp_sessions
+       SET used_at=datetime('now'), order_id=?, updated_at=datetime('now')
+       WHERE id=? AND used_at IS NULL`,
+      [r.lastID, otpSession.id]
+    );
 
     res.json({ orderId: r.lastID });
   } catch (e) {
