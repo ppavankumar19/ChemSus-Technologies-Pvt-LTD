@@ -350,10 +350,13 @@
       display: inline-block;
     }
 
-    .objective-logo img {
+    .objective-logo img,
+    .objective-logo video {
       width: 100%;
       max-width: 200px;
       height: auto;
+      border-radius: 10px;
+      display: block;
     }
 
     /* FEATURE CARDS */
@@ -465,7 +468,8 @@
         grid-template-columns: 1fr;
       }
 
-      .objective-logo img {
+      .objective-logo img,
+      .objective-logo video {
         max-width: 180px;
       }
 
@@ -792,7 +796,9 @@
         <div class="objective-grid">
           <div class="objective-logo">
             <div class="objective-logo-inner">
-              <img src="assets/logo.jpg" alt="ChemSus Logo">
+              <video autoplay muted loop playsinline preload="metadata" aria-label="ChemSus objective video">
+                <source src="assets/vid-logo.mp4" type="video/mp4">
+              </video>
             </div>
           </div>
 
