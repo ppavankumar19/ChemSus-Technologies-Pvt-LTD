@@ -20,10 +20,20 @@ function ensureDirFor(filePath) {
 function isWritable(filePath) {
   try {
     ensureDirFor(filePath);
-    fs.accessSync(path.dirname(filePath), fs.constants.W_OK);
+    const dir = path.dirname(filePath);
+    const probeName = `.chemsus_write_probe_${process.pid}_${Date.now()}.tmp`;
+    const probePath = path.join(dir, probeName);
+
+    // Real write probe to avoid false positives from permission bits only.
+    fs.writeFileSync(probePath, "ok");
+    fs.unlinkSync(probePath);
+
+    // Ensure DB file itself can be opened in read-write mode if it already exists.
     if (fs.existsSync(filePath)) {
-      fs.accessSync(filePath, fs.constants.W_OK);
+      const fd = fs.openSync(filePath, "r+");
+      fs.closeSync(fd);
     }
+
     return true;
   } catch {
     return false;
@@ -32,7 +42,8 @@ function isWritable(filePath) {
 
 function pickDbPath() {
   const primary = resolveDbPath(process.env.DB_PATH);
-  if (isWritable(primary)) return primary;
+  const forceFallback = String(process.env.DB_FORCE_FALLBACK || "").toLowerCase() === "true";
+  if (!forceFallback && isWritable(primary)) return primary;
 
   const fallback = resolveDbPath(
     process.env.DB_FALLBACK_PATH || path.join(os.tmpdir(), "chemsus.sqlite")
