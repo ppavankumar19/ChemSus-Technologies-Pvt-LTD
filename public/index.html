@@ -200,26 +200,6 @@
       pointer-events: none;
     }
 
-    .chem-intro-brand-bg {
-      --brand-logo-size: 64%;
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: min(94vw, 1120px);
-      height: min(94vw, 1120px);
-      transform: translate(-50%, -50%);
-      z-index: 0;
-      opacity: 0.2;
-      background:
-        radial-gradient(circle at center, rgba(255, 148, 35, 0.2) 0%, rgba(255, 148, 35, 0.03) 36%, transparent 62%),
-        radial-gradient(circle at center, rgba(66, 174, 255, 0.2) 0%, rgba(66, 174, 255, 0.03) 40%, transparent 66%),
-        url("assets/logo.jpg") center/var(--brand-logo-size) no-repeat;
-      mix-blend-mode: screen;
-      filter: saturate(1.22) contrast(1.08) drop-shadow(0 0 38px rgba(11, 78, 130, 0.4));
-      pointer-events: none;
-      animation: brandPulse 6s ease-in-out infinite;
-    }
-
     .chem-intro-content {
       position: relative;
       z-index: 1;
@@ -247,14 +227,15 @@
       font-weight: 800;
       letter-spacing: 0.012em;
       line-height: 1.08;
-      background: linear-gradient(94deg, #ff8610 0%, #ffaf38 24%, #1da0ff 54%, #005fd6 78%, #2f9fff 100%);
-      background-size: 240% 100%;
+      background: linear-gradient(96deg, #b55100 0%, #de7200 24%, #1d77ca 54%, #0b4f9e 78%, #052e66 100%);
+      background-size: 250% 100%;
       color: transparent;
       -webkit-background-clip: text;
       background-clip: text;
       font-size: clamp(46px, 8.4vw, 102px);
       margin-bottom: 6px;
-      text-shadow: 0 4px 22px rgba(255, 152, 36, 0.32), 0 4px 22px rgba(56, 174, 255, 0.32);
+      -webkit-text-stroke: 1px rgba(5, 18, 35, 0.35);
+      text-shadow: 0 5px 24px rgba(8, 26, 48, 0.5), 0 3px 16px rgba(188, 98, 9, 0.32), 0 3px 16px rgba(13, 78, 150, 0.3);
       animation: titleShimmer 4.2s linear infinite;
     }
 
@@ -384,19 +365,6 @@
       }
     }
 
-    @keyframes brandPulse {
-      0%,
-      100% {
-        transform: translate(-50%, -50%) scale(0.98);
-        opacity: 0.17;
-      }
-
-      50% {
-        transform: translate(-50%, -50%) scale(1.03);
-        opacity: 0.24;
-      }
-    }
-
     @keyframes emojiFall {
       0% {
         transform: translateY(-10vh) rotate(0deg);
@@ -449,12 +417,6 @@
     }
 
     @media (max-width: 600px) {
-      .chem-intro-brand-bg {
-        --brand-logo-size: 72%;
-        width: min(130vw, 760px);
-        height: min(130vw, 760px);
-      }
-
       .chem-intro-content {
         padding: 10px 10px 8px;
       }
@@ -1182,7 +1144,6 @@
       <span style="--x:90%;--size:28px;--duration:11.7s;--delay:-5.4s;">🧬</span>
     </div>
     <div class="chem-intro-grid" aria-hidden="true"></div>
-    <div class="chem-intro-brand-bg" aria-hidden="true"></div>
     <div class="chem-intro-content">
       <div class="chem-intro-logo-wrap" aria-hidden="true">
         <img src="assets/logo.jpg" alt="ChemSus Logo" class="chem-intro-logo">
