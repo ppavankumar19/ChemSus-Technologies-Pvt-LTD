@@ -209,6 +209,21 @@
       animation-delay: -6.2s;
     }
 
+    .chem-intro-grid {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      opacity: 0.2;
+      background-image:
+        linear-gradient(rgba(163, 228, 255, 0.28) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(163, 228, 255, 0.25) 1px, transparent 1px);
+      background-size: 42px 42px;
+      transform: perspective(520px) rotateX(58deg) translateY(36%);
+      transform-origin: center bottom;
+      animation: gridDrift 10s linear infinite;
+      pointer-events: none;
+    }
+
     .chem-intro-content {
       position: relative;
       z-index: 1;
@@ -247,6 +262,41 @@
       animation-duration: 4.8s;
     }
 
+    .chem-intro-orbit {
+      position: absolute;
+      border: 1px dashed rgba(141, 220, 255, 0.45);
+      border-radius: 50%;
+      inset: -12px;
+      animation: orbitSpin 8.2s linear infinite;
+    }
+
+    .chem-intro-orbit.o2 {
+      inset: -18px;
+      border-color: rgba(0, 184, 176, 0.45);
+      animation-duration: 10.6s;
+      animation-direction: reverse;
+      transform: rotate(28deg);
+    }
+
+    .chem-intro-orbit.o3 {
+      inset: -24px;
+      border-color: rgba(69, 196, 255, 0.35);
+      animation-duration: 13s;
+      transform: rotate(62deg);
+    }
+
+    .chem-intro-orbit .electron {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #8de9ff;
+      box-shadow: 0 0 10px rgba(141, 233, 255, 0.9);
+    }
+
     .chem-intro-logo {
       width: 86px;
       height: 86px;
@@ -261,9 +311,14 @@
       font-family: "Montserrat", sans-serif;
       font-weight: 700;
       letter-spacing: 0.02em;
-      color: #eff8ff;
+      background: linear-gradient(90deg, #e9f7ff 0%, #9ceaff 35%, #ffffff 50%, #9ceaff 66%, #e9f7ff 100%);
+      background-size: 210% 100%;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
       font-size: clamp(20px, 2.5vw, 30px);
       margin-bottom: 8px;
+      animation: titleShimmer 4.2s linear infinite;
     }
 
     .chem-intro-sub {
@@ -431,6 +486,32 @@
       }
     }
 
+    @keyframes orbitSpin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes gridDrift {
+      from {
+        background-position: 0 0, 0 0;
+      }
+
+      to {
+        background-position: 0 84px, 84px 0;
+      }
+    }
+
+    @keyframes titleShimmer {
+      to {
+        background-position: -210% 0;
+      }
+    }
+
     @keyframes emojiFall {
       0% {
         transform: translateY(-10vh) rotate(0deg);
@@ -469,6 +550,18 @@
 
       .chem-intro-molecule {
         transform: scale(0.92);
+      }
+
+      .chem-intro-orbit {
+        inset: -8px;
+      }
+
+      .chem-intro-orbit.o2 {
+        inset: -14px;
+      }
+
+      .chem-intro-orbit.o3 {
+        inset: -20px;
       }
     }
 
@@ -1175,10 +1268,14 @@
       <span>🧪</span>
       <span>⚗️</span>
     </div>
+    <div class="chem-intro-grid" aria-hidden="true"></div>
     <div class="chem-intro-content">
       <div class="chem-intro-logo-wrap" aria-hidden="true">
         <span class="chem-intro-ring"></span>
         <span class="chem-intro-ring r2"></span>
+        <span class="chem-intro-orbit o1"><span class="electron"></span></span>
+        <span class="chem-intro-orbit o2"><span class="electron"></span></span>
+        <span class="chem-intro-orbit o3"><span class="electron"></span></span>
         <img src="assets/logo.jpg" alt="ChemSus Logo" class="chem-intro-logo">
       </div>
       <div class="chem-intro-title">ChemSus Technologies Private Limited</div>
