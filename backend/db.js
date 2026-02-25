@@ -1,13 +1,14 @@
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const crypto = require("crypto");
 const sqlite3 = require("sqlite3").verbose();
 
 const ROOT = path.join(__dirname, "..");
 const DEFAULT_DB_PATH = path.join(ROOT, "db", "chemsus.sqlite");
 const PRIMARY_DB_PATH = resolveDbPath(process.env.DB_PATH);
 const FALLBACK_DB_PATH = resolveDbPath(
-  process.env.DB_FALLBACK_PATH || path.join(os.tmpdir(), "chemsus.sqlite")
+  process.env.DB_FALLBACK_PATH || path.join(os.tmpdir(), `chemsus_${crypto.createHash('md5').update(ROOT).digest('hex').slice(0, 8)}.sqlite`)
 );
 
 function resolveDbPath(rawPath) {
@@ -34,12 +35,18 @@ function isWritable(filePath) {
 
     // Ensure DB file itself can be opened in read-write mode if it already exists.
     if (fs.existsSync(filePath)) {
-      const fd = fs.openSync(filePath, "r+");
-      fs.closeSync(fd);
+      try {
+        const fd = fs.openSync(filePath, "r+");
+        fs.closeSync(fd);
+      } catch (e) {
+        console.warn(`[DB-PROBE] File exists but not writable: ${filePath} (${e.message})`);
+        return false;
+      }
     }
 
     return true;
-  } catch {
+  } catch (e) {
+    console.warn(`[DB-PROBE] Path or directory not writable: ${filePath} (${e.message})`);
     return false;
   }
 }
@@ -91,7 +98,11 @@ console.log(`[DB] SQLite path: ${ACTIVE_DB_PATH}`);
 function isReadonlyError(err) {
   const code = String(err?.code || "");
   const msg = String(err?.message || err || "");
-  return code === "SQLITE_READONLY" || /readonly database/i.test(msg);
+  return (
+    code === "SQLITE_READONLY" ||
+    /readonly database/i.test(msg) ||
+    /attempt to write a readonly database/i.test(msg)
+  );
 }
 
 function switchToFallbackIfReadonly(err) {
@@ -111,7 +122,7 @@ function switchToFallbackIfReadonly(err) {
   );
 
   try {
-    oldDb.close(() => {});
+    oldDb.close(() => { });
   } catch {
     // ignore close errors while failing over
   }
