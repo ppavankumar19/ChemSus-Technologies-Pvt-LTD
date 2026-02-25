@@ -9,7 +9,7 @@ try {
 } catch {
   nodemailer = null;
 }
-const { db, initDb } = require("./db");
+const { db, initDb, getActivePath } = require("./db");
 
 const app = express();
 const ROOT = path.join(__dirname, "..");
@@ -842,7 +842,12 @@ app.post("/api/otp/email/send", async (req, res) => {
     res.json(out);
   } catch (e) {
     console.error("OTP send error stack:", e);
-    res.status(500).json({ error: "OTP send failed", details: String(e.stack || e.message || e) });
+    const activePath = typeof getActivePath === 'function' ? getActivePath() : 'unknown';
+    res.status(500).json({
+      error: "OTP send failed",
+      details: String(e.stack || e.message || e),
+      dbPath: activePath
+    });
   }
 });
 

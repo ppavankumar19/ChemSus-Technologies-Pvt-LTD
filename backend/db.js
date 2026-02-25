@@ -96,37 +96,44 @@ let activeDb = new sqlite3.Database(ACTIVE_DB_PATH);
 console.log(`[DB] SQLite path: ${ACTIVE_DB_PATH}`);
 
 function isReadonlyError(err) {
-  const code = String(err?.code || "");
-  const msg = String(err?.message || err || "");
+  if (!err) return false;
+  const code = String(err.code || "");
+  const msg = String(err.message || err || "").toLowerCase();
   return (
     code === "SQLITE_READONLY" ||
-    /readonly database/i.test(msg) ||
-    /attempt to write a readonly database/i.test(msg)
+    msg.includes("readonly") ||
+    msg.includes("read-only") ||
+    msg.includes("permission denied")
   );
 }
 
 function switchToFallbackIfReadonly(err) {
   if (!isReadonlyError(err)) return false;
-  if (ACTIVE_DB_PATH === FALLBACK_DB_PATH) return false;
-
-  ensureDirFor(FALLBACK_DB_PATH);
-  seedFallbackFromPrimary(ACTIVE_DB_PATH, FALLBACK_DB_PATH);
-  if (!isWritable(FALLBACK_DB_PATH)) return false;
+  if (ACTIVE_DB_PATH === ":memory:") return false;
 
   const oldPath = ACTIVE_DB_PATH;
   const oldDb = activeDb;
-  activeDb = new sqlite3.Database(FALLBACK_DB_PATH);
-  ACTIVE_DB_PATH = FALLBACK_DB_PATH;
-  console.warn(
-    `[DB] SQLite became read-only at ${oldPath}. Switched to fallback DB: ${FALLBACK_DB_PATH}`
-  );
+
+  let nextPath = FALLBACK_DB_PATH;
+  if (ACTIVE_DB_PATH === FALLBACK_DB_PATH || !isWritable(FALLBACK_DB_PATH)) {
+    nextPath = ":memory:";
+  } else {
+    ensureDirFor(nextPath);
+    seedFallbackFromPrimary(ACTIVE_DB_PATH, nextPath);
+  }
 
   try {
+    activeDb = new sqlite3.Database(nextPath);
+    ACTIVE_DB_PATH = nextPath;
+    console.warn(
+      `[DB] SQLite became read-only at ${oldPath}. Switched to fallback: ${nextPath}`
+    );
     oldDb.close(() => { });
-  } catch {
-    // ignore close errors while failing over
+    return true;
+  } catch (e) {
+    console.error(`[DB] Failed to switch to fallback ${nextPath}:`, e.message);
+    return false;
   }
-  return true;
 }
 
 function invokeWithReadonlyRetry(methodName, args) {
@@ -338,4 +345,8 @@ async function initDb() {
   console.log("✅ SQLite ready with pack_pricing table");
 }
 
-module.exports = { db, initDb, exec, get, run, all };
+function getActivePath() {
+  return ACTIVE_DB_PATH;
+}
+
+module.exports = { db, initDb, exec, get, run, all, getActivePath };
