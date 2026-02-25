@@ -5,6 +5,10 @@ const sqlite3 = require("sqlite3").verbose();
 
 const ROOT = path.join(__dirname, "..");
 const DEFAULT_DB_PATH = path.join(ROOT, "db", "chemsus.sqlite");
+const PRIMARY_DB_PATH = resolveDbPath(process.env.DB_PATH);
+const FALLBACK_DB_PATH = resolveDbPath(
+  process.env.DB_FALLBACK_PATH || path.join(os.tmpdir(), "chemsus.sqlite")
+);
 
 function resolveDbPath(rawPath) {
   const val = String(rawPath || "").trim();
@@ -41,13 +45,11 @@ function isWritable(filePath) {
 }
 
 function pickDbPath() {
-  const primary = resolveDbPath(process.env.DB_PATH);
+  const primary = PRIMARY_DB_PATH;
   const forceFallback = String(process.env.DB_FORCE_FALLBACK || "").toLowerCase() === "true";
   if (!forceFallback && isWritable(primary)) return primary;
 
-  const fallback = resolveDbPath(
-    process.env.DB_FALLBACK_PATH || path.join(os.tmpdir(), "chemsus.sqlite")
-  );
+  const fallback = FALLBACK_DB_PATH;
   ensureDirFor(fallback);
 
   // Seed fallback DB with existing data once when possible.
@@ -70,10 +72,85 @@ function pickDbPath() {
   return primary;
 }
 
-const DB_PATH = pickDbPath();
-console.log(`[DB] SQLite path: ${DB_PATH}`);
+function seedFallbackFromPrimary(primary, fallback) {
+  if (primary === fallback) return;
+  if (fs.existsSync(primary) && !fs.existsSync(fallback)) {
+    try {
+      fs.copyFileSync(primary, fallback);
+      console.warn(`[DB] Seeded fallback DB from primary: ${fallback}`);
+    } catch (e) {
+      console.warn("[DB] Failed to seed fallback DB:", e.message || e);
+    }
+  }
+}
 
-const db = new sqlite3.Database(DB_PATH);
+let ACTIVE_DB_PATH = pickDbPath();
+let activeDb = new sqlite3.Database(ACTIVE_DB_PATH);
+console.log(`[DB] SQLite path: ${ACTIVE_DB_PATH}`);
+
+function isReadonlyError(err) {
+  const code = String(err?.code || "");
+  const msg = String(err?.message || err || "");
+  return code === "SQLITE_READONLY" || /readonly database/i.test(msg);
+}
+
+function switchToFallbackIfReadonly(err) {
+  if (!isReadonlyError(err)) return false;
+  if (ACTIVE_DB_PATH === FALLBACK_DB_PATH) return false;
+
+  ensureDirFor(FALLBACK_DB_PATH);
+  seedFallbackFromPrimary(ACTIVE_DB_PATH, FALLBACK_DB_PATH);
+  if (!isWritable(FALLBACK_DB_PATH)) return false;
+
+  const oldPath = ACTIVE_DB_PATH;
+  const oldDb = activeDb;
+  activeDb = new sqlite3.Database(FALLBACK_DB_PATH);
+  ACTIVE_DB_PATH = FALLBACK_DB_PATH;
+  console.warn(
+    `[DB] SQLite became read-only at ${oldPath}. Switched to fallback DB: ${FALLBACK_DB_PATH}`
+  );
+
+  try {
+    oldDb.close(() => {});
+  } catch {
+    // ignore close errors while failing over
+  }
+  return true;
+}
+
+function invokeWithReadonlyRetry(methodName, args) {
+  const userCb = typeof args[args.length - 1] === "function" ? args[args.length - 1] : null;
+  if (!userCb) return activeDb[methodName](...args);
+
+  const callArgs = args.slice(0, -1);
+  const runAttempt = (allowRetry) =>
+    activeDb[methodName](...callArgs, function (err, ...rest) {
+      if (err && allowRetry && switchToFallbackIfReadonly(err)) {
+        return runAttempt(false);
+      }
+      return userCb.call(this, err, ...rest);
+    });
+
+  return runAttempt(true);
+}
+
+const db = {
+  run(...args) {
+    return invokeWithReadonlyRetry("run", args);
+  },
+  get(...args) {
+    return invokeWithReadonlyRetry("get", args);
+  },
+  all(...args) {
+    return invokeWithReadonlyRetry("all", args);
+  },
+  exec(...args) {
+    return invokeWithReadonlyRetry("exec", args);
+  },
+  close(...args) {
+    return activeDb.close(...args);
+  },
+};
 
 function exec(sql) {
   return new Promise((resolve, reject) => db.exec(sql, (e) => (e ? reject(e) : resolve())));
@@ -87,6 +164,12 @@ function run(sql, p = []) {
       if (e) reject(e);
       else resolve(this);
     })
+  );
+}
+
+function all(sql, p = []) {
+  return new Promise((resolve, reject) =>
+    db.all(sql, p, (e, rows) => (e ? reject(e) : resolve(rows)))
   );
 }
 
@@ -244,4 +327,4 @@ async function initDb() {
   console.log("✅ SQLite ready with pack_pricing table");
 }
 
-module.exports = { db, initDb, exec, get, run };
+module.exports = { db, initDb, exec, get, run, all };
