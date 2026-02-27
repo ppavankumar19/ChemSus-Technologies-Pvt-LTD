@@ -225,6 +225,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/assets/js/supabase-client.js"></script>
     <script>
+        // Wait for supabaseReady (async config loader in supabase-client.js)
+        async function getClient() {
+            if (window.supabaseReady) return await window.supabaseReady;
+            return window.supabaseClient || null;
+        }
         let isLogin = true;
 
         function toggleMode() {
@@ -243,8 +248,9 @@
 
         async function handleAuth(e) {
             e.preventDefault();
-            if (!window.supabaseClient) {
-                showMsg("Supabase client not loaded.", true);
+            const client = await getClient();
+            if (!client) {
+                showMsg("Supabase client not loaded. Check server config.", true);
                 return;
             }
 
@@ -256,11 +262,11 @@
 
             try {
                 if (isLogin) {
-                    const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+                    const { data, error } = await client.auth.signInWithPassword({ email, password });
                     if (error) throw error;
                     handleSuccess(data.user.email);
                 } else {
-                    const { data, error } = await window.supabaseClient.auth.signUp({ email, password });
+                    const { data, error } = await client.auth.signUp({ email, password });
                     if (error) throw error;
                     showMsg("Success! Check your email to confirm if required, or you are now logged in.", false);
                     if (data.session) {
@@ -278,9 +284,10 @@
         }
 
         async function handleGoogleOAuth() {
-            if (!window.supabaseClient) return;
+            const client = await getClient();
+            if (!client) { showMsg('Supabase not loaded.', true); return; }
             try {
-                const { error } = await window.supabaseClient.auth.signInWithOAuth({
+                const { error } = await client.auth.signInWithOAuth({
                     provider: 'google',
                     options: {
                         redirectTo: window.location.origin + '/login.html'
@@ -302,8 +309,9 @@
 
         // Check if already logged in or returning from OAuth
         document.addEventListener("DOMContentLoaded", async () => {
-            if (!window.supabaseClient) return;
-            const { data: { session } } = await window.supabaseClient.auth.getSession();
+            const client = await getClient();
+            if (!client) return;
+            const { data: { session } } = await client.auth.getSession();
             if (session) {
                 handleSuccess(session.user.email);
             }

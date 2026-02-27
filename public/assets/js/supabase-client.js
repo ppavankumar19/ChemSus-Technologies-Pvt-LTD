@@ -21,7 +21,7 @@ async function loadSupabaseConfig() {
   }
 }
 
-const supabaseReady = (async () => {
+window.supabaseReady = (async () => {
   const cfg = await loadSupabaseConfig();
   if (!cfg || !cfg.supabaseUrl || !cfg.supabaseAnonKey) {
     console.error("[ChemSus] Missing Supabase config. Set SUPABASE_URL and SUPABASE_ANON_KEY env vars on the server.");
@@ -39,7 +39,7 @@ const supabaseReady = (async () => {
 
 // Auto-update the navbar auth button on every page
 document.addEventListener("DOMContentLoaded", async () => {
-  const client = await supabaseReady;
+  const client = await window.supabaseReady;
   const authLink = document.getElementById("nav-auth-link");
   const authText = document.getElementById("nav-auth-text");
   if (!client || !authLink || !authText) return;
@@ -65,5 +65,4 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (myOrdersLink) {
     myOrdersLink.style.display = session ? "block" : "none";
   }
-  // else: already shows "Log In / Sign Up" + links to /login.html (default HTML)
 });

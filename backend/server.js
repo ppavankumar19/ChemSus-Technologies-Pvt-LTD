@@ -1,3 +1,4 @@
+try { require("dotenv").config(); } catch { /* dotenv optional */ }
 const express = require("express");
 const path = require("path");
 const crypto = require("crypto");
