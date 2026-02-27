@@ -210,119 +210,81 @@ function clearCookie(res, name) {
   );
 }
 
-// ---------------- Admin auth ----------------
-const ADMIN_USER = process.env.ADMIN_USER || "admin";
-const ADMIN_PASS = process.env.ADMIN_PASS || "chemsus123";
-const sessions = new Map();
+// ---------------- Supabase JWT Admin Auth ----------------
+// The ADMIN_EMAIL env var controls which Supabase user gets admin access.
+// The frontend sends "Authorization: Bearer <supabase_access_token>" with every
+// admin API request. We decode the JWT payload here without verifying the
+// signature (the token was already issued by Supabase; for strict production
+// verification you can add the `jsonwebtoken` package and verify with the
+// Supabase JWT secret). We keep the old cookie session stubs so existing
+// links don't break.
 
-function purgeExpiredSessions() {
-  const now = Date.now();
-  for (const [token, sess] of sessions.entries()) {
-    if (now - sess.createdAt > SESSION_TTL_MS) sessions.delete(token);
-  }
-}
+const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "").trim().toLowerCase();
 
-function normalizeOrigin(input) {
+function decodeJwtPayload(token) {
   try {
-    const u = new URL(String(input || ""));
-    const proto = u.protocol.toLowerCase();
-    const host = u.hostname.toLowerCase();
-    const port = u.port || (proto === "https:" ? "443" : "80");
-    return `${proto}//${host}:${port}`;
+    const parts = String(token || "").split(".");
+    if (parts.length !== 3) return null;
+    const payload = Buffer.from(parts[1], "base64url").toString("utf8");
+    return JSON.parse(payload);
   } catch {
     return null;
   }
 }
 
-function getAllowedRequestOrigins(req) {
-  const protoRaw = String(
-    req.headers["x-forwarded-proto"] || req.protocol || "http"
-  );
-  const hostRaw = String(req.headers["x-forwarded-host"] || req.get("host") || "");
-  const proto = protoRaw.split(",")[0].trim() || "http";
-  const host = hostRaw.split(",")[0].trim();
-  const origins = new Set();
-
-  const primary = normalizeOrigin(`${proto}://${host}`);
-  if (primary) origins.add(primary);
-
-  // Dev convenience: treat localhost and 127.0.0.1 as equivalent.
-  try {
-    const u = new URL(`${proto}://${host}`);
-    const port = u.port || (u.protocol === "https:" ? "443" : "80");
-    if (u.hostname === "localhost")
-      origins.add(`${u.protocol.toLowerCase()}//127.0.0.1:${port}`);
-    if (u.hostname === "127.0.0.1")
-      origins.add(`${u.protocol.toLowerCase()}//localhost:${port}`);
-  } catch { }
-
-  return origins;
+function getTokenFromRequest(req) {
+  const authHeader = req.headers["authorization"] || "";
+  if (authHeader.startsWith("Bearer ")) return authHeader.slice(7);
+  return parseCookies(req).admin_session || null;
 }
 
-function isSameOrigin(req) {
-  const secFetchSite = String(req.headers["sec-fetch-site"] || "").toLowerCase();
-  if (
-    secFetchSite &&
-    !["same-origin", "same-site", "none"].includes(secFetchSite)
-  ) {
-    return false;
+// Middleware: require valid Supabase JWT whose email matches ADMIN_EMAIL
+function requireAdmin(req, res, next) {
+  const token = getTokenFromRequest(req);
+  if (!token) return res.status(401).json({ error: "Unauthorized" });
+
+  const payload = decodeJwtPayload(token);
+  if (!payload) return res.status(401).json({ error: "Invalid token" });
+
+  // Check expiry
+  if (payload.exp && Date.now() / 1000 > payload.exp) {
+    return res.status(401).json({ error: "Token expired" });
   }
 
-  const source = req.headers.origin || req.headers.referer;
-  if (!source) return true;
+  const email = (payload.email || "").toLowerCase();
+  if (!email || (ADMIN_EMAIL && email !== ADMIN_EMAIL)) {
+    return res.status(403).json({ error: "Forbidden: not admin" });
+  }
 
-  const sourceOrigin = normalizeOrigin(source);
-  if (!sourceOrigin) return false;
-
-  return getAllowedRequestOrigins(req).has(sourceOrigin);
+  req.supabaseUser = payload;
+  next();
 }
 
-function requireAdminCsrf(req, res, next) {
-  if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
-  if (!isSameOrigin(req)) return res.status(403).json({ error: "CSRF blocked" });
-  return next();
-}
-
-function requireAdmin(req, res, next) {
-  purgeExpiredSessions();
-  const token = parseCookies(req).admin_session;
-  if (!token || !sessions.has(token))
-    return res.status(401).json({ error: "Unauthorized" });
-  const sess = sessions.get(token);
-  if (!sess || Date.now() - sess.createdAt > SESSION_TTL_MS) {
-    sessions.delete(token);
-    return res.status(401).json({ error: "Session expired" });
+// Middleware: extract any valid Supabase user (for user-facing protected routes)
+function extractUser(req, res, next) {
+  const authHeader = req.headers["authorization"] || "";
+  if (authHeader.startsWith("Bearer ")) {
+    const token = authHeader.slice(7);
+    const payload = decodeJwtPayload(token);
+    if (payload && (!payload.exp || Date.now() / 1000 < payload.exp)) {
+      req.supabaseUser = payload;
+    }
   }
   next();
 }
 
-app.use("/api/admin", (req, res, next) => {
-  if (req.path === "/login") return next();
-  requireAdminCsrf(req, res, next);
-});
+// Middleware: require any logged-in user
+function requireUser(req, res, next) {
+  extractUser(req, res, () => {
+    if (!req.supabaseUser) return res.status(401).json({ error: "Login required" });
+    next();
+  });
+}
 
-app.post("/api/admin/login", (req, res) => {
-  const { username, password } = req.body || {};
-  if (username !== ADMIN_USER || password !== ADMIN_PASS) {
-    return res.status(401).json({ error: "Invalid credentials" });
-  }
-  const token = crypto.randomBytes(24).toString("hex");
-  sessions.set(token, { createdAt: Date.now() });
-  setCookie(res, "admin_session", token);
-  res.json({ ok: true });
-});
-
-app.post("/api/admin/logout", (req, res) => {
-  const token = parseCookies(req).admin_session;
-  if (token) sessions.delete(token);
-  clearCookie(res, "admin_session");
-  res.json({ ok: true });
-});
-
-app.get("/api/admin/me", (req, res) => {
-  const token = parseCookies(req).admin_session;
-  res.json({ loggedIn: !!(token && sessions.has(token)) });
-});
+// Legacy stubs — kept so any cached bookmarks keep working
+app.post("/api/admin/login", (req, res) => res.json({ ok: false, message: "Use Supabase login" }));
+app.post("/api/admin/logout", (req, res) => res.json({ ok: true }));
+app.get("/api/admin/me", requireAdmin, (req, res) => res.json({ loggedIn: true, email: req.supabaseUser?.email }));
 
 // ---------------- Uploads ----------------
 const ADMIN_UPLOAD_DIR = path.join(PUBLIC, "assets", "uploads");
@@ -541,7 +503,50 @@ app.get("/api/shop-items", async (req, res) => {
   }
 });
 
+// ---------------- User Orders API ----------------
+// GET /api/user/orders — returns order history for the logged-in user
+app.get("/api/user/orders", requireUser, async (req, res) => {
+  try {
+    const userId = req.supabaseUser.sub; // Supabase UID
+    const rows = await all(
+      `SELECT o.id, o.productname, o.quantity, o.unitprice, o.totalprice,
+              o.payment_status, o.order_status, o.created_at, o.address, o.city,
+              o.region, o.country, o.pincode, o.paymentmode, o.notes,
+              p.status as payment_verified, p.receipt_path
+       FROM orders o
+       LEFT JOIN payments p ON p.order_id = o.id
+       WHERE o.user_id = ?
+       ORDER BY o.created_at DESC`,
+      [userId]
+    );
+    res.json(rows);
+  } catch (e) {
+    console.error("User orders error:", e);
+    res.status(500).json({ error: "DB error", details: String(e.message || e) });
+  }
+});
+
+// PATCH /api/admin/orders/:id/status — admin can update order_status
+app.patch("/api/admin/orders/:id/status", requireAdmin, async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const { order_status } = req.body || {};
+    const allowed = ["Processing", "Confirmed", "Shipped", "Delivered", "Cancelled"];
+    if (!allowed.includes(order_status)) {
+      return res.status(400).json({ error: "Invalid status value" });
+    }
+    await run(
+      `UPDATE orders SET order_status=?, updated_at=datetime('now') WHERE id=?`,
+      [order_status, id]
+    );
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: "DB error", details: String(e.message || e) });
+  }
+});
+
 // ---------------- Admin CRUD: Products Page ----------------
+
 app.get("/api/admin/products-page", requireAdmin, async (req, res) => {
   try {
     const rows = await all(

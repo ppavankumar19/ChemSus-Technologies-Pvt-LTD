@@ -272,6 +272,8 @@ async function initDb() {
       payment_status TEXT NOT NULL DEFAULT 'PENDING',
       paymentmode TEXT NOT NULL DEFAULT 'PENDING',
       notes TEXT DEFAULT '',
+      user_id TEXT DEFAULT NULL,
+      order_status TEXT NOT NULL DEFAULT 'Processing',
       created_at TEXT NOT NULL DEFAULT (datetime('now')),
       updated_at TEXT NOT NULL DEFAULT (datetime('now'))
     );
@@ -342,6 +344,15 @@ async function initDb() {
   `);
 
   await seed();
+
+  // Migrate existing DBs — add new columns if they don't exist yet
+  const migrateCol = async (table, col, def) => {
+    try { await run(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`); } catch (_) { /* already exists */ }
+  };
+  await migrateCol("orders", "user_id", "TEXT DEFAULT NULL");
+  await migrateCol("orders", "order_status", "TEXT NOT NULL DEFAULT 'Processing'");
+  try { await run("CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id)"); } catch (_) { }
+
   console.log("✅ SQLite ready with pack_pricing table");
 }
 
