@@ -6,762 +6,1427 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ChemSus Admin Dashboard</title>
   <link rel="icon" type="image/png" href="../assets/logo.jpg">
-  <link
-    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap"
-    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #0074c7;
       --primary-dark: #00508a;
       --accent: #00b8b0;
-      --bg: #F3F7FB;
-      --ink: #1f2933;
+      --accent-light: rgba(0,184,176,0.1);
+      --bg: #f0f4f8;
       --card: #ffffff;
+      --ink: #1f2933;
       --muted: #64748b;
+      --border: #e2e8f0;
       --danger: #ef4444;
+      --danger-bg: #fee2e2;
       --ok: #16a34a;
-      --shadow: 0 12px 28px rgba(15, 23, 42, 0.12);
+      --ok-bg: #dcfce7;
+      --warn-bg: #fff7ed;
+      --warn: #c2410c;
+      --shadow: 0 4px 24px rgba(15,23,42,0.10);
+      --shadow-lg: 0 12px 40px rgba(15,23,42,0.14);
       --radius: 14px;
+      --sidebar-w: 240px;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { margin: 0; padding: 0; width: 100%; min-height: 100%; background: var(--bg, #F3F7FB); }
-
+    html, body { height: 100%; }
     body {
       font-family: "Open Sans", Arial, sans-serif;
       background: var(--bg);
       color: var(--ink);
-      min-height: 100dvh;
       line-height: 1.6;
       overflow-x: hidden;
     }
-
     a { color: inherit; text-decoration: none; }
     button, input, select, textarea { font-family: inherit; }
 
-    .topbar {
-      position: sticky; top: 0; z-index: 100;
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: #fff;
-      border-bottom: 3px solid rgba(255,255,255,0.2);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .topbar-inner {
-      max-width: 1400px; margin: 0 auto; padding: 16px 20px;
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 16px; flex-wrap: wrap;
-    }
-
-    .brand { display: flex; align-items: center; gap: 12px; font-family: "Montserrat", sans-serif; font-weight: 700; }
-
-    .brand-logo-img {
-      width: 40px; height: 40px; border-radius: 12px;
-      background: rgba(255,255,255,0.2);
+    /* ════════════════════════════════════════
+       LOADING OVERLAY
+    ════════════════════════════════════════ */
+    #loadingOverlay {
+      position: fixed; inset: 0;
+      background: var(--bg);
+      z-index: 9999;
       display: flex; align-items: center; justify-content: center;
-      font-weight: 900; font-size: 16px;
+      flex-direction: column; gap: 16px;
+    }
+    .spinner {
+      width: 44px; height: 44px;
+      border: 4px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ════════════════════════════════════════
+       LOGIN
+    ════════════════════════════════════════ */
+    #loginView {
+      min-height: 100vh; width: 100%;
+      position: fixed; inset: 0; z-index: 500;
+      display: none; align-items: center; justify-content: center;
+      padding: 40px 20px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(0,184,176,0.15), transparent 40%),
+        radial-gradient(circle at 85% 85%, rgba(0,116,199,0.15), transparent 40%),
+        linear-gradient(135deg, #e8f1f8 0%, #d0dde9 100%);
+    }
+    .login-card {
+      background: rgba(255,255,255,0.96);
+      backdrop-filter: blur(16px);
+      border-radius: 22px;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid rgba(255,255,255,0.8);
+      padding: 40px 36px 36px;
+      width: 100%; max-width: 420px;
+      text-align: center;
+    }
+    .login-logo {
+      width: 72px; height: 72px;
+      border-radius: 16px; object-fit: contain;
+      margin-bottom: 18px;
+      box-shadow: 0 10px 28px rgba(0,116,199,0.2);
+    }
+    .login-card h2 {
+      font-family: "Montserrat", sans-serif;
+      font-size: 24px; color: var(--primary-dark);
+      margin-bottom: 6px;
+    }
+    .login-card .sub {
+      color: var(--muted); font-size: 13px; margin-bottom: 28px;
+    }
+    .login-field { margin-bottom: 16px; text-align: left; }
+    .login-field label {
+      display: block; font-size: 12px; font-weight: 700;
+      color: var(--primary-dark); margin-bottom: 6px;
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
+    .login-field input {
+      width: 100%; height: 48px;
+      padding: 0 14px;
+      border: 2px solid var(--border);
+      border-radius: 10px; font-size: 14px;
+      background: #fff; outline: none;
+      transition: all 0.2s ease;
+    }
+    .login-field input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(0,116,199,0.12);
+    }
+    .login-btn {
+      width: 100%; height: 48px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: #fff; border: none; border-radius: 10px;
+      font-size: 15px; font-weight: 700;
+      font-family: "Montserrat", sans-serif;
+      cursor: pointer; margin-top: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 16px rgba(0,116,199,0.3);
+    }
+    .login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,116,199,0.35); }
+    .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    #loginStatus {
+      margin-top: 14px; font-size: 13px; padding: 10px 14px;
+      border-radius: 8px; display: none; text-align: left;
+    }
+    #loginStatus.err { display: block; background: var(--danger-bg); color: #7f1d1d; border-left: 4px solid var(--danger); }
+
+    /* ════════════════════════════════════════
+       LAYOUT — SIDEBAR + MAIN
+    ════════════════════════════════════════ */
+    #appView { display: none; min-height: 100vh; }
+
+    .layout {
+      display: flex; min-height: 100vh;
     }
 
-    .brand-text { display: flex; flex-direction: column; gap: 2px; }
-    .brand-title { font-size: 16px; line-height: 1.2; }
-    .brand-subtitle { font-size: 11px; opacity: 0.85; font-weight: 400; }
-
-    .topbar-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-
-    .pill {
-      border: 1px solid rgba(255,255,255,0.3);
-      background: rgba(255,255,255,0.15);
-      color: #fff; padding: 8px 14px; border-radius: 8px;
-      font-size: 13px; font-weight: 600; cursor: pointer;
-      transition: all 0.2s ease; white-space: nowrap;
-    }
-    .pill:hover { background: rgba(255,255,255,0.25); transform: translateY(-1px); }
-    .pill.secondary { background: rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.2); }
-
-    .container { max-width: 1400px; margin: 0 auto; padding: 24px 20px 40px; }
-
-    .sidebar-nav {
-      background: var(--card); border-radius: var(--radius);
-      box-shadow: var(--shadow); border-top: 4px solid var(--accent);
-      overflow: hidden; margin-bottom: 24px;
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: linear-gradient(180deg, #041e35 0%, #062a4a 100%);
+      color: #fff;
+      display: flex; flex-direction: column;
+      position: fixed; top: 0; left: 0; bottom: 0;
+      z-index: 200;
+      transition: transform 0.3s ease;
+      overflow-y: auto;
+      border-right: 1px solid rgba(255,255,255,0.06);
     }
 
-    .nav {
-      list-style: none; padding: 12px;
-      display: flex; gap: 6px; overflow-x: auto;
-    }
-
-    .nav a {
+    .sidebar-brand {
       display: flex; align-items: center; gap: 10px;
-      padding: 12px 16px; border-radius: 10px; font-size: 14px;
-      color: #334155; border: 1px solid transparent; cursor: pointer;
-      transition: all 0.2s ease; white-space: nowrap; font-weight: 500;
+      padding: 20px 18px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
     }
-    .nav a.active {
-      background: linear-gradient(135deg, rgba(0,184,176,0.12), rgba(0,116,199,0.08));
-      border-color: rgba(0,184,176,0.3); color: var(--primary-dark); font-weight: 700;
+    .sidebar-brand img {
+      width: 38px; height: 38px;
+      border-radius: 10px; object-fit: cover;
+      border: 2px solid rgba(0,184,176,0.5);
     }
-    .nav a:hover { background: #f1f5f9; border-color: #e2e8f0; }
+    .sidebar-brand-text { line-height: 1.2; }
+    .sidebar-brand-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 14px; font-weight: 700; color: #fff;
+    }
+    .sidebar-brand-sub { font-size: 11px; color: rgba(255,255,255,0.45); }
 
+    .sidebar-section-label {
+      font-size: 10px; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+      padding: 18px 18px 6px;
+    }
+
+    .sidebar-menu { list-style: none; padding: 4px 10px; flex: 1; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      font-size: 13.5px; color: rgba(255,255,255,0.7);
+      cursor: pointer; transition: all 0.2s ease;
+      border: 1px solid transparent; font-weight: 500;
+      white-space: nowrap;
+    }
+    .sidebar-menu li a .nav-icon { font-size: 16px; width: 22px; text-align: center; flex-shrink: 0; }
+    .sidebar-menu li a:hover {
+      background: rgba(255,255,255,0.07);
+      color: #fff;
+    }
+    .sidebar-menu li a.active {
+      background: linear-gradient(135deg, rgba(0,184,176,0.2), rgba(0,116,199,0.15));
+      border-color: rgba(0,184,176,0.3);
+      color: #fff; font-weight: 700;
+    }
+    .sidebar-menu li a .badge-count {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff; font-size: 10px;
+      padding: 2px 7px; border-radius: 20px;
+      font-weight: 700;
+    }
+
+    .sidebar-footer {
+      padding: 14px 10px 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+    .sidebar-footer button {
+      width: 100%; padding: 10px 14px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: #fca5a5; border-radius: 10px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s ease; display: flex;
+      align-items: center; gap: 8px; justify-content: center;
+    }
+    .sidebar-footer button:hover {
+      background: rgba(239,68,68,0.22);
+      color: #fff;
+    }
+
+    /* ── Main content ── */
+    .main-area {
+      margin-left: var(--sidebar-w);
+      flex: 1; min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Top header bar ── */
+    .topbar {
+      background: var(--card);
+      border-bottom: 2px solid var(--border);
+      padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.06);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+    .topbar-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 18px; font-weight: 700; color: var(--primary-dark);
+    }
+    .topbar-breadcrumb { font-size: 12px; color: var(--muted); margin-top: 1px; }
+    .topbar-right { display: flex; gap: 8px; align-items: center; }
+    .topbar-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 8px;
+      font-size: 12.5px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s ease; border: 1.5px solid var(--border);
+      background: var(--card); color: var(--primary-dark);
+    }
+    .topbar-btn:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .topbar-btn.accent {
+      background: linear-gradient(135deg, var(--accent), #00d4cc);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 3px 10px rgba(0,184,176,0.25);
+    }
+    .topbar-btn.accent:hover { transform: translateY(-1px); box-shadow: 0 5px 14px rgba(0,184,176,0.3); }
+
+    /* ── Page content ── */
+    .page-content { padding: 28px; flex: 1; }
+
+    /* ════════════════════════════════════════
+       STATS CARDS (Dashboard Overview)
+    ════════════════════════════════════════ */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 18px; margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      display: flex; align-items: center; gap: 16px;
+      position: relative; overflow: hidden;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .stat-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); }
+    .stat-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+    .stat-card.blue::before  { background: linear-gradient(90deg, var(--primary), var(--accent)); }
+    .stat-card.green::before { background: linear-gradient(90deg, #16a34a, #22c55e); }
+    .stat-card.orange::before{ background: linear-gradient(90deg, #d97706, #f59e0b); }
+    .stat-card.red::before   { background: linear-gradient(90deg, #dc2626, #ef4444); }
+    .stat-card.teal::before  { background: linear-gradient(90deg, var(--accent), #06b6d4); }
+
+    .stat-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+    }
+    .blue  .stat-icon { background: rgba(0,116,199,0.1);   color: var(--primary); }
+    .green .stat-icon { background: rgba(22,163,74,0.1);   color: #16a34a; }
+    .orange.stat-icon { background: rgba(217,119,6,0.1);   color: #d97706; }
+    .red   .stat-icon { background: rgba(220,38,38,0.1);   color: #dc2626; }
+    .teal  .stat-icon { background: rgba(0,184,176,0.1);   color: var(--accent); }
+
+    .stat-info { flex: 1; min-width: 0; }
+    .stat-value {
+      font-family: "Montserrat", sans-serif;
+      font-size: 26px; font-weight: 700; color: var(--ink);
+      line-height: 1;
+    }
+    .stat-label { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    /* ════════════════════════════════════════
+       SECTION VIEWS
+    ════════════════════════════════════════ */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── Section header ── */
+    .section-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap; gap: 12px;
+      margin-bottom: 22px;
+    }
+    .section-title-group {}
+    .section-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 20px; font-weight: 700; color: var(--primary-dark);
+    }
+    .section-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .section-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    /* ── Card ── */
     .card {
-      background: var(--card); border-radius: var(--radius);
-      box-shadow: var(--shadow); border-top: 4px solid var(--accent);
-      padding: 28px; margin-bottom: 24px;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 22px;
     }
-    .card h2 {
-      font-family: "Montserrat", sans-serif; font-size: 22px;
-      color: var(--primary-dark); margin-bottom: 8px; font-weight: 700;
+    .card-header {
+      padding: 16px 22px;
+      border-bottom: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 10px; flex-wrap: wrap;
+      background: linear-gradient(135deg, #fafbfc, #f3f7fb);
     }
-
-    .hint { color: var(--muted); font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
-
-    .row { display: grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 16px; }
-    @media (min-width: 768px) {
-      .row { grid-template-columns: 1fr 1fr; }
-      .row.full { grid-template-columns: 1fr; }
+    .card-title {
+      font-family: "Montserrat", sans-serif;
+      font-size: 15px; font-weight: 700; color: var(--primary-dark);
+      display: flex; align-items: center; gap: 8px;
     }
+    .card-title .ct-icon {
+      width: 28px; height: 28px;
+      background: var(--accent-light);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .card-body { padding: 22px; }
 
-    .field { display: flex; flex-direction: column; gap: 8px; }
-    .field label { font-size: 13px; font-weight: 600; color: var(--primary-dark); }
+    /* ── Form layout ── */
+    .form-grid { display: grid; gap: 16px; margin-bottom: 16px; }
+    .form-grid.cols-2 { grid-template-columns: 1fr 1fr; }
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 12px; font-weight: 700;
+      color: var(--primary-dark);
+      text-transform: uppercase; letter-spacing: 0.05em;
+    }
     .field input, .field select, .field textarea {
-      width: 100%; padding: 11px 14px; border-radius: 8px;
-      border: 2px solid #e2e8f0; outline: none; background: #fff;
-      font-size: 14px; transition: all 0.2s ease;
+      width: 100%; padding: 10px 13px;
+      border: 2px solid var(--border);
+      border-radius: 8px; font-size: 14px;
+      background: #fff; outline: none;
+      transition: all 0.2s ease;
     }
-    .field textarea { min-height: 100px; resize: vertical; }
+    .field textarea { min-height: 90px; resize: vertical; }
     .field input:focus, .field select:focus, .field textarea:focus {
-      border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,184,176,0.1);
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(0,184,176,0.1);
     }
+    .field .hint-text { font-size: 11.5px; color: var(--muted); }
 
-    .inline { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .upload-row {
+      display: flex; gap: 8px; align-items: center;
+      margin-top: 8px; flex-wrap: wrap;
+    }
+    .upload-row input[type="file"] { font-size: 12px; }
 
+    /* ── Buttons ── */
     .btn {
-      border: none; border-radius: 8px; padding: 11px 18px;
-      font-weight: 600; font-size: 14px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 6px;
+      border: none; border-radius: 8px; padding: 10px 18px;
+      font-weight: 600; font-size: 13px; cursor: pointer;
       transition: all 0.2s ease; white-space: nowrap;
       font-family: "Montserrat", sans-serif;
     }
     .btn.primary {
       background: linear-gradient(135deg, var(--accent), #00d4cc);
-      color: #fff; box-shadow: 0 4px 12px rgba(0,184,176,0.25);
+      color: #fff; box-shadow: 0 3px 10px rgba(0,184,176,0.25);
     }
-    .btn.primary:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,184,176,0.35); }
-    .btn.ghost { background: #f1f5f9; color: var(--primary-dark); border: 2px solid #e2e8f0; }
-    .btn.ghost:hover { background: #e2e8f0; border-color: #cbd5e1; }
-    .btn.danger { background: #fee2e2; color: #991b1b; border: 2px solid #fecaca; }
-    .btn.danger:hover { background: #fecaca; }
-    .btn.small { padding: 7px 12px; font-size: 12px; border-radius: 6px; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    .btn.primary:hover { transform: translateY(-1px); box-shadow: 0 5px 16px rgba(0,184,176,0.35); }
+    .btn.secondary {
+      background: var(--card); color: var(--primary-dark);
+      border: 2px solid var(--border);
+    }
+    .btn.secondary:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .btn.danger  { background: var(--danger-bg); color: #991b1b; border: 2px solid #fecaca; }
+    .btn.danger:hover  { background: #fecaca; }
+    .btn.success { background: var(--ok-bg); color: #166534; border: 2px solid #bbf7d0; }
+    .btn.success:hover { background: #bbf7d0; }
+    .btn.sm { padding: 6px 11px; font-size: 12px; border-radius: 6px; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
 
-    .status { margin-top: 14px; font-size: 13px; padding: 12px 16px; border-radius: 10px; display: none; }
-    .status.ok { display: block; background: #dcfce7; color: #14532d; border-left: 4px solid var(--ok); }
-    .status.err { display: block; background: #fee2e2; color: #7f1d1d; border-left: 4px solid var(--danger); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
 
-    .divider { height: 1px; background: linear-gradient(to right, transparent, #e2e8f0, transparent); margin: 20px 0; }
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+      margin: 22px 0;
+    }
 
-    .table-wrap { overflow-x: auto; border-radius: 12px; border: 2px solid #e2e8f0; margin-top: 16px; }
-    table { width: 100%; border-collapse: collapse; min-width: 800px; background: #fff; }
-    th, td { padding: 12px 14px; border-bottom: 1px solid #f1f5f9; text-align: left; font-size: 13px; vertical-align: top; }
-    th {
+    /* ── Status / alerts ── */
+    .alert {
+      padding: 11px 15px; border-radius: 10px;
+      font-size: 13px; font-weight: 500;
+      display: none; margin-top: 14px;
+    }
+    .alert.ok  { display: block; background: var(--ok-bg); color: #14532d; border-left: 4px solid var(--ok); }
+    .alert.err { display: block; background: var(--danger-bg); color: #7f1d1d; border-left: 4px solid var(--danger); }
+
+    /* ════════════════════════════════════════
+       FILTER BAR
+    ════════════════════════════════════════ */
+    .filter-bar {
+      display: flex; gap: 10px; align-items: center;
+      flex-wrap: wrap; margin-bottom: 16px;
+    }
+    .filter-bar input, .filter-bar select {
+      padding: 9px 13px; border: 2px solid var(--border);
+      border-radius: 8px; font-size: 13.5px;
+      background: var(--card); outline: none;
+      transition: border-color 0.2s ease;
+      font-family: inherit;
+    }
+    .filter-bar input { min-width: 220px; }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--accent); }
+    .filter-bar select { min-width: 140px; }
+
+    /* ════════════════════════════════════════
+       TABLES
+    ════════════════════════════════════════ */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+    }
+    table {
+      width: 100%; border-collapse: collapse;
+      background: var(--card);
+    }
+    thead th {
       background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-      font-family: "Montserrat", sans-serif; font-size: 12px;
-      color: var(--primary-dark); font-weight: 700; border-bottom: 2px solid var(--accent);
+      font-family: "Montserrat", sans-serif;
+      font-size: 11px; font-weight: 700;
+      color: var(--primary-dark);
+      text-transform: uppercase; letter-spacing: 0.06em;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--accent);
+      white-space: nowrap; text-align: left;
     }
+    tbody td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: 13px; vertical-align: middle;
+    }
+    tbody tr:last-child td { border-bottom: none; }
     tbody tr { transition: background 0.15s ease; }
     tbody tr:hover { background: #f8fafc; }
 
+    /* ── Status tags ── */
     .tag {
-      display: inline-block; padding: 5px 12px; border-radius: 6px;
-      font-size: 11px; font-weight: 700; letter-spacing: 0.03em;
-      white-space: nowrap; text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 10px; border-radius: 6px;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.03em; text-transform: uppercase; white-space: nowrap;
     }
-    .tag.pending { background: #fff7ed; color: #9a3412; }
-    .tag.verify { background: #eff6ff; color: #1e40af; }
-    .tag.paid { background: #dcfce7; color: #166534; }
-    .tag.failed { background: #fee2e2; color: #991b1b; }
+    .tag::before { content: ''; width: 6px; height: 6px; border-radius: 50%; }
+    .tag.pending { background: var(--warn-bg); color: var(--warn); }
+    .tag.pending::before { background: var(--warn); }
+    .tag.verify  { background: #eff6ff; color: #1e40af; }
+    .tag.verify::before  { background: #3b82f6; }
+    .tag.paid, .tag.success { background: var(--ok-bg); color: var(--ok); }
+    .tag.paid::before, .tag.success::before { background: var(--ok); }
+    .tag.failed  { background: var(--danger-bg); color: #991b1b; }
+    .tag.failed::before  { background: var(--danger); }
+    .tag.active  { background: rgba(0,184,176,0.1); color: #0f766e; }
+    .tag.active::before  { background: var(--accent); }
+    .tag.inactive{ background: #f8fafc; color: var(--muted); }
+    .tag.inactive::before{ background: var(--muted); }
 
-    /* FIX: Login overlay - starts visible (JS will hide if already logged in) */
-    .login-wrap {
-      min-height: 100vh; width: 100%; position: fixed; inset: 0;
-      z-index: 200; display: flex; align-items: center; justify-content: center;
-      padding: 40px 20px; overflow: hidden;
-      background:
-        radial-gradient(circle at 15% 15%, rgba(0,184,176,0.18), transparent 34%),
-        radial-gradient(circle at 85% 85%, rgba(0,116,199,0.18), transparent 38%),
-        linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-    }
+    /* ── Table action cell ── */
+    .actions-cell { display: flex; gap: 5px; flex-wrap: wrap; }
 
-    .login-card {
-      background: rgba(255,255,255,0.94); backdrop-filter: blur(14px);
-      border-radius: 22px; box-shadow: 0 22px 50px rgba(15,23,42,0.16);
-      border: 1px solid rgba(255,255,255,0.7);
-      padding: 34px 30px 30px; width: 100%; max-width: 430px;
-      text-align: center; position: relative;
-    }
-    .login-card .brand-logo {
-      width: 72px; height: 72px; object-fit: contain;
-      border-radius: 14px; margin-bottom: 18px;
-      box-shadow: 0 10px 24px rgba(0,116,199,0.25);
-    }
-    .login-card h2 {
-      margin-bottom: 8px; font-size: 26px;
-      font-family: "Montserrat", sans-serif; color: var(--primary-dark);
-    }
-    .login-card .field label { text-align: left; }
-    .login-card .field input { height: 46px; border-radius: 10px; border-width: 1px; background: #fff; }
-    .login-card .field input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(0,116,199,0.12); }
-    .login-actions { justify-content: center; }
-    .login-actions .btn { width: 100%; justify-content: center; min-height: 46px; font-size: 15px; border-radius: 10px; }
-    .login-card #loginStatus { margin-top: 16px; text-align: left; }
-
-    .muted { color: var(--muted); font-size: 13px; }
-
-    .actions-cell { display: flex; gap: 6px; flex-wrap: wrap; }
-
+    /* ── Image thumb ── */
     .thumb {
-      width: 50px; height: 50px; object-fit: cover;
-      border-radius: 8px; border: 2px solid #e2e8f0;
-      cursor: pointer; background: #f8fafc; transition: transform 0.2s ease;
+      width: 44px; height: 44px; object-fit: cover;
+      border-radius: 8px; border: 2px solid var(--border);
+      cursor: pointer; background: #f8fafc;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      display: block;
     }
-    .thumb:hover { transform: scale(1.05); border-color: var(--accent); }
+    .thumb:hover { transform: scale(1.08); border-color: var(--accent); }
 
-    /* Loading overlay */
-    #loadingOverlay {
-      position: fixed; inset: 0; background: var(--bg);
-      z-index: 300; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 16px;
+    /* ── Empty table state ── */
+    .table-empty {
+      padding: 48px 20px; text-align: center; color: var(--muted);
     }
-    .spinner {
-      width: 44px; height: 44px; border: 4px solid #e2e8f0;
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .table-empty .empty-icon { font-size: 40px; margin-bottom: 10px; }
 
-    @media (max-width: 768px) {
-      .topbar-inner { flex-direction: column; align-items: flex-start; }
-      .card { padding: 20px 16px; }
-      table { min-width: 1000px; }
-      .login-card { padding: 26px 20px 22px; border-radius: 18px; }
+    /* ════════════════════════════════════════
+       RECEIPT MODAL
+    ════════════════════════════════════════ */
+    #imgModal {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 9999; padding: 20px;
+      overflow-y: auto;
+    }
+    .modal-box {
+      max-width: 900px; margin: 60px auto;
+      background: var(--card); border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 18px;
+      background: #f8fafc; border-bottom: 2px solid var(--border);
+    }
+    .modal-header b { font-family: "Montserrat",sans-serif; color: var(--primary-dark); font-size: 14px; }
+    .modal-body { padding: 20px; max-height: 75vh; overflow: auto; }
+    .modal-body img { width: 100%; border-radius: 10px; border: 2px solid var(--border); }
+    .modal-body iframe { width: 100%; height: 68vh; border: none; }
+
+    /* ════════════════════════════════════════
+       MOBILE SIDEBAR TOGGLE
+    ════════════════════════════════════════ */
+    .sidebar-toggle {
+      display: none;
+      position: fixed; top: 14px; left: 14px;
+      z-index: 300;
+      background: var(--primary); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 10px; cursor: pointer;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    }
+    .sidebar-toggle svg { width: 20px; height: 20px; display: block; fill: currentColor; }
+
+    .sidebar-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 190; backdrop-filter: blur(2px);
+    }
+    .sidebar-overlay.active { display: block; }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+      .form-grid.cols-3 { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 900px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-area { margin-left: 0; }
+      .sidebar-toggle { display: flex; }
+      .topbar { padding: 14px 16px 14px 60px; }
+      .page-content { padding: 18px 14px; }
+      .form-grid.cols-2,
+      .form-grid.cols-3 { grid-template-columns: 1fr; }
+      table { min-width: 700px; }
+    }
+    @media (max-width: 580px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .login-card { padding: 28px 20px; }
+      .topbar-right { display: none; }
+    }
+    @media (max-width: 380px) {
+      .stats-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
 
-  <!-- FIX: Loading overlay shown first, hidden after boot() completes -->
+  <!-- LOADING -->
   <div id="loadingOverlay">
     <div class="spinner"></div>
-    <span style="color:var(--muted);font-size:14px;">Loading...</span>
+    <span style="color:var(--muted);font-size:14px;">Loading ChemSus Admin...</span>
   </div>
 
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <img src="../assets/logo.jpg" class="brand-logo-img" alt="ChemSus Logo">
-        <div class="brand-text">
-          <div class="brand-title">ChemSus Admin</div>
-          <div class="brand-subtitle">Products • Shop • Pack Pricing • Orders</div>
-        </div>
-      </div>
-      <div class="topbar-actions" id="topActions" style="display:none;">
-        <button class="pill" onclick="openPage('../products.html')">📄 Products Page</button>
-        <button class="pill" onclick="openPage('../shop.html')">🛍️ Shop Page</button>
-        <button class="pill secondary" onclick="logout()">🔓 Logout</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- LOGIN — FIX: starts hidden, shown by showLoginView() -->
-  <div id="loginView" class="login-wrap" style="display:none;">
+  <!-- LOGIN -->
+  <div id="loginView">
     <div class="login-card">
-      <img src="../assets/logo.jpg" class="brand-logo" alt="ChemSus Logo">
+      <img src="../assets/logo.jpg" class="login-logo" alt="ChemSus Logo"
+           onerror="this.style.display='none'">
       <h2>Admin Login</h2>
-      <p class="muted" style="margin-bottom:20px;">Enter your ChemSus admin credentials.</p>
-      <div class="row full">
-        <div class="field">
-          <label>Username</label>
-          <!-- FIX: Added keydown Enter handler -->
-          <input id="loginUser" type="text" autocomplete="username"
-            onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
-        </div>
-        <div class="field">
-          <label>Password</label>
-          <!-- FIX: Added keydown Enter handler, autocomplete -->
-          <input id="loginPass" type="password" autocomplete="current-password"
-            onkeydown="if(event.key==='Enter')login()">
-        </div>
+      <p class="sub">ChemSus Technologies Pvt Ltd</p>
+      <div class="login-field">
+        <label>Username</label>
+        <input id="loginUser" type="text" placeholder="Enter username"
+               autocomplete="username"
+               onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
       </div>
-      <div class="inline login-actions" style="margin-top:16px;">
-        <button class="btn primary" id="loginBtn" onclick="login()">Login</button>
+      <div class="login-field">
+        <label>Password</label>
+        <input id="loginPass" type="password" placeholder="Enter password"
+               autocomplete="current-password"
+               onkeydown="if(event.key==='Enter')login()">
       </div>
-      <div id="loginStatus" class="status err"></div>
+      <button class="login-btn" id="loginBtn" onclick="login()">🔐 Sign In</button>
+      <div id="loginStatus"></div>
     </div>
   </div>
+
+  <!-- SIDEBAR OVERLAY (mobile) -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+  <!-- MOBILE TOGGLE BUTTON -->
+  <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle sidebar">
+    <svg viewBox="0 0 24 24"><path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/></svg>
+  </button>
 
   <!-- APP -->
-  <div id="appView" style="display:none;">
-    <div class="container">
-      <nav class="sidebar-nav">
-        <ul class="nav" id="nav">
-          <li><a class="active" data-view="view-products" onclick="switchView('view-products')">📦 Products</a></li>
-          <li><a data-view="view-shop" onclick="switchView('view-shop')">🛒 Shop</a></li>
-          <li><a data-view="view-packs" onclick="switchView('view-packs')">📋 Pack Pricing</a></li>
-          <li><a data-view="view-orders" onclick="switchView('view-orders')">📋 Orders</a></li>
-          <li><a data-view="view-payments" onclick="switchView('view-payments')">💳 Payments</a></li>
-          <li><a data-view="view-settings" onclick="switchView('view-settings')">⚙️ Settings</a></li>
+  <div id="appView">
+    <div class="layout">
+
+      <!-- ══ SIDEBAR ══ -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+          <img src="../assets/logo.jpg" alt="ChemSus" onerror="this.style.display='none'">
+          <div class="sidebar-brand-text">
+            <div class="sidebar-brand-title">ChemSus</div>
+            <div class="sidebar-brand-sub">Admin Panel</div>
+          </div>
+        </div>
+
+        <div class="sidebar-section-label">Overview</div>
+        <ul class="sidebar-menu">
+          <li><a data-view="view-dashboard" onclick="switchView('view-dashboard')" class="active">
+            <span class="nav-icon">📊</span> Dashboard
+          </a></li>
         </ul>
-      </nav>
 
-      <!-- PRODUCTS -->
-      <section id="view-products" class="card">
-        <h2>Products Page CRUD</h2>
-        <p class="hint">Manage products displayed on <b>products.html</b>.</p>
-        <div class="inline">
-          <button class="btn ghost" onclick="clearProductsForm()">Clear</button>
-          <button class="btn ghost" onclick="refreshProducts()">Refresh</button>
-        </div>
-        <div class="divider"></div>
-        <div class="row">
-          <div class="field">
-            <label>Edit ID (blank = new)</label>
-            <input id="pid" placeholder="e.g. 1">
-          </div>
-          <div class="field">
-            <label>Active</label>
-            <select id="pactive">
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Name</label>
-            <input id="pname" placeholder="Product name">
-          </div>
-          <div class="field">
-            <label>Page link</label>
-            <input id="plink" placeholder="products/levulinic-acid.html">
-          </div>
-        </div>
-        <div class="row full">
-          <div class="field">
-            <label>Description</label>
-            <textarea id="pdesc" placeholder="Short card description"></textarea>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Image (assets/...)</label>
-            <input id="pimage" placeholder="assets/chemical1.avif">
-            <div class="inline" style="margin-top:8px;">
-              <input type="file" id="pimagefile" accept="image/*">
-              <button class="btn ghost small" type="button"
-                onclick="uploadFor('pimagefile','pimage','puploadstatus')">Upload</button>
-            </div>
-            <div class="muted" id="puploadstatus"></div>
-          </div>
-          <div class="field">
-            <label>Sort order</label>
-            <input id="psort" type="number" value="0">
-          </div>
-        </div>
-        <div class="inline" style="margin-top:16px;">
-          <button class="btn primary" onclick="saveProduct()">💾 Save</button>
-          <button class="btn danger" onclick="deleteProduct()">🗑️ Delete</button>
-        </div>
-        <div id="pstatus" class="status"></div>
-        <div class="divider"></div>
-        <h2 style="font-size:18px;margin-bottom:12px;">Existing Products</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th><th>Active</th><th>Name</th><th>Link</th>
-                <th>Image</th><th>Sort</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="ptable"></tbody>
-          </table>
-        </div>
-      </section>
+        <div class="sidebar-section-label">Catalogue</div>
+        <ul class="sidebar-menu">
+          <li><a data-view="view-products" onclick="switchView('view-products')">
+            <span class="nav-icon">📦</span> Products
+          </a></li>
+          <li><a data-view="view-shop" onclick="switchView('view-shop')">
+            <span class="nav-icon">🛒</span> Shop Items
+          </a></li>
+          <li><a data-view="view-packs" onclick="switchView('view-packs')">
+            <span class="nav-icon">🏷️</span> Pack Pricing
+          </a></li>
+        </ul>
 
-      <!-- SHOP -->
-      <section id="view-shop" class="card" style="display:none;">
-        <h2>Shop Page CRUD</h2>
-        <p class="hint">Manage shop items with features on <b>shop.html</b>. Pack pricing managed separately.</p>
-        <div class="inline">
-          <button class="btn ghost" onclick="clearShopForm()">Clear</button>
-          <button class="btn ghost" onclick="refreshShop()">Refresh</button>
-        </div>
-        <div class="divider"></div>
-        <div class="row">
-          <div class="field">
-            <label>Edit ID (blank = new)</label>
-            <input id="sid" placeholder="e.g. 1">
-          </div>
-          <div class="field">
-            <label>Active</label>
-            <select id="sactive">
-              <option value="1">Active</option>
-              <option value="0">Inactive</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Name</label>
-            <input id="sname" placeholder="Calcium Levulinate">
-          </div>
-          <div class="field">
-            <label>Subtitle</label>
-            <input id="ssubtitle" placeholder="Pharma-grade nutritional supplement">
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Features (one per line)</label>
-            <textarea id="sfeatures" placeholder="High bioavailability&#10;Pharma use"></textarea>
-          </div>
-          <div class="field">
-            <label>Base Price (display only)</label>
-            <input id="sprice" type="number" step="0.01" placeholder="1800">
-            <div class="muted">Actual pricing in Pack Pricing section.</div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Stock</label>
-            <select id="sstock">
-              <option value="in-stock">IN STOCK</option>
-              <option value="out-of-stock">OUT OF STOCK</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Show badge?</label>
-            <select id="sshowbadge">
-              <option value="0">No</option>
-              <option value="1">Yes</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Badge text</label>
-            <input id="sbadge" placeholder="Free sample available">
-          </div>
-          <div class="field">
-            <label>More details link</label>
-            <input id="smore" placeholder="products/calcium-levulinate.html">
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Image (assets/...)</label>
-            <input id="simage" placeholder="assets/cl.jpeg">
-            <div class="inline" style="margin-top:8px;">
-              <input type="file" id="simagefile" accept="image/*">
-              <button class="btn ghost small" type="button"
-                onclick="uploadFor('simagefile','simage','suploadstatus')">Upload</button>
-            </div>
-            <div class="muted" id="suploadstatus"></div>
-          </div>
-          <div class="field">
-            <label>Sort order</label>
-            <input id="ssort" type="number" value="0">
-          </div>
-        </div>
-        <div class="inline" style="margin-top:16px;">
-          <button class="btn primary" onclick="saveShop()">💾 Save</button>
-          <button class="btn danger" onclick="deleteShop()">🗑️ Delete</button>
-        </div>
-        <div id="sstatus" class="status"></div>
-        <div class="divider"></div>
-        <h2 style="font-size:18px;margin-bottom:12px;">Existing Shop Items</h2>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>ID</th><th>Active</th><th>Name</th><th>Price</th>
-                <th>Stock</th><th>Image</th><th>Sort</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="stable"></tbody>
-          </table>
-        </div>
-      </section>
+        <div class="sidebar-section-label">Sales</div>
+        <ul class="sidebar-menu">
+          <li><a data-view="view-orders" onclick="switchView('view-orders')">
+            <span class="nav-icon">📋</span> Orders
+            <span class="badge-count" id="sidebarOrderBadge">0</span>
+          </a></li>
+          <li><a data-view="view-payments" onclick="switchView('view-payments')">
+            <span class="nav-icon">💳</span> Payments
+          </a></li>
+        </ul>
 
-      <!-- PACK PRICING -->
-      <section id="view-packs" class="card" style="display:none;">
-        <h2>Pack Pricing Management</h2>
-        <p class="hint">Manage pack sizes and pricing for shop items.</p>
-        <div class="row">
-          <div class="field">
-            <label>Select Shop Item</label>
-            <select id="packShopItemSelect" onchange="loadPacksForItem()">
-              <option value="">-- Select Product --</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>&nbsp;</label>
-            <div class="inline">
-              <button class="btn ghost" onclick="clearPackForm()">Clear</button>
-              <button class="btn ghost" onclick="loadPacksForItem()">Refresh</button>
+        <div class="sidebar-section-label">System</div>
+        <ul class="sidebar-menu">
+          <li><a data-view="view-settings" onclick="switchView('view-settings')">
+            <span class="nav-icon">⚙️</span> Settings
+          </a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+          <button onclick="logout()">🔓 Logout</button>
+        </div>
+      </aside>
+
+      <!-- ══ MAIN AREA ══ -->
+      <div class="main-area">
+
+        <!-- TOP BAR -->
+        <div class="topbar">
+          <div class="topbar-left">
+            <div>
+              <div class="topbar-title" id="topbarTitle">Dashboard</div>
+              <div class="topbar-breadcrumb" id="topbarSub">Overview of your store</div>
             </div>
+          </div>
+          <div class="topbar-right" id="topActions">
+            <button class="topbar-btn" onclick="window.open('../products.html','_blank')">
+              📄 Products Page
+            </button>
+            <button class="topbar-btn" onclick="window.open('../shop.html','_blank')">
+              🛍️ Shop Page
+            </button>
           </div>
         </div>
 
-        <div id="packFormSection" style="display:none;">
-          <div class="divider"></div>
-          <h2 style="font-size:18px;margin-bottom:12px;">Add/Edit Pack</h2>
-          <div class="row">
-            <div class="field">
-              <label>Pack ID (blank = new)</label>
-              <!-- FIX: removed readonly so user can manually clear it -->
-              <input id="packId" placeholder="Auto-filled when editing">
-            </div>
-            <div class="field">
-              <label>Active</label>
-              <select id="packActive">
-                <option value="1">Active</option>
-                <option value="0">Inactive</option>
-              </select>
-            </div>
-          </div>
-          <div class="row">
-            <div class="field">
-              <label>Pack Size</label>
-              <input id="packSize" placeholder="100 g, 500 mL, 1 kg, etc.">
-            </div>
-            <div class="field">
-              <label>Sort Order</label>
-              <input id="packSort" type="number" value="0">
-            </div>
-          </div>
-          <div class="row">
-            <div class="field">
-              <label>Our Price (INR)</label>
-              <input id="packOurPrice" type="number" step="0.01" placeholder="2000">
-            </div>
-            <div class="field">
-              <label>&nbsp;</label>
-              <div class="muted">This is the customer-facing price per pack.</div>
-            </div>
-          </div>
-          <div class="inline" style="margin-top:16px;">
-            <button class="btn primary" onclick="savePack()">💾 Save Pack</button>
-            <button class="btn danger" onclick="deletePack()">🗑️ Delete</button>
-          </div>
-          <div id="packstatus" class="status"></div>
-        </div>
+        <!-- PAGE CONTENT -->
+        <div class="page-content">
 
-        <div class="divider"></div>
-        <h2 style="font-size:18px;margin-bottom:12px;">Existing Packs</h2>
-        <div id="packsTableWrap" style="display:none;">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th><th>Active</th><th>Pack Size</th>
-                  <th>Our Price</th><th>Sort</th><th>Actions</th>
-                </tr>
-              </thead>
-              <tbody id="packstable"></tbody>
-            </table>
-          </div>
-        </div>
-        <div id="packsEmpty" style="padding:40px;text-align:center;color:#6b7280;">
-          Select a shop item to manage its pack pricing
-        </div>
-      </section>
+          <!-- ══════════════════════════════════
+               DASHBOARD VIEW
+          ══════════════════════════════════ -->
+          <div id="view-dashboard" class="view active">
+            <div class="section-header">
+              <div class="section-title-group">
+                <div class="section-title">Store Overview</div>
+                <div class="section-sub">Live summary of products, orders and payments</div>
+              </div>
+              <div class="section-actions">
+                <button class="btn secondary sm" onclick="loadDashboard()">🔄 Refresh</button>
+              </div>
+            </div>
 
-      <!-- ORDERS -->
-      <section id="view-orders" class="card" style="display:none;">
-        <h2>Orders</h2>
-        <p class="hint">Orders from checkout with full address details.</p>
-        <div class="row">
-          <div class="field">
-            <label>Search</label>
-            <input id="orderSearch" placeholder="name, phone, product, city..." oninput="applyOrderFilters()">
-          </div>
-          <div class="field">
-            <label>Status</label>
-            <select id="orderStatusFilter" onchange="applyOrderFilters()">
-              <option value="">All</option>
-              <option value="PENDING">PENDING</option>
-              <option value="VERIFYING">VERIFYING</option>
-              <option value="PAID">PAID</option>
-              <option value="FAILED">FAILED</option>
-            </select>
-          </div>
-        </div>
-        <div class="inline">
-          <button class="btn ghost" onclick="clearOrderFilters()">Clear</button>
-          <button class="btn ghost" onclick="refreshOrders()">Refresh</button>
-        </div>
-        <div id="ostatus" class="status"></div>
-        <div class="divider"></div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Order ID</th><th>Status</th><th>Customer</th>
-                <th>Company</th><!-- FIX: Added missing Company column -->
-                <th>Product</th><th>Qty</th><th>Total</th>
-                <th>Phone</th><th>Address</th><th>City</th>
-                <th>Region</th><th>Pincode</th><th>Created</th><th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="otable"></tbody>
-          </table>
-        </div>
-      </section>
+            <!-- Stats -->
+            <div class="stats-grid">
+              <div class="stat-card blue">
+                <div class="stat-icon">📦</div>
+                <div class="stat-info">
+                  <div class="stat-value" id="ds-products">—</div>
+                  <div class="stat-label">Total Products</div>
+                </div>
+              </div>
+              <div class="stat-card teal">
+                <div class="stat-icon">🛒</div>
+                <div class="stat-info">
+                  <div class="stat-value" id="ds-shopitems">—</div>
+                  <div class="stat-label">Shop Items</div>
+                </div>
+              </div>
+              <div class="stat-card green">
+                <div class="stat-icon">📋</div>
+                <div class="stat-info">
+                  <div class="stat-value" id="ds-orders">—</div>
+                  <div class="stat-label">Total Orders</div>
+                </div>
+              </div>
+              <div class="stat-card orange">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-info">
+                  <div class="stat-value" id="ds-pending">—</div>
+                  <div class="stat-label">Pending Orders</div>
+                </div>
+              </div>
+              <div class="stat-card red">
+                <div class="stat-icon">💳</div>
+                <div class="stat-info">
+                  <div class="stat-value" id="ds-payments">—</div>
+                  <div class="stat-label">Payments</div>
+                </div>
+              </div>
+            </div>
 
-      <!-- PAYMENTS -->
-      <section id="view-payments" class="card" style="display:none;">
-        <h2>Payments & Receipts</h2>
-        <p class="hint">Receipts uploaded from payment2.html. Mark SUCCESS/FAILED.</p>
-        <div class="row">
-          <div class="field">
-            <label>Search</label>
-            <input id="paySearch" placeholder="order id, name..." oninput="applyPaymentFilters()">
-          </div>
-          <div class="field">
-            <label>Receipt</label>
-            <select id="receiptFilter" onchange="applyPaymentFilters()">
-              <option value="">All</option>
-              <option value="has">Has receipt</option>
-              <option value="none">No receipt</option>
-            </select>
-          </div>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label>Status</label>
-            <select id="payStatusFilter" onchange="applyPaymentFilters()">
-              <option value="">All</option>
-              <option value="PENDING">PENDING</option>
-              <option value="SUCCESS">SUCCESS</option>
-              <option value="FAILED">FAILED</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>&nbsp;</label>
-            <div class="inline">
-              <button class="btn ghost" onclick="clearPaymentFilters()">Clear</button>
-              <button class="btn ghost" onclick="refreshPayments()">Refresh</button>
+            <!-- Recent Orders -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">
+                  <span class="ct-icon">📋</span> Recent Orders
+                </div>
+                <button class="btn secondary sm" onclick="switchView('view-orders')">View All →</button>
+              </div>
+              <div class="card-body" style="padding:0;">
+                <div class="table-wrap" style="border:none; border-radius:0;">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Order ID</th>
+                        <th>Customer</th>
+                        <th>Product</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashRecentOrders">
+                      <tr><td colspan="6" class="table-empty"><div class="empty-icon">📭</div>No orders yet</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-        <div id="paystatus" class="status"></div>
-        <div class="divider"></div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Payment ID</th><th>Order ID</th><th>Status</th>
-                <th>Amount</th><th>Rating</th><th>Receipt</th>
-                <th>Feedback</th><th>Actions</th><th>Created</th>
-              </tr>
-            </thead>
-            <tbody id="paytable"></tbody>
-          </table>
-        </div>
-      </section>
 
-      <!-- SETTINGS -->
-      <section id="view-settings" class="card" style="display:none;">
-        <h2>Site Settings</h2>
-        <p class="hint">Upload brochure PDF.</p>
-        <div class="row">
-          <div class="field">
-            <label>Current brochure URL</label>
-            <input id="brochureurl" placeholder="assets/brochure.pdf">
-          </div>
-          <div class="field">
-            <label>Upload brochure PDF</label>
-            <div class="inline">
-              <input type="file" id="brochurefile" accept=".pdf">
-              <button class="btn ghost" type="button" onclick="uploadBrochure()">Upload PDF</button>
-              <button class="btn primary" type="button" onclick="saveBrochure()">💾 Save URL</button>
+          <!-- ══════════════════════════════════
+               PRODUCTS VIEW
+          ══════════════════════════════════ -->
+          <div id="view-products" class="view">
+            <div class="section-header">
+              <div class="section-title-group">
+                <div class="section-title">📦 Products</div>
+                <div class="section-sub">Manage items displayed on products.html</div>
+              </div>
+              <div class="section-actions">
+                <button class="btn secondary sm" onclick="clearProductsForm()">＋ New</button>
+                <button class="btn secondary sm" onclick="refreshProducts()">🔄 Refresh</button>
+              </div>
             </div>
-            <div class="muted" id="brochureuploadstatus"></div>
+
+            <!-- Form Card -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span class="ct-icon">✏️</span> Add / Edit Product</div>
+              </div>
+              <div class="card-body">
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Edit ID <span style="font-weight:400;text-transform:none;">(blank = new)</span></label>
+                    <input id="pid" placeholder="Leave blank to create new">
+                  </div>
+                  <div class="field">
+                    <label>Status</label>
+                    <select id="pactive">
+                      <option value="1">✅ Active</option>
+                      <option value="0">❌ Inactive</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Product Name *</label>
+                    <input id="pname" placeholder="e.g. Levulinic Acid">
+                  </div>
+                  <div class="field">
+                    <label>Page Link</label>
+                    <input id="plink" placeholder="products/levulinic-acid.html">
+                  </div>
+                </div>
+                <div class="form-grid">
+                  <div class="field">
+                    <label>Description</label>
+                    <textarea id="pdesc" placeholder="Short description shown on the product card"></textarea>
+                  </div>
+                </div>
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Image Path</label>
+                    <input id="pimage" placeholder="assets/chemical1.avif">
+                    <div class="upload-row">
+                      <input type="file" id="pimagefile" accept="image/*">
+                      <button class="btn secondary sm" type="button"
+                        onclick="uploadFor('pimagefile','pimage','puploadstatus')">⬆ Upload</button>
+                    </div>
+                    <div class="hint-text" id="puploadstatus"></div>
+                  </div>
+                  <div class="field">
+                    <label>Sort Order</label>
+                    <input id="psort" type="number" value="0">
+                    <span class="hint-text">Lower numbers appear first</span>
+                  </div>
+                </div>
+                <div class="btn-row">
+                  <button class="btn primary" onclick="saveProduct()">💾 Save Product</button>
+                  <button class="btn danger"  onclick="deleteProduct()">🗑️ Delete</button>
+                  <button class="btn secondary" onclick="clearProductsForm()">✕ Clear</button>
+                </div>
+                <div id="pstatus" class="alert"></div>
+              </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span class="ct-icon">📋</span> All Products</div>
+              </div>
+              <div class="card-body" style="padding:0;">
+                <div class="table-wrap" style="border:none;border-radius:0;">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Page Link</th>
+                        <th>Image</th>
+                        <th>Sort</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="ptable">
+                      <tr><td colspan="8" class="table-empty"><div class="empty-icon">📦</div>No products yet</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-        <div id="setstatus" class="status"></div>
-      </section>
 
-    </div>
-  </div>
+          <!-- ══════════════════════════════════
+               SHOP ITEMS VIEW
+          ══════════════════════════════════ -->
+          <div id="view-shop" class="view">
+            <div class="section-header">
+              <div class="section-title-group">
+                <div class="section-title">🛒 Shop Items</div>
+                <div class="section-sub">Manage items listed in shop.html with pack pricing</div>
+              </div>
+              <div class="section-actions">
+                <button class="btn secondary sm" onclick="clearShopForm()">＋ New</button>
+                <button class="btn secondary sm" onclick="refreshShop()">🔄 Refresh</button>
+              </div>
+            </div>
 
-  <!-- Receipt Modal -->
-  <div id="imgModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9999;padding:20px;"
-    onclick="if(event.target===this)closeModal()">
-    <div style="max-width:960px;margin:60px auto;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.3);">
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 18px;background:#f8fafc;border-bottom:2px solid #e2e8f0;">
-        <b style="font-family:Montserrat;color:var(--primary-dark);">Receipt Preview</b>
-        <button class="btn ghost small" onclick="closeModal()">✕ Close</button>
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span class="ct-icon">✏️</span> Add / Edit Shop Item</div>
+              </div>
+              <div class="card-body">
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Edit ID <span style="font-weight:400;text-transform:none;">(blank = new)</span></label>
+                    <input id="sid" placeholder="Leave blank to create new">
+                  </div>
+                  <div class="field">
+                    <label>Status</label>
+                    <select id="sactive">
+                      <option value="1">✅ Active</option>
+                      <option value="0">❌ Inactive</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Item Name *</label>
+                    <input id="sname" placeholder="e.g. Calcium Levulinate">
+                  </div>
+                  <div class="field">
+                    <label>Subtitle</label>
+                    <input id="ssubtitle" placeholder="e.g. Pharma-grade nutritional supplement">
+                  </div>
+                </div>
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Features <span style="font-weight:400;text-transform:none;">(one per line)</span></label>
+                    <textarea id="sfeatures" placeholder="High bioavailability&#10;Pharma use&#10;ISO certified"></textarea>
+                  </div>
+                  <div class="field">
+                    <label>Base Price (INR)</label>
+                    <input id="sprice" type="number" step="0.01" placeholder="1800">
+                    <span class="hint-text">Display price only. Actual pricing managed in Pack Pricing.</span>
+                  </div>
+                </div>
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Stock Status</label>
+                    <select id="sstock">
+                      <option value="in-stock">✅ In Stock</option>
+                      <option value="out-of-stock">❌ Out of Stock</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label>Show Badge?</label>
+                    <select id="sshowbadge">
+                      <option value="0">No</option>
+                      <option value="1">Yes</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Badge Text</label>
+                    <input id="sbadge" placeholder="Free sample available">
+                  </div>
+                  <div class="field">
+                    <label>More Details Link</label>
+                    <input id="smore" placeholder="products/calcium-levulinate.html">
+                  </div>
+                </div>
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Image Path</label>
+                    <input id="simage" placeholder="assets/cl.jpeg">
+                    <div class="upload-row">
+                      <input type="file" id="simagefile" accept="image/*">
+                      <button class="btn secondary sm" type="button"
+                        onclick="uploadFor('simagefile','simage','suploadstatus')">⬆ Upload</button>
+                    </div>
+                    <div class="hint-text" id="suploadstatus"></div>
+                  </div>
+                  <div class="field">
+                    <label>Sort Order</label>
+                    <input id="ssort" type="number" value="0">
+                    <span class="hint-text">Lower numbers appear first</span>
+                  </div>
+                </div>
+                <div class="btn-row">
+                  <button class="btn primary" onclick="saveShop()">💾 Save Item</button>
+                  <button class="btn danger"  onclick="deleteShop()">🗑️ Delete</button>
+                  <button class="btn secondary" onclick="clearShopForm()">✕ Clear</button>
+                </div>
+                <div id="sstatus" class="alert"></div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span class="ct-icon">📋</span> All Shop Items</div>
+              </div>
+              <div class="card-body" style="padding:0;">
+                <div class="table-wrap" style="border:none;border-radius:0;">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Status</th>
+                        <th>Name</th>
+                        <th>Subtitle</th>
+                        <th>Base Price</th>
+                        <th>Stock</th>
+                        <th>Image</th>
+                        <th>Sort</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="stable">
+                      <tr><td colspan="9" class="table-empty"><div class="empty-icon">🛒</div>No shop items yet</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════
+               PACK PRICING VIEW
+          ══════════════════════════════════ -->
+          <div id="view-packs" class="view">
+            <div class="section-header">
+              <div class="section-title-group">
+                <div class="section-title">🏷️ Pack Pricing</div>
+                <div class="section-sub">Manage pack sizes and customer prices per shop item</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span class="ct-icon">🛒</span> Select Shop Item</div>
+              </div>
+              <div class="card-body">
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Shop Item</label>
+                    <select id="packShopItemSelect" onchange="loadPacksForItem()">
+                      <option value="">— Select a product —</option>
+                    </select>
+                  </div>
+                  <div class="field" style="justify-content:flex-end;">
+                    <label>&nbsp;</label>
+                    <div style="display:flex;gap:8px;">
+                      <button class="btn secondary sm" onclick="clearPackForm()">＋ New Pack</button>
+                      <button class="btn secondary sm" onclick="loadPacksForItem()">🔄 Refresh</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="packFormSection" style="display:none;">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><span class="ct-icon">✏️</span> Add / Edit Pack</div>
+                </div>
+                <div class="card-body">
+                  <div class="form-grid cols-2">
+                    <div class="field">
+                      <label>Pack ID <span style="font-weight:400;text-transform:none;">(blank = new)</span></label>
+                      <input id="packId" placeholder="Auto-filled when editing">
+                    </div>
+                    <div class="field">
+                      <label>Status</label>
+                      <select id="packActive">
+                        <option value="1">✅ Active</option>
+                        <option value="0">❌ Inactive</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="form-grid cols-2">
+                    <div class="field">
+                      <label>Pack Size *</label>
+                      <input id="packSize" placeholder="e.g. 100 g, 500 mL, 1 kg">
+                    </div>
+                    <div class="field">
+                      <label>Sort Order</label>
+                      <input id="packSort" type="number" value="0">
+                    </div>
+                  </div>
+                  <div class="form-grid cols-2">
+                    <div class="field">
+                      <label>Our Price (INR) *</label>
+                      <input id="packOurPrice" type="number" step="0.01" placeholder="2000">
+                    </div>
+                    <div class="field">
+                      <label>&nbsp;</label>
+                      <span class="hint-text" style="padding-top:10px;">Customer-facing price per pack shown on shop page</span>
+                    </div>
+                  </div>
+                  <div class="btn-row">
+                    <button class="btn primary" onclick="savePack()">💾 Save Pack</button>
+                    <button class="btn danger"  onclick="deletePack()">🗑️ Delete</button>
+                    <button class="btn secondary" onclick="clearPackForm()">✕ Clear</button>
+                  </div>
+                  <div id="packstatus" class="alert"></div>
+                </div>
+              </div>
+            </div>
+
+            <div id="packsTableWrap" style="display:none;">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title"><span class="ct-icon">📋</span> Packs for Selected Item</div>
+                </div>
+                <div class="card-body" style="padding:0;">
+                  <div class="table-wrap" style="border:none;border-radius:0;">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>ID</th>
+                          <th>Status</th>
+                          <th>Pack Size</th>
+                          <th>Our Price</th>
+                          <th>Sort</th>
+                          <th>Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="packstable"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="packsEmpty" class="card">
+              <div class="card-body">
+                <div class="table-empty">
+                  <div class="empty-icon">🏷️</div>
+                  <div>Select a shop item above to manage its pack sizes and pricing</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════
+               ORDERS VIEW
+          ══════════════════════════════════ -->
+          <div id="view-orders" class="view">
+            <div class="section-header">
+              <div class="section-title-group">
+                <div class="section-title">📋 Orders</div>
+                <div class="section-sub">All customer orders with delivery details</div>
+              </div>
+              <div class="section-actions">
+                <button class="btn secondary sm" onclick="clearOrderFilters()">✕ Clear Filters</button>
+                <button class="btn secondary sm" onclick="refreshOrders()">🔄 Refresh</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="padding:16px 20px;">
+                <div class="filter-bar">
+                  <input id="orderSearch" placeholder="🔍 Search name, phone, product, city..."
+                         oninput="applyOrderFilters()">
+                  <select id="orderStatusFilter" onchange="applyOrderFilters()">
+                    <option value="">All Statuses</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="VERIFYING">VERIFYING</option>
+                    <option value="PAID">PAID</option>
+                    <option value="FAILED">FAILED</option>
+                  </select>
+                </div>
+                <div id="ostatus" class="alert"></div>
+              </div>
+              <div class="table-wrap" style="border-top:2px solid var(--border);border-radius:0;border-left:none;border-right:none;border-bottom:none;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>#ID</th>
+                      <th>Status</th>
+                      <th>Customer</th>
+                      <th>Company</th>
+                      <th>Product</th>
+                      <th>Qty</th>
+                      <th>Total</th>
+                      <th>Phone</th>
+                      <th>City</th>
+                      <th>Region</th>
+                      <th>Pincode</th>
+                      <th>Address</th>
+                      <th>Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="otable">
+                    <tr><td colspan="14" class="table-empty"><div class="empty-icon">📭</div>No orders found</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════
+               PAYMENTS VIEW
+          ══════════════════════════════════ -->
+          <div id="view-payments" class="view">
+            <div class="section-header">
+              <div class="section-title-group">
+                <div class="section-title">💳 Payments & Receipts</div>
+                <div class="section-sub">Receipts submitted via payment page — mark SUCCESS or FAILED</div>
+              </div>
+              <div class="section-actions">
+                <button class="btn secondary sm" onclick="clearPaymentFilters()">✕ Clear Filters</button>
+                <button class="btn secondary sm" onclick="refreshPayments()">🔄 Refresh</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-body" style="padding:16px 20px;">
+                <div class="filter-bar">
+                  <input id="paySearch" placeholder="🔍 Search order ID, name..."
+                         oninput="applyPaymentFilters()">
+                  <select id="payStatusFilter" onchange="applyPaymentFilters()">
+                    <option value="">All Statuses</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="SUCCESS">SUCCESS</option>
+                    <option value="FAILED">FAILED</option>
+                  </select>
+                  <select id="receiptFilter" onchange="applyPaymentFilters()">
+                    <option value="">All Receipts</option>
+                    <option value="has">Has Receipt</option>
+                    <option value="none">No Receipt</option>
+                  </select>
+                </div>
+                <div id="paystatus" class="alert"></div>
+              </div>
+              <div class="table-wrap" style="border-top:2px solid var(--border);border-radius:0;border-left:none;border-right:none;border-bottom:none;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Pay ID</th>
+                      <th>Order ID</th>
+                      <th>Status</th>
+                      <th>Amount</th>
+                      <th>Rating</th>
+                      <th>Receipt</th>
+                      <th>Feedback</th>
+                      <th>Date</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="paytable">
+                    <tr><td colspan="9" class="table-empty"><div class="empty-icon">💳</div>No payments found</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ══════════════════════════════════
+               SETTINGS VIEW
+          ══════════════════════════════════ -->
+          <div id="view-settings" class="view">
+            <div class="section-header">
+              <div class="section-title-group">
+                <div class="section-title">⚙️ Settings</div>
+                <div class="section-sub">Site configuration and file uploads</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title"><span class="ct-icon">📄</span> Brochure PDF</div>
+              </div>
+              <div class="card-body">
+                <div class="form-grid cols-2">
+                  <div class="field">
+                    <label>Current Brochure URL</label>
+                    <input id="brochureurl" placeholder="assets/brochure.pdf">
+                  </div>
+                  <div class="field">
+                    <label>Upload New Brochure PDF</label>
+                    <div class="upload-row">
+                      <input type="file" id="brochurefile" accept=".pdf">
+                      <button class="btn secondary sm" onclick="uploadBrochure()">⬆ Upload PDF</button>
+                      <button class="btn primary sm"   onclick="saveBrochure()">💾 Save URL</button>
+                    </div>
+                    <div class="hint-text" id="brochureuploadstatus"></div>
+                  </div>
+                </div>
+                <div id="setstatus" class="alert"></div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /.page-content -->
+      </div><!-- /.main-area -->
+    </div><!-- /.layout -->
+  </div><!-- /#appView -->
+
+  <!-- RECEIPT MODAL -->
+  <div id="imgModal" onclick="if(event.target===this)closeModal()">
+    <div class="modal-box">
+      <div class="modal-header">
+        <b>📄 Receipt Preview</b>
+        <button class="btn secondary sm" onclick="closeModal()">✕ Close</button>
       </div>
-      <div style="padding:20px;max-height:70vh;overflow:auto;">
-        <img id="modalImg" src="" alt="receipt" style="width:100%;height:auto;border-radius:12px;border:2px solid #e2e8f0;">
-        <iframe id="modalPdf" title="receipt-pdf" style="display:none;width:100%;height:70vh;border:none;"></iframe>
+      <div class="modal-body">
+        <img id="modalImg" src="" alt="receipt">
+        <iframe id="modalPdf" title="receipt-pdf" style="display:none;"></iframe>
       </div>
     </div>
   </div>
 
   <script>
-    // FIX: Allow overriding API base for cross-origin deployments via meta tag or window variable
     const API_BASE = (window.CHEMSUS_API_BASE || '/api').replace(/\/$/, '');
     let ORDERS_CACHE = [];
     let PAY_CACHE = [];
 
-    function showStatus(id, type, msg) {
+    /* ════ UTILS ════ */
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, c =>
+        ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])
+      );
+    }
+
+    const ROW_STORE = {};
+    let _rsIdx = 0;
+    const storeRow = obj => { const k = 'r'+(++_rsIdx); ROW_STORE[k]=obj; return k; };
+    const getRow   = key => ROW_STORE[key] || null;
+
+    function showAlert(id, type, msg) {
       const el = document.getElementById(id);
       if (!el) return;
-      el.className = 'status ' + (type === 'ok' ? 'ok' : 'err');
+      el.className = 'alert ' + type;
       el.textContent = msg;
-      el.style.display = 'block';
-      setTimeout(() => { el.style.display = 'none'; }, 4500);
-    }
-
-    function escapeHtml(s) {
-      const text = String(s ?? '');
-      return text.replace(/[&<>"']/g, (ch) => {
-        if (ch === '&') return '&amp;';
-        if (ch === '<') return '&lt;';
-        if (ch === '>') return '&gt;';
-        if (ch === '"') return '&quot;';
-        return '&#39;';
-      });
-    }
-
-    // FIX: Use a WeakMap-style store keyed by numeric index to avoid HTML attribute injection
-    const ROW_STORE = {};
-    let rowStoreIdx = 0;
-    function storeRow(obj) {
-      const key = 'r' + (++rowStoreIdx);
-      ROW_STORE[key] = obj;
-      return key;
-    }
-    function getRow(key) {
-      return ROW_STORE[key] || null;
+      setTimeout(() => { el.className = 'alert'; el.textContent = ''; }, 5000);
     }
 
     function tagHTML(st) {
-      const s = (st || '').toUpperCase();
-      if (s === 'PAID') return '<span class="tag paid">PAID</span>';
-      if (s === 'FAILED') return '<span class="tag failed">FAILED</span>';
-      if (s === 'VERIFYING') return '<span class="tag verify">VERIFYING</span>';
-      return '<span class="tag pending">PENDING</span>';
+      const s = (st||'').toUpperCase();
+      const map = {
+        'PAID':      'paid',
+        'SUCCESS':   'success',
+        'FAILED':    'failed',
+        'VERIFYING': 'verify',
+        'PENDING':   'pending'
+      };
+      const cls = map[s] || 'pending';
+      return `<span class="tag ${cls}">${escapeHtml(st||'PENDING')}</span>`;
     }
 
-    function openPage(p) { window.open(p, '_blank'); }
+    function activeTag(v) {
+      return v ? '<span class="tag active">Active</span>' : '<span class="tag inactive">Inactive</span>';
+    }
 
+    /* ════ SIDEBAR ════ */
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+    function closeSidebar() {
+      document.getElementById('sidebar').classList.remove('open');
+      document.getElementById('sidebarOverlay').classList.remove('active');
+    }
+
+    /* ════ VIEW SWITCHING ════ */
+    const VIEW_META = {
+      'view-dashboard': { title: 'Dashboard',     sub: 'Overview of your store' },
+      'view-products':  { title: 'Products',       sub: 'Manage products.html catalogue' },
+      'view-shop':      { title: 'Shop Items',     sub: 'Manage shop.html listings' },
+      'view-packs':     { title: 'Pack Pricing',   sub: 'Set pack sizes and prices' },
+      'view-orders':    { title: 'Orders',         sub: 'All customer orders' },
+      'view-payments':  { title: 'Payments',       sub: 'Receipts and payment status' },
+      'view-settings':  { title: 'Settings',       sub: 'Site configuration' },
+    };
+
+    function switchView(id) {
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      const target = document.getElementById(id);
+      if (target) target.classList.add('active');
+
+      document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`.sidebar-menu a[data-view="${id}"]`);
+      if (active) active.classList.add('active');
+
+      const meta = VIEW_META[id] || {};
+      document.getElementById('topbarTitle').textContent = meta.title || '';
+      document.getElementById('topbarSub').textContent   = meta.sub   || '';
+
+      closeSidebar();
+
+      if (id === 'view-dashboard') loadDashboard();
+      if (id === 'view-products')  refreshProducts();
+      if (id === 'view-shop')      refreshShop();
+      if (id === 'view-packs')     { loadShopItemsForPackSelect(); loadPacksForItem(); }
+      if (id === 'view-orders')    refreshOrders();
+      if (id === 'view-payments')  refreshPayments();
+      if (id === 'view-settings')  loadBrochure();
+    }
+
+    /* ════ AUTH ════ */
     function showLoginView() {
       document.getElementById('loadingOverlay').style.display = 'none';
-      document.getElementById('topActions').style.display = 'none';
       document.getElementById('appView').style.display = 'none';
       document.getElementById('loginView').style.display = 'flex';
     }
@@ -770,83 +1435,34 @@
       document.getElementById('loadingOverlay').style.display = 'none';
       document.getElementById('loginView').style.display = 'none';
       document.getElementById('appView').style.display = 'block';
-      document.getElementById('topActions').style.display = 'flex';
     }
 
     async function parseApiError(r) {
       const ct = r.headers.get('content-type') || '';
       if (ct.includes('application/json')) {
         try {
-          const payload = await r.json();
-          if (payload && typeof payload === 'object') {
-            return payload.error || payload.message || `Request failed (${r.status})`;
-          }
+          const p = await r.json();
+          return p?.error || p?.message || `Request failed (${r.status})`;
         } catch {}
       }
-      try {
-        const txt = (await r.text()).trim();
-        return txt || `Request failed (${r.status})`;
-      } catch {
-        return `Request failed (${r.status})`;
-      }
+      try { return (await r.text()).trim() || `Request failed (${r.status})`; } catch {}
+      return `Request failed (${r.status})`;
     }
 
     async function api(url, opts = {}) {
       const r = await fetch(API_BASE + url, { credentials: 'include', ...opts });
       if (!r.ok) throw new Error(await parseApiError(r));
       const ct = r.headers.get('content-type');
-      if (ct && ct.includes('application/json')) return r.json();
-      return r.text();
+      return ct?.includes('application/json') ? r.json() : r.text();
     }
-
-    function receiptUrl(p) {
-      const rp = String(p?.receiptpath || '').trim();
-      if (!rp) return '';
-      if (rp.startsWith('assets/')) return '../' + rp;
-      if (rp.startsWith('/assets')) return '..' + rp;
-      if (rp.startsWith('receipts/')) return '../assets/' + rp;
-      return '../assets/receipts/' + rp;
-    }
-
-    function openModal(src) {
-      const img = document.getElementById('modalImg');
-      const pdf = document.getElementById('modalPdf');
-      const isPdf = String(src || '').toLowerCase().endsWith('.pdf');
-      if (isPdf) {
-        img.style.display = 'none'; pdf.style.display = 'block'; pdf.src = src;
-      } else {
-        pdf.style.display = 'none'; img.style.display = 'block'; img.src = src;
-      }
-      document.getElementById('imgModal').style.display = 'block';
-    }
-
-    function closeModal() {
-      document.getElementById('imgModal').style.display = 'none';
-      document.getElementById('modalImg').src = '';
-      document.getElementById('modalPdf').src = '';
-    }
-
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
-
-    // FIX: Use ROW_STORE keys instead of encoded JSON in HTML attributes
-    document.addEventListener('click', (e) => {
-      const pBtn = e.target.closest('button[data-edit-product]');
-      if (pBtn) { const row = getRow(pBtn.dataset.editProduct); if (row) fillProductsForm(row); return; }
-      const sBtn = e.target.closest('button[data-edit-shop]');
-      if (sBtn) { const row = getRow(sBtn.dataset.editShop); if (row) fillShopForm(row); return; }
-      const packBtn = e.target.closest('button[data-edit-pack]');
-      if (packBtn) { const row = getRow(packBtn.dataset.editPack); if (row) fillPackForm(row); }
-    });
 
     async function login() {
       const username = document.getElementById('loginUser').value.trim();
-      // FIX: Do NOT trim password — spaces are valid password characters
       const password = document.getElementById('loginPass').value;
-      const st = document.getElementById('loginStatus');
+      const st  = document.getElementById('loginStatus');
       const btn = document.getElementById('loginBtn');
       st.style.display = 'none';
-      btn.disabled = true;
-      btn.textContent = 'Logging in...';
+      btn.disabled = true; btn.textContent = 'Signing in...';
       try {
         await api('/admin/login', {
           method: 'POST',
@@ -854,13 +1470,11 @@
           body: JSON.stringify({ username, password })
         });
         await boot();
-      } catch (e) {
-        st.className = 'status err';
-        st.textContent = 'Login failed: ' + (e.message || e);
+      } catch(e) {
+        st.className = 'err'; st.textContent = '❌ ' + (e.message || 'Login failed');
         st.style.display = 'block';
       } finally {
-        btn.disabled = false;
-        btn.textContent = 'Login';
+        btn.disabled = false; btn.textContent = '🔐 Sign In';
       }
     }
 
@@ -869,67 +1483,144 @@
       showLoginView();
     }
 
-    function switchView(id) {
-      // FIX: Only hide/show sections inside #appView, not the login card
-      document.querySelectorAll('#appView .card').forEach(s => s.style.display = 'none');
-      const target = document.getElementById(id);
-      if (target) target.style.display = 'block';
-      document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
-      const active = document.querySelector(`.nav a[data-view="${id}"]`);
-      if (active) active.classList.add('active');
-
-      if (id === 'view-products') refreshProducts();
-      if (id === 'view-shop') refreshShop();
-      if (id === 'view-packs') { loadShopItemsForPackSelect(); loadPacksForItem(); }
-      if (id === 'view-orders') refreshOrders();
-      if (id === 'view-payments') refreshPayments();
-      if (id === 'view-settings') loadBrochure();
-    }
-
-    async function uploadFor(fileInputId, targetInputId, statusId) {
-      const fileInput = document.getElementById(fileInputId);
-      const target = document.getElementById(targetInputId);
-      const statusEl = document.getElementById(statusId);
-      if (!fileInput?.files?.length) {
-        if (statusEl) statusEl.textContent = '⚠️ Choose a file first.';
-        return;
-      }
+    async function boot() {
       try {
-        if (statusEl) statusEl.textContent = '⏳ Uploading...';
-        const fd = new FormData();
-        fd.append('file', fileInput.files[0]);
-        const res = await fetch(API_BASE + '/admin/upload', {
-          method: 'POST', credentials: 'include', body: fd
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const data = await res.json();
-        target.value = data.path;
-        if (statusEl) statusEl.textContent = `✅ Uploaded: ${data.path}`;
-      } catch (e) {
-        if (statusEl) statusEl.textContent = '❌ Upload failed: ' + (e.message || e);
+        const me = await api('/admin/me');
+        if (!me.loggedIn) throw new Error('Not logged in');
+        showAppView();
+        switchView('view-dashboard');
+      } catch {
+        showLoginView();
       }
     }
 
-    async function uploadBrochure() {
-      await uploadFor('brochurefile', 'brochureurl', 'brochureuploadstatus');
+    /* ════ API helpers ════ */
+    async function uploadFor(fileInputId, targetInputId, statusId) {
+      const fi = document.getElementById(fileInputId);
+      const ti = document.getElementById(targetInputId);
+      const si = document.getElementById(statusId);
+      if (!fi?.files?.length) { if(si) si.textContent='⚠️ Choose a file first.'; return; }
+      try {
+        if(si) si.textContent='⏳ Uploading...';
+        const fd = new FormData();
+        fd.append('file', fi.files[0]);
+        const res = await fetch(API_BASE+'/admin/upload', { method:'POST', credentials:'include', body:fd });
+        if(!res.ok) throw new Error(await res.text());
+        const data = await res.json();
+        ti.value = data.path;
+        if(si) si.textContent = '✅ Uploaded: '+data.path;
+      } catch(e) {
+        if(si) si.textContent = '❌ Upload failed: '+(e.message||e);
+      }
     }
 
+    async function uploadBrochure() { await uploadFor('brochurefile','brochureurl','brochureuploadstatus'); }
+
+    /* ════ MODAL ════ */
+    function openModal(src) {
+      const img = document.getElementById('modalImg');
+      const pdf = document.getElementById('modalPdf');
+      const isPdf = String(src||'').toLowerCase().endsWith('.pdf');
+      if(isPdf) { img.style.display='none'; pdf.style.display='block'; pdf.src=src; }
+      else       { pdf.style.display='none'; img.style.display='block'; img.src=src; }
+      document.getElementById('imgModal').style.display='block';
+    }
+    function closeModal() {
+      document.getElementById('imgModal').style.display='none';
+      document.getElementById('modalImg').src='';
+      document.getElementById('modalPdf').src='';
+    }
+    document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+    /* ════ ROW STORE CLICK DELEGATION ════ */
+    document.addEventListener('click', e => {
+      const pBtn = e.target.closest('button[data-edit-product]');
+      if(pBtn) { const r=getRow(pBtn.dataset.editProduct); if(r) fillProductsForm(r); return; }
+      const sBtn = e.target.closest('button[data-edit-shop]');
+      if(sBtn) { const r=getRow(sBtn.dataset.editShop); if(r) fillShopForm(r); return; }
+      const pkBtn = e.target.closest('button[data-edit-pack]');
+      if(pkBtn) { const r=getRow(pkBtn.dataset.editPack); if(r) fillPackForm(r); }
+    });
+
+    /* ════ RECEIPT URL ════ */
+    function receiptUrl(p) {
+      const rp = String(p?.receiptpath||'').trim();
+      if(!rp) return '';
+      if(rp.startsWith('assets/')) return '../'+rp;
+      if(rp.startsWith('/assets'))  return '..'+rp;
+      if(rp.startsWith('receipts/'))return '../assets/'+rp;
+      return '../assets/receipts/'+rp;
+    }
+
+    /* ════ DASHBOARD ════ */
+    async function loadDashboard() {
+      try {
+        const [products, shopitems, orders, payments] = await Promise.allSettled([
+          api('/admin/products-page'),
+          api('/admin/shop-items'),
+          api('/admin/orders'),
+          api('/admin/payments')
+        ]);
+
+        const p  = products.value  || [];
+        const s  = shopitems.value || [];
+        const o  = orders.value    || [];
+        const py = payments.value  || [];
+
+        const pending = o.filter(x => (x.paymentstatus||'').toUpperCase() === 'PENDING').length;
+
+        document.getElementById('ds-products').textContent  = p.length;
+        document.getElementById('ds-shopitems').textContent = s.length;
+        document.getElementById('ds-orders').textContent    = o.length;
+        document.getElementById('ds-pending').textContent   = pending;
+        document.getElementById('ds-payments').textContent  = py.length;
+        document.getElementById('sidebarOrderBadge').textContent = pending;
+
+        // Recent 5 orders
+        const tb = document.getElementById('dashRecentOrders');
+        tb.innerHTML = '';
+        const recent = [...o].reverse().slice(0, 5);
+        if(!recent.length) {
+          tb.innerHTML = '<tr><td colspan="6" class="table-empty"><div class="empty-icon">📭</div>No orders yet</td></tr>';
+        } else {
+          recent.forEach(ord => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><b>#${ord.id}</b></td>
+              <td>
+                <div style="font-weight:600;">${escapeHtml(ord.customername)}</div>
+                <div style="font-size:11px;color:var(--muted);">${escapeHtml(ord.email)}</div>
+              </td>
+              <td>${escapeHtml(ord.productname)}</td>
+              <td><b>₹${Number(ord.totalprice||0).toLocaleString('en-IN')}</b></td>
+              <td>${tagHTML(ord.paymentstatus)}</td>
+              <td style="font-size:12px;color:var(--muted);">${escapeHtml(ord.createdat||'—')}</td>
+            `;
+            tb.appendChild(tr);
+          });
+        }
+      } catch(e) {
+        console.error('Dashboard load error', e);
+      }
+    }
+
+    /* ════ PRODUCTS ════ */
     function clearProductsForm() {
-      ['pid','pname','pdesc','pimage','plink'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('pactive').value = '1';
-      document.getElementById('psort').value = '0';
+      ['pid','pname','pdesc','pimage','plink'].forEach(id => document.getElementById(id).value='');
+      document.getElementById('pactive').value='1';
+      document.getElementById('psort').value='0';
     }
 
     function fillProductsForm(r) {
-      document.getElementById('pid').value = r.id ?? '';
-      document.getElementById('pactive').value = String(r.is_active ?? 1);
-      document.getElementById('pname').value = r.name ?? '';
-      document.getElementById('pdesc').value = r.description ?? '';
+      document.getElementById('pid').value    = r.id ?? '';
+      document.getElementById('pactive').value= String(r.is_active ?? 1);
+      document.getElementById('pname').value  = r.name ?? '';
+      document.getElementById('pdesc').value  = r.description ?? '';
       document.getElementById('pimage').value = r.image ?? '';
-      document.getElementById('plink').value = r.link ?? '';
-      document.getElementById('psort').value = r.sort_order ?? 0;
+      document.getElementById('plink').value  = r.link ?? '';
+      document.getElementById('psort').value  = r.sort_order ?? 0;
       switchView('view-products');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top:0, behavior:'smooth' });
     }
 
     async function refreshProducts() {
@@ -937,195 +1628,175 @@
         const rows = await api('/admin/products-page');
         const tb = document.getElementById('ptable');
         tb.innerHTML = '';
+        if(!rows.length) {
+          tb.innerHTML='<tr><td colspan="8" class="table-empty"><div class="empty-icon">📦</div>No products yet</td></tr>';
+          return;
+        }
         rows.forEach(r => {
-          // FIX: Use ROW_STORE instead of encoding JSON in attribute
           const key = storeRow(r);
-          const tr = document.createElement('tr');
+          const tr  = document.createElement('tr');
           tr.innerHTML = `
             <td><b>${r.id}</b></td>
-            <td>${r.is_active ? '✅ Yes' : '❌ No'}</td>
-            <td>${escapeHtml(r.name)}</td>
-            <td><span class="muted">${escapeHtml(r.link)}</span></td>
-            <td>${r.image ? `<a href="../${escapeHtml(r.image)}" target="_blank" style="color:var(--accent);font-weight:600;">View</a>` : '—'}</td>
-            <td>${r.sort_order ?? 0}</td>
-            <td><button class="btn ghost small" data-edit-product="${key}">✏️ Edit</button></td>
+            <td>${activeTag(r.is_active)}</td>
+            <td><b>${escapeHtml(r.name)}</b></td>
+            <td style="max-width:200px;color:var(--muted);font-size:12px;">${escapeHtml(r.description||'—')}</td>
+            <td style="font-size:12px;color:var(--muted);">${escapeHtml(r.link||'—')}</td>
+            <td>${r.image ? `<img class="thumb" src="../${escapeHtml(r.image)}" alt="" onclick="openModal('../${escapeHtml(r.image)}')">` : '—'}</td>
+            <td>${r.sort_order??0}</td>
+            <td><button class="btn secondary sm" data-edit-product="${key}">✏️ Edit</button></td>
           `;
           tb.appendChild(tr);
         });
-      } catch (e) {
-        showStatus('pstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('pstatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function saveProduct() {
       try {
         const id = document.getElementById('pid').value.trim();
         const payload = {
-          isactive: Number(document.getElementById('pactive').value),
-          name: document.getElementById('pname').value.trim(),
+          isactive:  Number(document.getElementById('pactive').value),
+          name:      document.getElementById('pname').value.trim(),
           description: document.getElementById('pdesc').value.trim(),
-          image: document.getElementById('pimage').value.trim(),
-          link: document.getElementById('plink').value.trim(),
-          sortorder: Number(document.getElementById('psort').value || 0),
+          image:     document.getElementById('pimage').value.trim(),
+          link:      document.getElementById('plink').value.trim(),
+          sortorder: Number(document.getElementById('psort').value||0),
         };
-        if (!payload.name) return showStatus('pstatus', 'err', '❌ Name required.');
-        if (id) {
-          await api(`/admin/products-page/${id}`, {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          showStatus('pstatus', 'ok', `✅ Updated product #${id}`);
+        if(!payload.name) return showAlert('pstatus','err','❌ Name is required.');
+        if(id) {
+          await api(`/admin/products-page/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+          showAlert('pstatus','ok',`✅ Product #${id} updated`);
         } else {
-          await api('/admin/products-page', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          showStatus('pstatus', 'ok', '✅ Created product');
+          await api('/admin/products-page', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+          showAlert('pstatus','ok','✅ Product created');
         }
         await refreshProducts();
-      } catch (e) {
-        showStatus('pstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('pstatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function deleteProduct() {
       const id = document.getElementById('pid').value.trim();
-      if (!id) return showStatus('pstatus', 'err', '❌ Enter ID to delete.');
-      if (!confirm(`Delete product #${id}?`)) return;
+      if(!id) return showAlert('pstatus','err','❌ Enter an ID to delete.');
+      if(!confirm(`Delete product #${id}?`)) return;
       try {
-        await api(`/admin/products-page/${id}`, { method: 'DELETE' });
-        showStatus('pstatus', 'ok', `✅ Deleted product #${id}`);
-        clearProductsForm();
-        await refreshProducts();
-      } catch (e) {
-        showStatus('pstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+        await api(`/admin/products-page/${id}`, { method:'DELETE' });
+        showAlert('pstatus','ok',`✅ Deleted product #${id}`);
+        clearProductsForm(); await refreshProducts();
+      } catch(e) { showAlert('pstatus','err','❌ Error: '+(e.message||e)); }
     }
 
+    /* ════ SHOP ITEMS ════ */
     function clearShopForm() {
-      ['sid','sname','ssubtitle','sfeatures','sprice','sbadge','smore','simage'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('sactive').value = '1';
-      document.getElementById('sstock').value = 'in-stock';
-      document.getElementById('sshowbadge').value = '0';
-      document.getElementById('ssort').value = '0';
+      ['sid','sname','ssubtitle','sfeatures','sprice','sbadge','smore','simage'].forEach(id => document.getElementById(id).value='');
+      document.getElementById('sactive').value='1';
+      document.getElementById('sstock').value='in-stock';
+      document.getElementById('sshowbadge').value='0';
+      document.getElementById('ssort').value='0';
     }
 
     function fillShopForm(r) {
-      document.getElementById('sid').value = r.id ?? '';
-      document.getElementById('sactive').value = String(r.is_active ?? 1);
-      document.getElementById('sname').value = r.name ?? '';
-      document.getElementById('ssubtitle').value = r.subtitle ?? '';
+      document.getElementById('sid').value       = r.id ?? '';
+      document.getElementById('sactive').value   = String(r.is_active??1);
+      document.getElementById('sname').value     = r.name??'';
+      document.getElementById('ssubtitle').value = r.subtitle??'';
       const feats = (() => {
-        try {
-          const arr = Array.isArray(r.features) ? r.features : JSON.parse(r.features_json || '[]');
-          return arr.join('\n');
-        } catch { return ''; }
+        try { const a = Array.isArray(r.features)?r.features:JSON.parse(r.features_json||'[]'); return a.join('\n'); }
+        catch{ return ''; }
       })();
-      document.getElementById('sfeatures').value = feats;
-      document.getElementById('sprice').value = r.price ?? 0;
-      document.getElementById('sstock').value = r.stockStatus || 'in-stock';
-      document.getElementById('sshowbadge').value = String(r.showBadge ?? 0);
-      document.getElementById('sbadge').value = r.badge ?? '';
-      document.getElementById('smore').value = r.moreLink ?? '';
-      document.getElementById('simage').value = r.image ?? '';
-      document.getElementById('ssort').value = r.sort_order ?? 0;
+      document.getElementById('sfeatures').value  = feats;
+      document.getElementById('sprice').value     = r.price??0;
+      document.getElementById('sstock').value     = r.stockStatus||'in-stock';
+      document.getElementById('sshowbadge').value = String(r.showBadge??0);
+      document.getElementById('sbadge').value     = r.badge??'';
+      document.getElementById('smore').value      = r.moreLink??'';
+      document.getElementById('simage').value     = r.image??'';
+      document.getElementById('ssort').value      = r.sort_order??0;
       switchView('view-shop');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      window.scrollTo({ top:0, behavior:'smooth' });
     }
 
     async function refreshShop() {
       try {
         const rows = await api('/admin/shop-items');
         const tb = document.getElementById('stable');
-        tb.innerHTML = '';
+        tb.innerHTML='';
+        if(!rows.length) {
+          tb.innerHTML='<tr><td colspan="9" class="table-empty"><div class="empty-icon">🛒</div>No shop items yet</td></tr>';
+          return;
+        }
         rows.forEach(r => {
           const key = storeRow(r);
-          const tr = document.createElement('tr');
+          const tr  = document.createElement('tr');
           tr.innerHTML = `
             <td><b>${r.id}</b></td>
-            <td>${r.is_active ? '✅ Yes' : '❌ No'}</td>
-            <td>${escapeHtml(r.name)}</td>
-            <td><b>₹${Number(r.price || 0).toLocaleString('en-IN')}</b></td>
-            <td>${escapeHtml(r.stockStatus)}</td>
-            <td>${r.image ? `<a href="../${escapeHtml(r.image)}" target="_blank" style="color:var(--accent);font-weight:600;">View</a>` : '—'}</td>
-            <td>${r.sort_order ?? 0}</td>
-            <td><button class="btn ghost small" data-edit-shop="${key}">✏️ Edit</button></td>
+            <td>${activeTag(r.is_active)}</td>
+            <td><b>${escapeHtml(r.name)}</b></td>
+            <td style="font-size:12px;color:var(--muted);">${escapeHtml(r.subtitle||'—')}</td>
+            <td><b>₹${Number(r.price||0).toLocaleString('en-IN')}</b></td>
+            <td>${escapeHtml(r.stockStatus||'—')}</td>
+            <td>${r.image?`<img class="thumb" src="../${escapeHtml(r.image)}" alt="" onclick="openModal('../${escapeHtml(r.image)}')">` : '—'}</td>
+            <td>${r.sort_order??0}</td>
+            <td><button class="btn secondary sm" data-edit-shop="${key}">✏️ Edit</button></td>
           `;
           tb.appendChild(tr);
         });
-      } catch (e) {
-        showStatus('sstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('sstatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function saveShop() {
       try {
-        const id = document.getElementById('sid').value.trim();
-        const features = document.getElementById('sfeatures').value.split('\n').map(x => x.trim()).filter(Boolean);
-        const payload = {
-          isactive: Number(document.getElementById('sactive').value),
-          name: document.getElementById('sname').value.trim(),
-          subtitle: document.getElementById('ssubtitle').value.trim(),
+        const id       = document.getElementById('sid').value.trim();
+        const features = document.getElementById('sfeatures').value.split('\n').map(x=>x.trim()).filter(Boolean);
+        const payload  = {
+          isactive:    Number(document.getElementById('sactive').value),
+          name:        document.getElementById('sname').value.trim(),
+          subtitle:    document.getElementById('ssubtitle').value.trim(),
           features,
-          price: Number(document.getElementById('sprice').value || 0),
+          price:       Number(document.getElementById('sprice').value||0),
           stockStatus: document.getElementById('sstock').value,
-          showBadge: Number(document.getElementById('sshowbadge').value),
-          badge: document.getElementById('sbadge').value.trim(),
-          moreLink: document.getElementById('smore').value.trim(),
-          image: document.getElementById('simage').value.trim(),
-          sortorder: Number(document.getElementById('ssort').value || 0),
+          showBadge:   Number(document.getElementById('sshowbadge').value),
+          badge:       document.getElementById('sbadge').value.trim(),
+          moreLink:    document.getElementById('smore').value.trim(),
+          image:       document.getElementById('simage').value.trim(),
+          sortorder:   Number(document.getElementById('ssort').value||0),
         };
-        if (!payload.name) return showStatus('sstatus', 'err', '❌ Name required.');
-        if (id) {
-          await api(`/admin/shop-items/${id}`, {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          showStatus('sstatus', 'ok', `✅ Updated shop item #${id}`);
+        if(!payload.name) return showAlert('sstatus','err','❌ Name is required.');
+        if(id) {
+          await api(`/admin/shop-items/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+          showAlert('sstatus','ok',`✅ Shop item #${id} updated`);
         } else {
-          await api('/admin/shop-items', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          showStatus('sstatus', 'ok', '✅ Created shop item');
+          await api('/admin/shop-items', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+          showAlert('sstatus','ok','✅ Shop item created');
         }
         await refreshShop();
-      } catch (e) {
-        showStatus('sstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('sstatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function deleteShop() {
       const id = document.getElementById('sid').value.trim();
-      if (!id) return showStatus('sstatus', 'err', '❌ Enter ID to delete.');
-      if (!confirm(`Delete shop item #${id}?`)) return;
+      if(!id) return showAlert('sstatus','err','❌ Enter an ID to delete.');
+      if(!confirm(`Delete shop item #${id}?`)) return;
       try {
-        await api(`/admin/shop-items/${id}`, { method: 'DELETE' });
-        showStatus('sstatus', 'ok', `✅ Deleted shop item #${id}`);
-        clearShopForm();
-        await refreshShop();
-      } catch (e) {
-        showStatus('sstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+        await api(`/admin/shop-items/${id}`, { method:'DELETE' });
+        showAlert('sstatus','ok',`✅ Deleted shop item #${id}`);
+        clearShopForm(); await refreshShop();
+      } catch(e) { showAlert('sstatus','err','❌ Error: '+(e.message||e)); }
     }
 
+    /* ════ PACK PRICING ════ */
     async function loadShopItemsForPackSelect() {
       try {
         const rows = await api('/admin/shop-items');
-        const select = document.getElementById('packShopItemSelect');
-        const prev = select.value;
-        select.innerHTML = '<option value="">-- Select Product --</option>';
+        const sel  = document.getElementById('packShopItemSelect');
+        const prev = sel.value;
+        sel.innerHTML = '<option value="">— Select a product —</option>';
         rows.forEach(r => {
           const opt = document.createElement('option');
           opt.value = r.id;
           opt.textContent = `${r.name} (ID: ${r.id})`;
-          select.appendChild(opt);
+          sel.appendChild(opt);
         });
-        // FIX: Restore previous selection after refresh
-        if (prev) select.value = prev;
-      } catch (e) {
-        showStatus('packstatus', 'err', '❌ Error loading shop items');
-      }
+        if(prev) sel.value = prev;
+      } catch(e) { showAlert('packstatus','err','❌ Could not load shop items'); }
     }
 
     function clearPackForm() {
@@ -1137,129 +1808,111 @@
     }
 
     function fillPackForm(p) {
-      document.getElementById('packId').value = p.id ?? '';
-      document.getElementById('packActive').value = String(p.is_active ?? 1);
-      document.getElementById('packSize').value = p.pack_size ?? '';
-      document.getElementById('packOurPrice').value = p.our_price ?? 0;
-      document.getElementById('packSort').value = p.sort_order ?? 0;
-      document.getElementById('packFormSection').style.display = 'block';
-      window.scrollTo({ top: document.getElementById('packFormSection').offsetTop - 100, behavior: 'smooth' });
+      document.getElementById('packId').value       = p.id??'';
+      document.getElementById('packActive').value   = String(p.is_active??1);
+      document.getElementById('packSize').value     = p.pack_size??'';
+      document.getElementById('packOurPrice').value = p.our_price??0;
+      document.getElementById('packSort').value     = p.sort_order??0;
+      document.getElementById('packFormSection').style.display='block';
+      window.scrollTo({ top: document.getElementById('packFormSection').offsetTop - 80, behavior:'smooth' });
     }
 
     async function loadPacksForItem() {
       const shopItemId = document.getElementById('packShopItemSelect').value;
-      const formSection = document.getElementById('packFormSection');
-      const tableWrap = document.getElementById('packsTableWrap');
-      const emptyMsg = document.getElementById('packsEmpty');
+      const fs = document.getElementById('packFormSection');
+      const tw = document.getElementById('packsTableWrap');
+      const em = document.getElementById('packsEmpty');
 
-      if (!shopItemId) {
-        formSection.style.display = 'none';
-        tableWrap.style.display = 'none';
-        emptyMsg.style.display = 'block';
-        emptyMsg.textContent = 'Select a shop item to manage its pack pricing';
+      if(!shopItemId) {
+        fs.style.display='none'; tw.style.display='none'; em.style.display='block';
         return;
       }
 
-      formSection.style.display = 'block';
-      clearPackForm();
+      fs.style.display='block'; clearPackForm();
 
       try {
         const rows = await api(`/admin/pack-pricing/${shopItemId}`);
-        const tb = document.getElementById('packstable');
-        tb.innerHTML = '';
+        const tb   = document.getElementById('packstable');
+        tb.innerHTML='';
 
-        if (rows.length === 0) {
-          tableWrap.style.display = 'none';
-          emptyMsg.textContent = 'No packs defined yet for this item. Add packs below.';
-          emptyMsg.style.display = 'block';
+        if(!rows.length) {
+          tw.style.display='none'; em.style.display='block';
+          em.querySelector('.table-empty div:last-child').textContent='No packs yet for this item. Add one above.';
         } else {
-          emptyMsg.style.display = 'none';
-          tableWrap.style.display = 'block';
+          em.style.display='none'; tw.style.display='block';
           rows.forEach(p => {
             const key = storeRow(p);
-            const tr = document.createElement('tr');
+            const tr  = document.createElement('tr');
             tr.innerHTML = `
               <td><b>${p.id}</b></td>
-              <td>${p.is_active ? '✅ Yes' : '❌ No'}</td>
+              <td>${activeTag(p.is_active)}</td>
               <td><b>${escapeHtml(p.pack_size)}</b></td>
-              <td><b>₹${Number(p.our_price || 0).toLocaleString('en-IN')}</b></td>
-              <td>${p.sort_order ?? 0}</td>
-              <td><button class="btn ghost small" data-edit-pack="${key}">✏️ Edit</button></td>
+              <td><b>₹${Number(p.our_price||0).toLocaleString('en-IN')}</b></td>
+              <td>${p.sort_order??0}</td>
+              <td><button class="btn secondary sm" data-edit-pack="${key}">✏️ Edit</button></td>
             `;
             tb.appendChild(tr);
           });
         }
-      } catch (e) {
-        showStatus('packstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('packstatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function savePack() {
       try {
         const shopItemId = document.getElementById('packShopItemSelect').value;
-        if (!shopItemId) return showStatus('packstatus', 'err', '❌ Select a shop item first.');
-        const id = document.getElementById('packId').value.trim();
+        if(!shopItemId) return showAlert('packstatus','err','❌ Select a shop item first.');
+        const id      = document.getElementById('packId').value.trim();
         const payload = {
           shopItemId: Number(shopItemId),
-          packSize: document.getElementById('packSize').value.trim(),
-          ourPrice: Number(document.getElementById('packOurPrice').value || 0),
-          isActive: Number(document.getElementById('packActive').value),
-          sortOrder: Number(document.getElementById('packSort').value || 0),
+          packSize:   document.getElementById('packSize').value.trim(),
+          ourPrice:   Number(document.getElementById('packOurPrice').value||0),
+          isActive:   Number(document.getElementById('packActive').value),
+          sortOrder:  Number(document.getElementById('packSort').value||0),
         };
-        if (!payload.packSize) return showStatus('packstatus', 'err', '❌ Pack size required.');
-        if (id) {
-          await api(`/admin/pack-pricing/${id}`, {
-            method: 'PUT', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          showStatus('packstatus', 'ok', `✅ Updated pack #${id}`);
+        if(!payload.packSize) return showAlert('packstatus','err','❌ Pack size required.');
+        if(id) {
+          await api(`/admin/pack-pricing/${id}`, { method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+          showAlert('packstatus','ok',`✅ Pack #${id} updated`);
         } else {
-          await api('/admin/pack-pricing', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-          showStatus('packstatus', 'ok', '✅ Created pack');
+          await api('/admin/pack-pricing', { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+          showAlert('packstatus','ok','✅ Pack created');
         }
         await loadPacksForItem();
-      } catch (e) {
-        showStatus('packstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('packstatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function deletePack() {
       const id = document.getElementById('packId').value.trim();
-      if (!id) return showStatus('packstatus', 'err', '❌ Enter pack ID to delete.');
-      if (!confirm(`Delete pack #${id}?`)) return;
+      if(!id) return showAlert('packstatus','err','❌ Enter pack ID to delete.');
+      if(!confirm(`Delete pack #${id}?`)) return;
       try {
-        await api(`/admin/pack-pricing/${id}`, { method: 'DELETE' });
-        showStatus('packstatus', 'ok', `✅ Deleted pack #${id}`);
-        clearPackForm();
-        await loadPacksForItem();
-      } catch (e) {
-        showStatus('packstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+        await api(`/admin/pack-pricing/${id}`, { method:'DELETE' });
+        showAlert('packstatus','ok',`✅ Deleted pack #${id}`);
+        clearPackForm(); await loadPacksForItem();
+      } catch(e) { showAlert('packstatus','err','❌ Error: '+(e.message||e)); }
     }
 
+    /* ════ ORDERS ════ */
     async function refreshOrders() {
       try {
         ORDERS_CACHE = await api('/admin/orders');
         applyOrderFilters();
-      } catch (e) {
-        showStatus('ostatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('ostatus','err','❌ Error: '+(e.message||e)); }
     }
 
     function applyOrderFilters() {
-      const q = document.getElementById('orderSearch').value.trim().toLowerCase();
-      const st = document.getElementById('orderStatusFilter').value.trim().toUpperCase();
+      const q  = document.getElementById('orderSearch').value.trim().toLowerCase();
+      const st = document.getElementById('orderStatusFilter').value.toUpperCase();
       const rows = ORDERS_CACHE.filter(o => {
-        const hay = [o.id, o.customername, o.email, o.phone, o.productname, o.city, o.region, o.pincode, o.address, o.paymentstatus, o.companyName].join(' ').toLowerCase();
-        const okQ = !q || hay.includes(q);
-        const okSt = !st || String(o.paymentstatus).toUpperCase() === st;
-        return okQ && okSt;
+        const hay = [o.id,o.customername,o.email,o.phone,o.productname,o.city,o.region,o.pincode,o.address,o.paymentstatus,o.companyName].join(' ').toLowerCase();
+        return (!q || hay.includes(q)) && (!st || String(o.paymentstatus).toUpperCase()===st);
       });
       const tb = document.getElementById('otable');
-      tb.innerHTML = '';
+      tb.innerHTML='';
+      if(!rows.length) {
+        tb.innerHTML='<tr><td colspan="14" class="table-empty"><div class="empty-icon">📭</div>No orders match</td></tr>';
+        return;
+      }
       rows.forEach(o => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
@@ -1267,163 +1920,142 @@
           <td>${tagHTML(o.paymentstatus)}</td>
           <td>
             <div style="font-weight:600;">${escapeHtml(o.customername)}</div>
-            <div class="muted" style="font-size:12px;">${escapeHtml(o.email)}</div>
+            <div style="font-size:11px;color:var(--muted);">${escapeHtml(o.email)}</div>
           </td>
-          <td>${escapeHtml(o.companyName || '—')}</td>
+          <td style="font-size:12px;">${escapeHtml(o.companyName||'—')}</td>
           <td>${escapeHtml(o.productname)}</td>
-          <td><b>${Number(o.quantity || 0)} packs</b></td>
-          <td><b>₹${Number(o.totalprice || 0).toLocaleString('en-IN')}</b></td>
-          <td>${escapeHtml(o.phone)}</td>
-          <td style="max-width:200px;"><span class="muted">${escapeHtml(o.address || '—')}</span></td>
-          <td>${escapeHtml(o.city || '—')}</td>
-          <td>${escapeHtml(o.region || '—')}</td>
-          <td>${escapeHtml(o.pincode || '—')}</td>
-          <td class="muted" style="font-size:12px;">${escapeHtml(o.createdat)}</td>
-          <td><button class="btn danger small" onclick="deleteOrder(${o.id})">🗑️</button></td>
+          <td><b>${Number(o.quantity||0)} packs</b></td>
+          <td><b>₹${Number(o.totalprice||0).toLocaleString('en-IN')}</b></td>
+          <td style="font-size:12px;">${escapeHtml(o.phone)}</td>
+          <td style="font-size:12px;">${escapeHtml(o.city||'—')}</td>
+          <td style="font-size:12px;">${escapeHtml(o.region||'—')}</td>
+          <td style="font-size:12px;">${escapeHtml(o.pincode||'—')}</td>
+          <td style="max-width:180px;font-size:12px;color:var(--muted);">${escapeHtml(o.address||'—')}</td>
+          <td style="font-size:11px;color:var(--muted);white-space:nowrap;">${escapeHtml(o.createdat||'—')}</td>
+          <td><button class="btn danger sm" onclick="deleteOrder(${o.id})">🗑️ Del</button></td>
         `;
         tb.appendChild(tr);
       });
     }
 
     function clearOrderFilters() {
-      document.getElementById('orderSearch').value = '';
-      document.getElementById('orderStatusFilter').value = '';
+      document.getElementById('orderSearch').value='';
+      document.getElementById('orderStatusFilter').value='';
       applyOrderFilters();
     }
 
     async function deleteOrder(id) {
-      if (!confirm(`Delete order #${id}?`)) return;
+      if(!confirm(`Delete order #${id}?`)) return;
       try {
-        await api(`/admin/orders/${id}`, { method: 'DELETE' });
-        showStatus('ostatus', 'ok', `✅ Deleted order #${id}`);
+        await api(`/admin/orders/${id}`, { method:'DELETE' });
+        showAlert('ostatus','ok',`✅ Deleted order #${id}`);
         await refreshOrders();
-      } catch (e) {
-        showStatus('ostatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('ostatus','err','❌ Error: '+(e.message||e)); }
     }
 
+    /* ════ PAYMENTS ════ */
     async function refreshPayments() {
       try {
         PAY_CACHE = await api('/admin/payments');
         applyPaymentFilters();
-      } catch (e) {
-        showStatus('paystatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('paystatus','err','❌ Error: '+(e.message||e)); }
     }
 
     function applyPaymentFilters() {
-      const q = document.getElementById('paySearch').value.trim().toLowerCase();
-      const recFilter = document.getElementById('receiptFilter').value;
-      const stFilter = document.getElementById('payStatusFilter').value.toUpperCase();
+      const q   = document.getElementById('paySearch').value.trim().toLowerCase();
+      const rf  = document.getElementById('receiptFilter').value;
+      const stf = document.getElementById('payStatusFilter').value.toUpperCase();
       const rows = PAY_CACHE.filter(p => {
-        const hay = [p.id, p.orderid, p.customername, p.email, p.phone].join(' ').toLowerCase();
-        const okQ = !q || hay.includes(q);
-        const hasRec = !!(p.receiptpath || '').trim();
-        const okRec = !recFilter || (recFilter === 'has' ? hasRec : !hasRec);
-        const okSt = !stFilter || String(p.status).toUpperCase() === stFilter;
-        return okQ && okRec && okSt;
+        const hay  = [p.id,p.orderid,p.customername,p.email,p.phone].join(' ').toLowerCase();
+        const hasR = !!(p.receiptpath||'').trim();
+        const okRec = !rf || (rf==='has'?hasR:!hasR);
+        return (!q||hay.includes(q)) && okRec && (!stf||String(p.status).toUpperCase()===stf);
       });
       const tb = document.getElementById('paytable');
-      tb.innerHTML = '';
+      tb.innerHTML='';
+      if(!rows.length) {
+        tb.innerHTML='<tr><td colspan="9" class="table-empty"><div class="empty-icon">💳</div>No payments match</td></tr>';
+        return;
+      }
       rows.forEach(p => {
-        const rec = receiptUrl(p);
-        const tr = document.createElement('tr');
-        const stars = Math.max(0, Math.min(5, Number(p.rating || 0)));
-        const isPdf = String(rec || '').toLowerCase().endsWith('.pdf');
-        // FIX: Use escapeHtml on rec to avoid XSS in image src
-        const safeRec = escapeHtml(rec);
+        const rec    = receiptUrl(p);
+        const safeR  = escapeHtml(rec);
+        const isPdf  = String(rec||'').toLowerCase().endsWith('.pdf');
+        const stars  = Math.max(0, Math.min(5, Number(p.rating||0)));
+        const tr     = document.createElement('tr');
         tr.innerHTML = `
           <td><b>#${p.id}</b></td>
           <td><b>#${p.orderid}</b></td>
           <td>${tagHTML(p.status)}</td>
-          <td><b>&#8377;${Number(p.amount || 0).toLocaleString('en-IN')}</b></td>
-          <td>${'\u2605'.repeat(stars)}</td>
+          <td><b>₹${Number(p.amount||0).toLocaleString('en-IN')}</b></td>
+          <td style="color:#f59e0b;">${'★'.repeat(stars)}${'☆'.repeat(5-stars)}</td>
           <td>${rec ? (isPdf
-            ? `<a href="${safeRec}" target="_blank" class="btn ghost small">View PDF</a>`
-            : `<img class="thumb" src="${safeRec}" alt="receipt" onclick="openModal('${safeRec}')">`
-          ) : '-'}</td>
-          <td style="max-width:200px;"><span class="muted">${escapeHtml(p.feedback || '-')}</span></td>
+              ? `<a href="${safeR}" target="_blank" class="btn secondary sm">📄 PDF</a>`
+              : `<img class="thumb" src="${safeR}" alt="receipt" onclick="openModal('${safeR}')">`)
+            : '<span style="color:var(--muted);font-size:12px;">None</span>'}</td>
+          <td style="max-width:180px;font-size:12px;color:var(--muted);">${escapeHtml(p.feedback||'—')}</td>
+          <td style="font-size:11px;color:var(--muted);white-space:nowrap;">${escapeHtml(p.createdat||'—')}</td>
           <td>
             <div class="actions-cell">
-              <button class="btn ghost small" onclick="markPayment(${p.id},'SUCCESS')">✅ OK</button>
-              <button class="btn danger small" onclick="markPayment(${p.id},'FAILED')">❌ FAIL</button>
-              <button class="btn danger small" onclick="deletePayment(${p.id})">🗑️ DEL</button>
+              <button class="btn success sm" onclick="markPayment(${p.id},'SUCCESS')">✅ OK</button>
+              <button class="btn danger sm"  onclick="markPayment(${p.id},'FAILED')">❌ Fail</button>
+              <button class="btn danger sm"  onclick="deletePayment(${p.id})">🗑️</button>
             </div>
           </td>
-          <td class="muted" style="font-size:12px;">${escapeHtml(p.createdat)}</td>
         `;
         tb.appendChild(tr);
       });
     }
 
     function clearPaymentFilters() {
-      document.getElementById('paySearch').value = '';
-      document.getElementById('receiptFilter').value = '';
-      document.getElementById('payStatusFilter').value = '';
+      document.getElementById('paySearch').value='';
+      document.getElementById('receiptFilter').value='';
+      document.getElementById('payStatusFilter').value='';
       applyPaymentFilters();
     }
 
     async function markPayment(id, status) {
       try {
         await api('/admin/payment-status', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId: id, status })
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ paymentId:id, status })
         });
-        showStatus('paystatus', 'ok', `✅ Marked payment #${id} as ${status}`);
+        showAlert('paystatus','ok',`✅ Payment #${id} marked ${status}`);
         await refreshPayments();
         await refreshOrders();
-      } catch (e) {
-        showStatus('paystatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('paystatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function deletePayment(id) {
-      if (!confirm(`Delete payment #${id}?`)) return;
+      if(!confirm(`Delete payment #${id}?`)) return;
       try {
-        await api(`/admin/payments/${id}`, { method: 'DELETE' });
-        showStatus('paystatus', 'ok', `✅ Deleted payment #${id}`);
+        await api(`/admin/payments/${id}`, { method:'DELETE' });
+        showAlert('paystatus','ok',`✅ Deleted payment #${id}`);
         await refreshPayments();
-      } catch (e) {
-        showStatus('paystatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+      } catch(e) { showAlert('paystatus','err','❌ Error: '+(e.message||e)); }
     }
 
+    /* ════ SETTINGS ════ */
     async function loadBrochure() {
       try {
         const data = await api('/site/brochure');
-        document.getElementById('brochureurl').value = data.url || '';
-      } catch (e) {
-        showStatus('setstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+        document.getElementById('brochureurl').value = data.url||'';
+      } catch(e) { showAlert('setstatus','err','❌ Error: '+(e.message||e)); }
     }
 
     async function saveBrochure() {
       try {
         const url = document.getElementById('brochureurl').value.trim();
         await api('/admin/brochure', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ url })
         });
-        showStatus('setstatus', 'ok', '✅ Brochure URL saved');
-      } catch (e) {
-        showStatus('setstatus', 'err', '❌ Error: ' + (e.message || e));
-      }
+        showAlert('setstatus','ok','✅ Brochure URL saved');
+      } catch(e) { showAlert('setstatus','err','❌ Error: '+(e.message||e)); }
     }
 
-    async function boot() {
-      try {
-        const me = await api('/admin/me');
-        if (!me.loggedIn) throw new Error('Not logged in');
-        showAppView();
-        await refreshProducts();
-      } catch (e) {
-        showLoginView();
-      }
-    }
-
-    window.addEventListener('load', async function () {
-      await boot();
-    });
+    /* ════ BOOT ════ */
+    window.addEventListener('load', async () => { await boot(); });
   </script>
 </body>
 </html>
