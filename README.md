@@ -121,11 +121,13 @@ ChemSus/
 
 ## Environment Variables
 
-Create a `.env` file in the project root:
+Create a `.env` file in the project root (see `.env.example`):
 
 ```env
-# Required — Supabase admin email
-ADMIN_EMAIL=your-admin@email.com
+# Supabase (required)
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_ANON_KEY=your-supabase-anon-key
+ADMIN_EMAIL=admin@example.com
 
 # Optional — Email OTP for order verification
 OTP_SMTP_HOST=smtp.your-provider.com
@@ -141,17 +143,8 @@ OTP_MAX_ATTEMPTS=5
 OTP_TOKEN_TTL_MIN=30
 ```
 
-### Supabase Configuration
-
-Edit `public/assets/js/supabase-client.js`:
-
-```js
-const SUPABASE_URL      = "https://your-project.supabase.co";
-const SUPABASE_ANON_KEY = "your-anon-key";
-const ADMIN_EMAIL       = "your-admin@email.com";
-```
-
-Get these values from: **Supabase Dashboard → Your Project → Settings → API**
+Supabase values come from **Supabase Dashboard → Settings → API**.  
+The backend now exposes `/config.json` using these env vars so the public anon key never lives in git; `public/assets/js/supabase-client.js` fetches that endpoint at runtime.
 
 ---
 

@@ -178,6 +178,17 @@ function deleteReceiptFile(receiptPath) {
   }
 }
 
+// ---------------- Runtime config for the frontend ----------------
+// Exposes only the Supabase public anon key + admin email so they don't live in git.
+app.get("/config.json", (_req, res) => {
+  res.set("Cache-Control", "no-store, max-age=0");
+  res.json({
+    supabaseUrl: process.env.SUPABASE_URL || "",
+    supabaseAnonKey: process.env.SUPABASE_ANON_KEY || "",
+    adminEmail: process.env.ADMIN_EMAIL || "",
+  });
+});
+
 // ---------------- Static ----------------
 app.use("/assets", express.static(path.join(PUBLIC, "assets")));
 app.use("/products", express.static(path.join(PUBLIC, "products")));
