@@ -307,12 +307,69 @@ http://localhost:3000
 
 ## Deployment
 
-Works out of the box on **Railway, Render, Heroku**, or any Node.js host:
+### Live URL
 
-* Set all environment variables in the platform's dashboard
+**[https://chemsus-technologies-pvt-ltd.onrender.com](https://chemsus-technologies-pvt-ltd.onrender.com)**
+
+---
+
+### Deployed on Render.com
+
+The application is hosted on **Render.com** as a Web Service connected to this GitHub repository.
+
+#### How it was deployed
+
+1. **Pushed code to GitHub**
+   - Repository: `ChemSus-Technologies-Pvt-LTD` (public)
+   - Branch: `main`
+
+2. **Created a Web Service on Render.com**
+   - Connected the GitHub repository URL
+   - **Runtime**: Node
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+
+3. **Set Environment Variables** in Render dashboard:
+
+   | Variable | Description |
+   |---|---|
+   | `NODE_ENV` | `production` |
+   | `SUPABASE_URL` | Supabase project URL |
+   | `SUPABASE_ANON_KEY` | Supabase anon/public key |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Supabase service role key (for admin Users view) |
+   | `ADMIN_EMAIL` | Email that gets admin dashboard access |
+   | `DB_HOST` | Supabase transaction pooler host |
+   | `DB_PORT` | `6543` (Supabase transaction pooler) |
+   | `DB_USER` | `postgres.yourprojectref` |
+   | `DB_PASSWORD` | Supabase database password |
+   | `DB_NAME` | `postgres` |
+   | `OTP_HASH_SECRET` | Random secret string for OTP hashing |
+   | `OTP_SMTP_HOST` | SMTP host for OTP emails (optional) |
+   | `OTP_SMTP_PORT` | SMTP port (default `587`) |
+   | `OTP_SMTP_USER` | SMTP username |
+   | `OTP_SMTP_PASS` | SMTP password |
+   | `OTP_EMAIL_FROM` | From address for OTP emails |
+
+4. **Clicked "Create Web Service"** → Render pulled the code, ran `npm install`, and started the server
+
+5. **Seeded the database** via Render Shell:
+   ```bash
+   npm run seed
+   ```
+
+6. **Configured Supabase Auth redirect URLs**
+   - Supabase Dashboard → Authentication → URL Configuration
+   - Site URL: `https://chemsus-technologies-pvt-ltd.onrender.com`
+   - Redirect URLs: `https://chemsus-technologies-pvt-ltd.onrender.com/login.html`
+
+---
+
+### Notes
+
+* Works out of the box on **Railway, Render, Heroku**, or any Node.js host
 * `DATABASE_URL` is auto-set by most platforms — the app detects it automatically
 * For Supabase-hosted PostgreSQL, use the **Transaction pooler** URL (port 6543)
-* Uploaded files go to `public/assets/uploads/` and `public/assets/receipts/` — use a persistent disk or swap to S3/Supabase Storage for production
+* Uploaded files go to `public/assets/uploads/` and `public/assets/receipts/` — use a **persistent disk** or swap to S3/Supabase Storage to preserve files across deploys
 
 ---
 
