@@ -622,6 +622,7 @@
       <li><a href="contact.html">Contact us</a></li>
       <li><a href="request-sample.html">Request for Sample</a></li>
       <li><a href="orders.html" class="active">Orders</a></li>
+      <li id="nav-my-orders" style="display:none"><a href="user-orders.html">My Orders</a></li>
     </ul>
 
     
@@ -686,18 +687,7 @@
             </div>
           </div>
           <div class="order-summary-line"></div>
-          <div class="summary-row">
-            <span class="summary-row-label">Product</span>
-            <span id="summaryProduct" class="summary-row-value">–</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-row-label">Quantity (packs)</span>
-            <span id="summaryQuantity" class="summary-row-value">–</span>
-          </div>
-          <div class="summary-row">
-            <span class="summary-row-label">Unit Price per pack</span>
-            <span id="summaryUnitPrice" class="summary-row-value">–</span>
-          </div>
+          <div id="summaryRows"></div>
           <div class="summary-total">
             <span>Total:</span>
             <span id="totalAmount">₹0</span>
@@ -849,14 +839,12 @@
 
     /* ── Load order data from sessionStorage ── */
     function loadOrderData() {
-      const buyNowData = sessionStorage.getItem('buyNowData');
+      const buyNowDataRaw = sessionStorage.getItem('buyNowData');
+      const cartItemsRaw  = sessionStorage.getItem('cartItems');
+      const rowsEl        = document.getElementById('summaryRows');
+      const totalEl       = document.getElementById('totalAmount');
 
-      const productEl = document.getElementById('summaryProduct');
-      const qtyEl     = document.getElementById('summaryQuantity');
-      const unitEl    = document.getElementById('summaryUnitPrice');
-      const totalEl   = document.getElementById('totalAmount');
-
-      if (!buyNowData) {
+      if (!buyNowDataRaw) {
         const mainSection = document.querySelector('.section');
         mainSection.innerHTML = `
           <div style="text-align:center; padding:40px 20px;">
@@ -871,27 +859,58 @@
 
       let productData;
       try {
-        productData = JSON.parse(buyNowData);
+        productData = JSON.parse(buyNowDataRaw);
       } catch (e) {
-        productEl.textContent = 'Invalid product data';
-        qtyEl.textContent     = '–';
-        unitEl.textContent    = '₹0';
-        totalEl.textContent   = '₹0';
+        rowsEl.innerHTML = '<p style="color:#b91c1c;">Invalid product data.</p>';
+        totalEl.textContent = '₹0';
         document.getElementById('checkoutForm').style.display = 'none';
         return;
       }
 
-      const productName = productData.productName || 'Unknown Product';
-      const quantity    = parseFloat(productData.quantity) || 1;
-      const unitPrice   = parseFloat(productData.unitPrice) || 0;
-      const totalPrice  = quantity * unitPrice;
+      let cartItems = null;
+      if (cartItemsRaw) {
+        try { cartItems = JSON.parse(cartItemsRaw); } catch { /* ignore */ }
+      }
 
-      productEl.textContent = productName;
-      qtyEl.textContent     = quantity + ' pack(s)';
-      unitEl.textContent    = '₹' + unitPrice.toLocaleString('en-IN');
-      totalEl.textContent   = '₹' + totalPrice.toLocaleString('en-IN');
-
-      sessionStorage.setItem('orderTotal', totalPrice);
+      if (cartItems && Array.isArray(cartItems) && cartItems.length > 0) {
+        // Cart order — list every item
+        let subtotal = 0;
+        let html = '';
+        cartItems.forEach(item => {
+          const itemTotal = (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0);
+          subtotal += itemTotal;
+          const packLabel = item.packSize || item.weight || '';
+          html += `
+            <div class="summary-row">
+              <span class="summary-row-label">${item.name}${packLabel ? ' (' + packLabel + ')' : ''} &times; ${item.quantity}</span>
+              <span class="summary-row-value">&#8377;${itemTotal.toLocaleString('en-IN')}</span>
+            </div>`;
+        });
+        rowsEl.innerHTML = html;
+        totalEl.textContent = '₹' + subtotal.toLocaleString('en-IN');
+        sessionStorage.setItem('orderTotal', subtotal);
+      } else {
+        // Single buy-now item
+        const productName = productData.productName || 'Unknown Product';
+        const quantity    = parseFloat(productData.quantity) || 1;
+        const unitPrice   = parseFloat(productData.unitPrice) || 0;
+        const totalPrice  = quantity * unitPrice;
+        rowsEl.innerHTML = `
+          <div class="summary-row">
+            <span class="summary-row-label">Product</span>
+            <span class="summary-row-value">${productName}</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row-label">Quantity (packs)</span>
+            <span class="summary-row-value">${quantity} pack(s)</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-row-label">Unit Price per pack</span>
+            <span class="summary-row-value">&#8377;${unitPrice.toLocaleString('en-IN')}</span>
+          </div>`;
+        totalEl.textContent = '₹' + totalPrice.toLocaleString('en-IN');
+        sessionStorage.setItem('orderTotal', totalPrice);
+      }
     }
 
     /* ── OTP state ── */
@@ -1080,9 +1099,19 @@
           emailOtpToken
         };
 
+        // Attach JWT so the server can link this order to the logged-in user
+        const headers = { 'Content-Type': 'application/json' };
+        try {
+          const client = await window.supabaseReady;
+          if (client) {
+            const { data: { session } } = await client.auth.getSession();
+            if (session?.access_token) headers['Authorization'] = 'Bearer ' + session.access_token;
+          }
+        } catch { /* proceed without auth — guest order */ }
+
         const response = await fetch(`${API_BASE}/orders`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers,
           body: JSON.stringify(orderData)
         });
 
@@ -1093,6 +1122,8 @@
 
         const result = await response.json();
         sessionStorage.setItem('orderId', result.orderId);
+        // Overwrite with server-confirmed total to prevent amount mismatch on receipt upload
+        if (result.totalprice != null) sessionStorage.setItem('orderTotal', result.totalprice);
 
         errorMsg.style.display   = 'none';
         successMsg.textContent   = `✅ Order #${result.orderId} placed successfully! Redirecting to payment...`;

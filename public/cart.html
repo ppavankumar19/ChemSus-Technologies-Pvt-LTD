@@ -765,6 +765,8 @@
       if (cart.length === 0) return;
 
       const firstItem = cart[0];
+      const subtotal = cart.reduce((sum, item) => sum + (parseFloat(item.price) || 0) * (parseInt(item.quantity) || 0), 0);
+
       const buyNowData = {
         productName: firstItem.name,
         quantity: firstItem.quantity,
@@ -775,6 +777,7 @@
 
       sessionStorage.setItem('buyNowData', JSON.stringify(buyNowData));
       sessionStorage.setItem('cartItems', JSON.stringify(cart));
+      sessionStorage.setItem('orderTotal', subtotal);
       window.location.href = 'orders.html';
     };
 

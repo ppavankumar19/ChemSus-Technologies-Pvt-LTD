@@ -1,363 +1,279 @@
-const path = require("path");
-const fs = require("fs");
-const os = require("os");
-const crypto = require("crypto");
-const sqlite3 = require("sqlite3").verbose();
+try { require("dotenv").config(); } catch { /* dotenv optional */ }
+const { Pool } = require("pg");
 
-const ROOT = path.join(__dirname, "..");
-const DEFAULT_DB_PATH = path.join(ROOT, "db", "chemsus.sqlite");
-const PRIMARY_DB_PATH = resolveDbPath(process.env.DB_PATH);
-const FALLBACK_DB_PATH = resolveDbPath(
-  process.env.DB_FALLBACK_PATH || path.join(os.tmpdir(), `chemsus_${crypto.createHash('md5').update(ROOT).digest('hex').slice(0, 8)}.sqlite`)
-);
-
-function resolveDbPath(rawPath) {
-  const val = String(rawPath || "").trim();
-  if (!val) return DEFAULT_DB_PATH;
-  return path.isAbsolute(val) ? val : path.join(ROOT, val);
+if (!process.env.DATABASE_URL && !process.env.DB_HOST) {
+  console.error("[DB] FATAL: No database connection configured.");
+  console.error("[DB] Add DB_HOST / DB_PORT / DB_USER / DB_PASSWORD / DB_NAME to your .env file.");
+  process.exit(1);
 }
 
-function ensureDirFor(filePath) {
-  const dir = path.dirname(filePath);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+// Build connection config — supports two modes:
+//
+// MODE 1 (recommended for Supabase — avoids URL-encoding issues with special chars in password):
+//   DB_HOST=aws-0-ap-south-1.pooler.supabase.com
+//   DB_PORT=6543
+//   DB_USER=postgres.yourprojectref
+//   DB_PASSWORD=YourPasswordHere   ← paste as-is, no URL encoding needed
+//   DB_NAME=postgres
+//
+// MODE 2 (single URL — password must be URL-encoded if it has special chars):
+//   DATABASE_URL=postgresql://user:password@host:port/dbname
+//
+// SSL auto-enables for Supabase hosts. Set DATABASE_SSL=false to force-disable (local dev).
+
+const dbUrl = process.env.DATABASE_URL || "";
+const dbHost = process.env.DB_HOST || "";
+
+// Determine if SSL is needed
+function resolveSSL(host) {
+  if (process.env.DATABASE_SSL === "false") return false;
+  const h = host || "";
+  if (h.includes("supabase.co") || h.includes("supabase.com")) return { rejectUnauthorized: false };
+  if (process.env.NODE_ENV === "production") return { rejectUnauthorized: false };
+  return false;
 }
 
-function isWritable(filePath) {
-  try {
-    ensureDirFor(filePath);
-    const dir = path.dirname(filePath);
-    const probeName = `.chemsus_write_probe_${process.pid}_${Date.now()}.tmp`;
-    const probePath = path.join(dir, probeName);
+// Trim all DB vars defensively (guards against accidental leading spaces in .env)
+const t = (k, def = "") => (process.env[k] || "").trim() || def;
 
-    // Real write probe to avoid false positives from permission bits only.
-    fs.writeFileSync(probePath, "ok");
-    fs.unlinkSync(probePath);
-
-    // Ensure DB file itself can be opened in read-write mode if it already exists.
-    if (fs.existsSync(filePath)) {
-      try {
-        const fd = fs.openSync(filePath, "r+");
-        fs.closeSync(fd);
-      } catch (e) {
-        console.warn(`[DB-PROBE] File exists but not writable: ${filePath} (${e.message})`);
-        return false;
-      }
-    }
-
-    return true;
-  } catch (e) {
-    console.warn(`[DB-PROBE] Path or directory not writable: ${filePath} (${e.message})`);
-    return false;
-  }
+let poolConfig;
+if (dbHost) {
+  // Mode 1: individual params (safe with any password)
+  const user = t("DB_USER", "postgres");
+  const db   = t("DB_NAME", "postgres");
+  const port = Number(t("DB_PORT", "5432")) || 5432;
+  poolConfig = {
+    host:     dbHost,
+    port,
+    user,
+    password: t("DB_PASSWORD"),
+    database: db,
+    ssl:      resolveSSL(dbHost),
+  };
+  console.log(`[DB] Connecting as '${user}' to ${dbHost}:${port}/${db}`);
+} else if (dbUrl) {
+  // Mode 2: connection URL
+  let urlHost = "";
+  try { urlHost = new URL(dbUrl).hostname; } catch { /* ignore */ }
+  poolConfig = {
+    connectionString: dbUrl,
+    ssl: resolveSSL(urlHost),
+  };
+} else {
+  console.error("[DB] FATAL: Set DATABASE_URL or DB_HOST/DB_PORT/DB_USER/DB_PASSWORD/DB_NAME in your .env file.");
+  process.exit(1);
 }
 
-function pickDbPath() {
-  const primary = PRIMARY_DB_PATH;
-  const forceFallback = String(process.env.DB_FORCE_FALLBACK || "").toLowerCase() === "true";
-  if (!forceFallback && isWritable(primary)) return primary;
+const pool = new Pool(poolConfig);
 
-  const fallback = FALLBACK_DB_PATH;
-  ensureDirFor(fallback);
+pool.on("error", (err) => {
+  console.error("[DB] Unexpected pool error:", err.message);
+});
 
-  // Seed fallback DB with existing data once when possible.
-  if (fs.existsSync(primary) && !fs.existsSync(fallback)) {
-    try {
-      fs.copyFileSync(primary, fallback);
-    } catch (e) {
-      console.warn("[DB] Failed to seed fallback DB:", e.message || e);
-    }
-  }
+// ── Core query helpers ────────────────────────────────────────────────────────
 
-  if (isWritable(fallback)) {
-    console.warn(
-      `[DB] Primary DB path is not writable: ${primary}. Using fallback: ${fallback}`
-    );
-    return fallback;
-  }
-
-  // Last resort: return primary so startup still surfaces a clear SQLite error.
-  return primary;
+/** Returns the first row or null. */
+async function get(sql, params = []) {
+  const result = await pool.query(sql, params);
+  return result.rows[0] || null;
 }
 
-function seedFallbackFromPrimary(primary, fallback) {
-  if (primary === fallback) return;
-  if (fs.existsSync(primary) && !fs.existsSync(fallback)) {
-    try {
-      fs.copyFileSync(primary, fallback);
-      console.warn(`[DB] Seeded fallback DB from primary: ${fallback}`);
-    } catch (e) {
-      console.warn("[DB] Failed to seed fallback DB:", e.message || e);
-    }
-  }
+/** Returns all rows as an array. */
+async function all(sql, params = []) {
+  const result = await pool.query(sql, params);
+  return result.rows;
 }
 
-let ACTIVE_DB_PATH = pickDbPath();
-let activeDb = new sqlite3.Database(ACTIVE_DB_PATH);
-console.log(`[DB] SQLite path: ${ACTIVE_DB_PATH}`);
-
-function isReadonlyError(err) {
-  if (!err) return false;
-  const code = String(err.code || "");
-  const msg = String(err.message || err || "").toLowerCase();
-  return (
-    code === "SQLITE_READONLY" ||
-    msg.includes("readonly") ||
-    msg.includes("read-only") ||
-    msg.includes("permission denied")
-  );
+/**
+ * Executes a write statement.
+ * For INSERT ... RETURNING id, exposes lastID.
+ * Exposes rowCount for UPDATE/DELETE affected-row counts.
+ */
+async function run(sql, params = []) {
+  const result = await pool.query(sql, params);
+  return {
+    lastID: result.rows[0]?.id ?? null,
+    rowCount: result.rowCount,
+  };
 }
 
-function switchToFallbackIfReadonly(err) {
-  if (!isReadonlyError(err)) return false;
-  if (ACTIVE_DB_PATH === ":memory:") return false;
-
-  const oldPath = ACTIVE_DB_PATH;
-  const oldDb = activeDb;
-
-  let nextPath = FALLBACK_DB_PATH;
-  if (ACTIVE_DB_PATH === FALLBACK_DB_PATH || !isWritable(FALLBACK_DB_PATH)) {
-    nextPath = ":memory:";
-  } else {
-    ensureDirFor(nextPath);
-    seedFallbackFromPrimary(ACTIVE_DB_PATH, nextPath);
-  }
-
-  try {
-    activeDb = new sqlite3.Database(nextPath);
-    ACTIVE_DB_PATH = nextPath;
-    console.warn(
-      `[DB] SQLite became read-only at ${oldPath}. Switched to fallback: ${nextPath}`
-    );
-    oldDb.close(() => { });
-    return true;
-  } catch (e) {
-    console.error(`[DB] Failed to switch to fallback ${nextPath}:`, e.message);
-    return false;
-  }
-}
-
-function invokeWithReadonlyRetry(methodName, args) {
-  const userCb = typeof args[args.length - 1] === "function" ? args[args.length - 1] : null;
-  if (!userCb) return activeDb[methodName](...args);
-
-  const callArgs = args.slice(0, -1);
-  const runAttempt = (allowRetry) =>
-    activeDb[methodName](...callArgs, function (err, ...rest) {
-      if (err && allowRetry && switchToFallbackIfReadonly(err)) {
-        return runAttempt(false);
-      }
-      return userCb.call(this, err, ...rest);
-    });
-
-  return runAttempt(true);
-}
-
-const db = {
-  run(...args) {
-    return invokeWithReadonlyRetry("run", args);
-  },
-  get(...args) {
-    return invokeWithReadonlyRetry("get", args);
-  },
-  all(...args) {
-    return invokeWithReadonlyRetry("all", args);
-  },
-  exec(...args) {
-    return invokeWithReadonlyRetry("exec", args);
-  },
-  close(...args) {
-    return activeDb.close(...args);
-  },
-};
-
-function exec(sql) {
-  return new Promise((resolve, reject) => db.exec(sql, (e) => (e ? reject(e) : resolve())));
-}
-function get(sql, p = []) {
-  return new Promise((resolve, reject) => db.get(sql, p, (e, r) => (e ? reject(e) : resolve(r))));
-}
-function run(sql, p = []) {
-  return new Promise((resolve, reject) =>
-    db.run(sql, p, function (e) {
-      if (e) reject(e);
-      else resolve(this);
-    })
-  );
-}
-
-function all(sql, p = []) {
-  return new Promise((resolve, reject) =>
-    db.all(sql, p, (e, rows) => (e ? reject(e) : resolve(rows)))
-  );
-}
-
-async function seed() {
-  const st = await get(`SELECT COUNT(*) AS c FROM site_settings`);
-  if ((st?.c || 0) === 0) {
-    await run(`INSERT INTO site_settings(key,value) VALUES ('brochure_url','assets/brochure.pdf')`);
-    console.log("✅ Seeded brochure_url");
-  }
-}
+// ── Schema ────────────────────────────────────────────────────────────────────
 
 async function initDb() {
-  await exec(`
-    PRAGMA foreign_keys = ON;
-
+  // Products displayed on the /products page
+  await pool.query(`
     CREATE TABLE IF NOT EXISTS products_page (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      description TEXT NOT NULL DEFAULT '',
-      image TEXT NOT NULL DEFAULT '',
-      link TEXT NOT NULL DEFAULT '',
-      is_active INTEGER NOT NULL DEFAULT 1,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS shop_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      name TEXT NOT NULL,
-      subtitle TEXT NOT NULL DEFAULT '',
-      features_json TEXT NOT NULL DEFAULT '[]',
-      price REAL NOT NULL DEFAULT 0,
-      stockStatus TEXT NOT NULL DEFAULT 'in-stock',
-      showBadge INTEGER NOT NULL DEFAULT 0,
-      badge TEXT NOT NULL DEFAULT '',
-      moreLink TEXT NOT NULL DEFAULT '',
-      image TEXT NOT NULL DEFAULT '',
-      is_active INTEGER NOT NULL DEFAULT 1,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
-    CREATE TABLE IF NOT EXISTS pack_pricing (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      shop_item_id INTEGER NOT NULL,
-      pack_size TEXT NOT NULL,
-      biofm_usd REAL NOT NULL DEFAULT 0,
-      biofm_inr REAL NOT NULL DEFAULT 0,
-      our_price REAL NOT NULL DEFAULT 0,
-      is_active INTEGER NOT NULL DEFAULT 1,
-      sort_order INTEGER NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY(shop_item_id) REFERENCES shop_items(id) ON DELETE CASCADE,
-      UNIQUE(shop_item_id, pack_size)
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_pack_pricing_item ON pack_pricing(shop_item_id);
-
-    CREATE TABLE IF NOT EXISTS site_settings (
-      key TEXT PRIMARY KEY,
-      value TEXT NOT NULL DEFAULT ''
-    );
-
-    CREATE TABLE IF NOT EXISTS orders (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      customername TEXT NOT NULL DEFAULT '',
-      email TEXT NOT NULL DEFAULT '',
-      phone TEXT NOT NULL DEFAULT '',
-      companyName TEXT DEFAULT '',
-      address TEXT NOT NULL DEFAULT '',
-      city TEXT NOT NULL DEFAULT '',
-      region TEXT NOT NULL DEFAULT '',
-      pincode TEXT NOT NULL DEFAULT '',
-      country TEXT NOT NULL DEFAULT 'India',
-      productname TEXT NOT NULL DEFAULT '',
-      quantity REAL NOT NULL DEFAULT 1,
-      unitprice REAL NOT NULL DEFAULT 0,
-      totalprice REAL NOT NULL DEFAULT 0,
-      payment_status TEXT NOT NULL DEFAULT 'PENDING',
-      paymentmode TEXT NOT NULL DEFAULT 'PENDING',
-      notes TEXT DEFAULT '',
-      user_id TEXT DEFAULT NULL,
-      order_status TEXT NOT NULL DEFAULT 'Processing',
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now'))
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(payment_status);
-    CREATE INDEX IF NOT EXISTS idx_orders_created ON orders(created_at);
-
-    CREATE TABLE IF NOT EXISTS email_otp_sessions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      challenge_id TEXT NOT NULL UNIQUE,
-      email TEXT NOT NULL,
-      otp_hash TEXT NOT NULL,
-      attempts INTEGER NOT NULL DEFAULT 0,
-      max_attempts INTEGER NOT NULL DEFAULT 5,
-      expires_at TEXT NOT NULL,
-      cooldown_until TEXT NOT NULL,
-      verified_at TEXT DEFAULT NULL,
-      verification_token TEXT DEFAULT NULL,
-      token_expires_at TEXT DEFAULT NULL,
-      used_at TEXT DEFAULT NULL,
-      order_id INTEGER DEFAULT NULL,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE SET NULL
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_email_otp_email ON email_otp_sessions(email);
-    CREATE INDEX IF NOT EXISTS idx_email_otp_challenge ON email_otp_sessions(challenge_id);
-    CREATE INDEX IF NOT EXISTS idx_email_otp_token ON email_otp_sessions(verification_token);
-
-    CREATE TABLE IF NOT EXISTS order_items (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id INTEGER NOT NULL,
-      shop_item_id INTEGER NOT NULL,
-      product_name TEXT NOT NULL DEFAULT '',
-      pack_size TEXT NOT NULL DEFAULT '',
-      unit_price REAL NOT NULL DEFAULT 0,
-      quantity REAL NOT NULL DEFAULT 1,
-      total_price REAL NOT NULL DEFAULT 0,
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
-      FOREIGN KEY(shop_item_id) REFERENCES shop_items(id) ON DELETE RESTRICT
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
-
-    CREATE TABLE IF NOT EXISTS payments (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      order_id INTEGER NOT NULL,
-      provider TEXT NOT NULL DEFAULT 'UPI',
-      payment_ref TEXT NOT NULL DEFAULT '',
-      amount REAL NOT NULL DEFAULT 0,
-      currency TEXT NOT NULL DEFAULT 'INR',
-      status TEXT NOT NULL DEFAULT 'PENDING',
-      receipt_path TEXT NOT NULL DEFAULT '',
-      rating INTEGER NOT NULL DEFAULT 0,
-      feedback TEXT NOT NULL DEFAULT '',
-      customername TEXT NOT NULL DEFAULT '',
-      email TEXT NOT NULL DEFAULT '',
-      phone TEXT NOT NULL DEFAULT '',
-      created_at TEXT NOT NULL DEFAULT (datetime('now')),
-      updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-      FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_payments_order ON payments(order_id);
-    CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status);
+      id          SERIAL PRIMARY KEY,
+      name        TEXT    NOT NULL,
+      description TEXT    NOT NULL DEFAULT '',
+      image       TEXT    NOT NULL DEFAULT '',
+      link        TEXT    NOT NULL DEFAULT '',
+      is_active   INTEGER NOT NULL DEFAULT 1,
+      sort_order  INTEGER NOT NULL DEFAULT 0,
+      created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
   `);
 
-  await seed();
+  // Buyable products shown in the shop
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS shop_items (
+      id           SERIAL PRIMARY KEY,
+      name         TEXT             NOT NULL,
+      subtitle     TEXT             NOT NULL DEFAULT '',
+      features_json TEXT            NOT NULL DEFAULT '[]',
+      price        DOUBLE PRECISION NOT NULL DEFAULT 0,
+      stock_status TEXT             NOT NULL DEFAULT 'in-stock',
+      show_badge   INTEGER          NOT NULL DEFAULT 0,
+      badge        TEXT             NOT NULL DEFAULT '',
+      more_link    TEXT             NOT NULL DEFAULT '',
+      image        TEXT             NOT NULL DEFAULT '',
+      is_active    INTEGER          NOT NULL DEFAULT 1,
+      sort_order   INTEGER          NOT NULL DEFAULT 0,
+      created_at   TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
+      updated_at   TIMESTAMPTZ      NOT NULL DEFAULT NOW()
+    )
+  `);
 
-  // Migrate existing DBs — add new columns if they don't exist yet
-  const migrateCol = async (table, col, def) => {
-    try { await run(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`); } catch (_) { /* already exists */ }
-  };
-  await migrateCol("orders", "user_id", "TEXT DEFAULT NULL");
-  await migrateCol("orders", "order_status", "TEXT NOT NULL DEFAULT 'Processing'");
-  try { await run("CREATE INDEX IF NOT EXISTS idx_orders_user ON orders(user_id)"); } catch (_) { }
+  // Pack sizes & tiered pricing per shop item
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS pack_pricing (
+      id           SERIAL PRIMARY KEY,
+      shop_item_id INTEGER          NOT NULL REFERENCES shop_items(id) ON DELETE CASCADE,
+      pack_size    TEXT             NOT NULL,
+      biofm_usd    DOUBLE PRECISION NOT NULL DEFAULT 0,
+      biofm_inr    DOUBLE PRECISION NOT NULL DEFAULT 0,
+      our_price    DOUBLE PRECISION NOT NULL DEFAULT 0,
+      is_active    INTEGER          NOT NULL DEFAULT 1,
+      sort_order   INTEGER          NOT NULL DEFAULT 0,
+      created_at   TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
+      updated_at   TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
+      UNIQUE(shop_item_id, pack_size)
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_pack_pricing_item ON pack_pricing(shop_item_id)`);
 
-  console.log("✅ SQLite ready with pack_pricing table");
+  // Key-value store for site configuration
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS site_settings (
+      key   TEXT PRIMARY KEY,
+      value TEXT NOT NULL DEFAULT ''
+    )
+  `);
+
+  // Customer orders
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS orders (
+      id             SERIAL PRIMARY KEY,
+      customername   TEXT             NOT NULL DEFAULT '',
+      email          TEXT             NOT NULL DEFAULT '',
+      phone          TEXT             NOT NULL DEFAULT '',
+      company_name   TEXT                      DEFAULT '',
+      address        TEXT             NOT NULL DEFAULT '',
+      city           TEXT             NOT NULL DEFAULT '',
+      region         TEXT             NOT NULL DEFAULT '',
+      pincode        TEXT             NOT NULL DEFAULT '',
+      country        TEXT             NOT NULL DEFAULT 'India',
+      productname    TEXT             NOT NULL DEFAULT '',
+      quantity       DOUBLE PRECISION NOT NULL DEFAULT 1,
+      unitprice      DOUBLE PRECISION NOT NULL DEFAULT 0,
+      totalprice     DOUBLE PRECISION NOT NULL DEFAULT 0,
+      payment_status TEXT             NOT NULL DEFAULT 'PENDING',
+      paymentmode    TEXT             NOT NULL DEFAULT 'PENDING',
+      notes          TEXT                      DEFAULT '',
+      user_id        TEXT                      DEFAULT NULL,
+      order_status   TEXT             NOT NULL DEFAULT 'Processing',
+      created_at     TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
+      updated_at     TIMESTAMPTZ      NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_orders_status   ON orders(payment_status)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_orders_created  ON orders(created_at)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_orders_user     ON orders(user_id)`);
+
+  // Email OTP sessions for order verification
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS email_otp_sessions (
+      id                 SERIAL PRIMARY KEY,
+      challenge_id       TEXT        NOT NULL UNIQUE,
+      email              TEXT        NOT NULL,
+      otp_hash           TEXT        NOT NULL,
+      attempts           INTEGER     NOT NULL DEFAULT 0,
+      max_attempts       INTEGER     NOT NULL DEFAULT 5,
+      expires_at         TIMESTAMPTZ NOT NULL,
+      cooldown_until     TIMESTAMPTZ NOT NULL,
+      verified_at        TIMESTAMPTZ          DEFAULT NULL,
+      verification_token TEXT                 DEFAULT NULL,
+      token_expires_at   TIMESTAMPTZ          DEFAULT NULL,
+      used_at            TIMESTAMPTZ          DEFAULT NULL,
+      order_id           INTEGER              DEFAULT NULL REFERENCES orders(id) ON DELETE SET NULL,
+      created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_email_otp_email     ON email_otp_sessions(email)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_email_otp_challenge ON email_otp_sessions(challenge_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_email_otp_token     ON email_otp_sessions(verification_token)`);
+
+  // Line items within an order (cart purchases)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS order_items (
+      id           SERIAL PRIMARY KEY,
+      order_id     INTEGER          NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      shop_item_id INTEGER          NOT NULL REFERENCES shop_items(id) ON DELETE RESTRICT,
+      product_name TEXT             NOT NULL DEFAULT '',
+      pack_size    TEXT             NOT NULL DEFAULT '',
+      unit_price   DOUBLE PRECISION NOT NULL DEFAULT 0,
+      quantity     DOUBLE PRECISION NOT NULL DEFAULT 1,
+      total_price  DOUBLE PRECISION NOT NULL DEFAULT 0,
+      created_at   TIMESTAMPTZ      NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id)`);
+
+  // Payment records & receipt uploads
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id           SERIAL PRIMARY KEY,
+      order_id     INTEGER          NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      provider     TEXT             NOT NULL DEFAULT 'UPI',
+      payment_ref  TEXT             NOT NULL DEFAULT '',
+      amount       DOUBLE PRECISION NOT NULL DEFAULT 0,
+      currency     TEXT             NOT NULL DEFAULT 'INR',
+      status       TEXT             NOT NULL DEFAULT 'PENDING',
+      receipt_path TEXT             NOT NULL DEFAULT '',
+      rating       INTEGER          NOT NULL DEFAULT 0,
+      feedback     TEXT             NOT NULL DEFAULT '',
+      customername TEXT             NOT NULL DEFAULT '',
+      email        TEXT             NOT NULL DEFAULT '',
+      phone        TEXT             NOT NULL DEFAULT '',
+      created_at   TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
+      updated_at   TIMESTAMPTZ      NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_payments_order  ON payments(order_id)`);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_payments_status ON payments(status)`);
+
+  // Order messages — user queries and admin replies
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS order_messages (
+      id         SERIAL PRIMARY KEY,
+      order_id   INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      sender     TEXT    NOT NULL DEFAULT 'user',
+      message    TEXT    NOT NULL DEFAULT '',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+  await pool.query(`CREATE INDEX IF NOT EXISTS idx_order_messages_order ON order_messages(order_id)`);
+
+  // Seed default site settings (idempotent)
+  await pool.query(`
+    INSERT INTO site_settings (key, value)
+    VALUES ('brochure_url', 'assets/brochure.pdf')
+    ON CONFLICT (key) DO NOTHING
+  `);
+
+  console.log("✅ PostgreSQL database ready");
 }
 
-function getActivePath() {
-  return ACTIVE_DB_PATH;
-}
-
-module.exports = { db, initDb, exec, get, run, all, getActivePath };
+module.exports = { pool, get, all, run, initDb };

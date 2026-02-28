@@ -1,5 +1,56 @@
+# ─── Dependencies ───────────────────────────────────────────────
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# ─── Environment / Secrets ──────────────────────────────────────
 .env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+
+# ─── Database ───────────────────────────────────────────────────
 *.sqlite
-uploads/
+*.sqlite3
+*.db
+db/
+
+# ─── Uploads & User Files ───────────────────────────────────────
+public/assets/uploads/
+public/assets/receipts/
+
+# ─── Logs ───────────────────────────────────────────────────────
 logs/
+*.log
+*.out.log
+*.err.log
+smoke-server.out.log
+smoke-server.err.log
+
+# ─── OS & Editor ────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── Build Output ───────────────────────────────────────────────
+dist/
+build/
+.cache/
+
+# ─── Misc ───────────────────────────────────────────────────────
+*.tmp
+*.bak
+*.orig

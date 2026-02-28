@@ -8,18 +8,21 @@ A full-stack web application for **ChemSus Technologies Pvt Ltd**, featuring a *
 
 * Public website for **products, shop, and company info**
 * **User authentication** — Sign up / Log in with Email or Google OAuth (Supabase)
-* **Order placement** — Buy Now and Cart flows
+* **Order placement** — Buy Now and Cart flows with OTP email verification
 * **UPI payment receipt upload**
-* **My Orders page** — Users can track their order history and delivery status
+* **My Orders page** — Users can track their order history, view item-level order details, delivery status, and send queries to the admin
+* **Order messaging** — Users send queries per order; admin views and replies in the order detail modal
 * **Admin dashboard** — Full control for a designated admin email:
   * Products page management
   * Shop items CRUD
   * Pack pricing management
-  * Orders management with status updates
+  * Orders management — status updates, full order detail modal (customer info, shipping, items, customer queries), delete
+  * Customers view — aggregated per-customer stats across all orders
   * Payments and receipt verification
   * Site settings (brochure upload)
+  * Auto-resets order & payment ID sequences to 1 when all records are deleted
 
-Built with **Node.js + Express + SQLite** — lightweight, fast, and easy to deploy.
+Built with **Node.js + Express + PostgreSQL** — production-ready and cloud-deployable.
 
 ---
 
@@ -44,7 +47,7 @@ Built with **Node.js + Express + SQLite** — lightweight, fast, and easy to dep
 | `/cart.html` | Shopping cart |
 | `/buy.html` | Buy Now / Cart checkout |
 | `/buynow.html` | Direct buy flow |
-| `/orders.html` | Order placement form |
+| `/orders.html` | Order placement form (OTP-verified) |
 | `/payment2.html` | UPI payment + receipt upload |
 | `/success.html` | Order success confirmation |
 | `/login.html` | Supabase auth — Email/Password & Google OAuth |
@@ -61,8 +64,10 @@ Built with **Node.js + Express + SQLite** — lightweight, fast, and easy to dep
 * Products page CRUD
 * Shop items CRUD
 * Pack pricing CRUD (per product)
-* Orders — listing, filtering, deletion, and **order status updates** (Processing → Confirmed → Shipped → Delivered → Cancelled)
-* Payments — view receipts, mark SUCCESS/FAILED, delete
+* **Orders** — listing, search/filter, inline order status dropdown, full order detail modal (customer info, shipping, items, **customer query thread with admin reply**), delete. Deleting all orders resets ID to 1.
+* **Customers** — aggregated view per customer derived from orders (name, email, phone, company, total orders, total spend, last order date) with one-click filter to their orders
+* **Users** — list of all registered Supabase Auth accounts (email, sign-in provider, joined date, last sign-in); requires `SUPABASE_SERVICE_ROLE_KEY`
+* **Payments** — view receipts, mark SUCCESS/FAILED, delete. Deleting all payments resets ID to 1.
 * File uploads — images and PDFs
 * Brochure URL management
 * Fully mobile-responsive
@@ -78,7 +83,7 @@ Built with **Node.js + Express + SQLite** — lightweight, fast, and easy to dep
 
 ### Backend
 * Node.js + Express.js
-* SQLite3 (auto-migrated)
+* **PostgreSQL** via `pg` (node-postgres)
 * Multer (file uploads)
 * Nodemailer (email OTP for order verification)
 
@@ -94,26 +99,25 @@ Built with **Node.js + Express + SQLite** — lightweight, fast, and easy to dep
 ChemSus/
 ├── backend/
 │   ├── server.js               # Express server + API routes + Supabase JWT middleware
-│   └── db.js                   # SQLite schema, migrations, and seeding
+│   └── db.js                   # PostgreSQL pool, schema init, run/get/all helpers
 ├── public/
 │   ├── admin/
 │   │   └── admin.html          # Admin dashboard (Supabase-protected)
 │   ├── assets/
 │   │   ├── js/
 │   │   │   └── supabase-client.js  # Supabase config + navbar auth state
-│   │   ├── uploads/            # Uploaded images
-│   │   └── receipts/           # Payment receipts
+│   │   ├── uploads/            # Uploaded images (gitignored)
+│   │   └── receipts/           # Payment receipts (gitignored)
 │   ├── products/               # Individual product detail pages
 │   ├── index.html              # Home page
 │   ├── login.html              # Supabase login/signup page
 │   ├── user-orders.html        # User order history page
 │   ├── shop.html, cart.html, buy.html, orders.html, payment2.html, ...
 │   └── (other public pages)
-├── db/
-│   └── chemsus.sqlite          # SQLite database (auto-created)
-├── .env                        # Environment variables
+├── .env                        # Environment variables (gitignored)
+├── .env.example                # Template for required env vars
 ├── package.json
-├── seed.js / seed-data.sql     # Database seeding scripts
+├── seed.js                     # Database seeding (npm run seed / npm run reset)
 └── README.md
 ```
 
@@ -124,10 +128,23 @@ ChemSus/
 Create a `.env` file in the project root (see `.env.example`):
 
 ```env
+# PostgreSQL — use individual params (safe for passwords with special characters)
+DB_HOST=aws-0-xx-region.pooler.supabase.com
+DB_PORT=6543
+DB_USER=postgres.yourprojectref
+DB_PASSWORD=YourPasswordHere
+DB_NAME=postgres
+
+# OR use a single connection string (simpler, but avoid special chars in password)
+# DATABASE_URL=postgresql://postgres.ref:password@host:6543/postgres
+
 # Supabase (required)
 SUPABASE_URL=https://your-project.supabase.co
 SUPABASE_ANON_KEY=your-supabase-anon-key
 ADMIN_EMAIL=admin@example.com
+
+# Required for the admin Users view (lists Supabase Auth accounts)
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
 
 # Optional — Email OTP for order verification
 OTP_SMTP_HOST=smtp.your-provider.com
@@ -143,8 +160,11 @@ OTP_MAX_ATTEMPTS=5
 OTP_TOKEN_TTL_MIN=30
 ```
 
-Supabase values come from **Supabase Dashboard → Settings → API**.  
-The backend now exposes `/config.json` using these env vars so the public anon key never lives in git; `public/assets/js/supabase-client.js` fetches that endpoint at runtime.
+**Where to get these values:**
+* `DB_HOST` / `DB_PORT` / `DB_USER` — Supabase Dashboard → Project Settings → Database → Connection string → **Transaction pooler** tab
+* `SUPABASE_URL` / `SUPABASE_ANON_KEY` — Supabase Dashboard → Settings → API
+* `SUPABASE_SERVICE_ROLE_KEY` — Supabase Dashboard → Settings → API → **Service Role Key** (keep this secret — never expose to the browser)
+* Use port **6543** (Supavisor transaction pooler), not 5432, for serverless/Node.js apps
 
 ---
 
@@ -160,8 +180,9 @@ The backend now exposes `/config.json` using these env vars so the public anon k
 | `payments` | Payment records and receipts |
 | `site_settings` | Brochure URL and site configuration |
 | `email_otp_sessions` | Email OTP sessions for checkout verification |
+| `order_messages` | Customer queries and admin replies per order |
 
-Database auto-migrates on startup — new columns (`user_id`, `order_status`) are added automatically to existing databases.
+All tables are created automatically on first startup via `initDb()` in `backend/db.js`.
 
 ---
 
@@ -182,19 +203,29 @@ Database auto-migrates on startup — new columns (`user_id`, `order_status`) ar
 | DELETE | `/api/admin/shop-items/:id` | Delete shop item |
 | GET | `/api/admin/pack-pricing/:shopItemId` | List pack prices |
 | GET | `/api/admin/orders` | List all orders |
+| PATCH | `/api/admin/orders/:id/status` | Update order delivery status |
 | DELETE | `/api/admin/orders/:id` | Delete order |
-| PATCH | `/api/admin/orders/:id/status` | Update order status |
 | GET | `/api/admin/payments` | List payments |
 | DELETE | `/api/admin/payments/:id` | Delete payment |
 | POST | `/api/admin/payment-status` | Mark payment SUCCESS/FAILED |
 | POST | `/api/admin/upload` | Upload file |
 | POST | `/api/admin/brochure` | Save brochure URL |
+| GET | `/api/admin/users` | List all Supabase Auth accounts (requires service role key) |
 
 ### User APIs (require Supabase JWT)
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/api/user/orders` | Get logged-in user's order history |
+| GET | `/api/user/orders` | Get logged-in user's order history (with item-level details) |
+| GET | `/api/user/orders/:id/messages` | Get query thread for a specific order |
+| POST | `/api/user/orders/:id/message` | Send a query message for a specific order |
+
+### Admin Message APIs (require Supabase JWT with admin email)
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/admin/orders/:id/messages` | View all messages for an order |
+| POST | `/api/admin/orders/:id/reply` | Send an admin reply to a customer query |
 
 ### Public APIs
 
@@ -222,19 +253,29 @@ npm install
 
 1. Create a project at [supabase.com](https://supabase.com)
 2. Copy your **Project URL** and **anon key** from Settings → API
-3. Paste them into `public/assets/js/supabase-client.js`
-4. Enable **Email** provider in Authentication → Providers
-5. (Optional) Enable **Google** provider with your OAuth credentials
-6. Add your site URL to Authentication → URL Configuration
+3. Enable **Email** provider in Authentication → Providers
+4. (Optional) Enable **Google** provider with your OAuth credentials
+5. Add your site URL to Authentication → URL Configuration
+6. Get your **Transaction pooler** connection details from Project Settings → Database
 
 ### 3. Configure environment
 
 ```bash
-# Create .env file
-echo ADMIN_EMAIL=your-admin@email.com > .env
+cp .env.example .env
+# Fill in DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, SUPABASE_URL, SUPABASE_ANON_KEY, ADMIN_EMAIL
 ```
 
-### 4. Start the server
+### 4. Seed the database
+
+```bash
+# Populate with initial product and shop data
+npm run seed
+
+# To wipe and re-seed from scratch
+npm run reset
+```
+
+### 5. Start the server
 
 ```bash
 # Development (auto-reload)
@@ -244,7 +285,7 @@ npm run dev
 npm start
 ```
 
-### 5. Open in browser
+### 6. Open in browser
 
 ```
 http://localhost:3000
@@ -254,13 +295,24 @@ http://localhost:3000
 
 ## Authentication Flow
 
-1. User visits any page → sidebar shows **"Log In / Sign Up"**
+1. User visits any page → navbar shows **"Log In / Sign Up"**
 2. Clicks login → redirected to `/login.html`
 3. Signs up or logs in with Email/Password or Google
 4. **Admin email** → redirected to `/admin/admin.html` (dashboard)
 5. **Any other email** → redirected to `/index.html` (homepage)
 6. Navbar updates to show **"Logout (email)"** on all pages
 7. Admin API calls include `Authorization: Bearer <supabase_jwt>` header
+
+---
+
+## Deployment
+
+Works out of the box on **Railway, Render, Heroku**, or any Node.js host:
+
+* Set all environment variables in the platform's dashboard
+* `DATABASE_URL` is auto-set by most platforms — the app detects it automatically
+* For Supabase-hosted PostgreSQL, use the **Transaction pooler** URL (port 6543)
+* Uploaded files go to `public/assets/uploads/` and `public/assets/receipts/` — use a persistent disk or swap to S3/Supabase Storage for production
 
 ---
 
